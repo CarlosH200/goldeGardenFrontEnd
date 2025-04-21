@@ -1,0 +1,102 @@
+.login-container {
+    height: 100vh;
+    width: 100vw;
+    background-color: #25d3f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 350px;
+    box-sizing: border-box;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 0.75rem; /* Modificado: eliminando el espacio adicional a la izquierda */
+    padding-left: 0.75rem; /* Para asegurar que el placeholder no tenga espacio */
+    border: none;
+    border-bottom: 2px solid #25d3f5;
+    outline: none;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.password-group {
+    position: relative;
+}
+
+.eye-button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding-right: 0.5rem;
+    color: #25d3f5;
+}
+
+.eye-button .material-icons {
+    font-size: 20px;
+}
+
+.options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.options-row a {
+    color: #25d3f5;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.login-button {
+    width: 100%;
+    background-color: #25d3f5;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #1bb3d6;
+}
+
+.signup-text {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.signup-text a {
+    color: #25d3f5;
+    text-decoration: none;
+    font-weight: 500;
+}

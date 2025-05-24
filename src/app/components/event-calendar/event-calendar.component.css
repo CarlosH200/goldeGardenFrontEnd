@@ -1,0 +1,104 @@
+.calendar-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+  border-radius: 10px;
+  background: #f5f5f5;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-view-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.calendar-view-toggle button {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.calendar-view-toggle .active {
+  background: #6200ea;
+  color: white;
+}
+
+.calendar-month-view {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.calendar-day-name {
+  font-weight: bold;
+  background: #e0e0e0;
+  padding: 0.5rem 0;
+}
+
+.calendar-day {
+  background: white;
+  padding: 1rem 0;
+  border: 1px solid #ccc;
+  min-height: 80px;
+}
+
+.calendar-day:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+.calendar-day-view {
+  margin-top: 1rem;
+}
+
+.day-events {
+  list-style: none;
+  padding: 0;
+}
+
+.day-events li {
+  background: #fff;
+  margin: 0.3rem 0;
+  padding: 0.5rem;
+  border-left: 4px solid #6200ea;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+.calendar-year-view {
+  margin-top: 1rem;
+}
+
+.calendar-year-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+
+.calendar-month {
+  padding: 1rem;
+  background: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.calendar-month:hover {
+  background: #eee;
+}
+
+/* Utilidad para ocultar vistas */
+.hidden {
+  display: none;
+}

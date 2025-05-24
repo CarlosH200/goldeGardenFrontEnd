@@ -1,0 +1,50 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <div class="sidebar" [class.closed]="isSidebarClosed">
+    <div class="sidebar-profile">
+      <img src="https://centralinaaging.org/wp-content/uploads/2021/03/Your-Logo-here.png" alt="Usuario" />
+      <h3>Golden Garden</h3>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li (click)="navigateTo('/EventCalendar')">
+        <span class="material-icons">calendar_month</span>
+        Calendario Eventos
+      </li>
+      <li (click)="navigateTo('/Event')">
+        <span class="material-icons">celebration</span>
+        Eventos
+      </li>
+      <li (click)="navigateTo('/gift')">
+        <span class="material-icons">redeem</span>
+        Gift Code
+      </li>
+      <li (click)="navigateTo('/review')">
+        <span class="material-icons">star</span>
+        Top Review
+      </li>
+      <li (click)="navigateTo('/settings')">
+        <span class="material-icons">settings</span>
+        Settings
+      </li>
+      <li (click)="navigateTo('/support')">
+        <span class="material-icons">support</span>
+        Support
+      </li>
+      <li (click)="navigateTo('/logout')">
+        <span class="material-icons">logout</span>
+        Sign Out
+      </li>
+    </ul>
+  </div>
+
+  <!-- Botón para mostrar el menú -->
+  <button class="sidebar-toggle" *ngIf="isSidebarClosed" (click)="toggleSidebar()">
+    <span class="material-icons">menu</span>
+  </button>
+
+  <!-- Contenido -->
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

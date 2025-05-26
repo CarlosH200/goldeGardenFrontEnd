@@ -3,9 +3,9 @@
         <h2>Login</h2>
         <form>
             <div class="form-group">
-                <input type="text" placeholder="User" required />
+                <input type="text" [(ngModel)]="username" placeholder="User" name="username" required />
             </div>
-
+            <p>{{username}}</p>
             <div class="form-group password-group">
                 <button type="button" class="eye-button" (click)="hidePassword = !hidePassword">
                     <span class="material-icons">

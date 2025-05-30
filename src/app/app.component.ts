@@ -8,9 +8,8 @@ import { EventCalendarComponent } from "./components/event-calendar/event-calend
 @Component({
   selector: 'app-root',
   imports: [
-    SideBarComponent,
     FormsModule,
-    EventCalendarComponent
+    LoginComponent
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

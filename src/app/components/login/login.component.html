@@ -1,18 +1,21 @@
-<div class="login-container">
+<app-side-bar *ngIf="isLoggingIn" ></app-side-bar>
+
+
+<div *ngIf="!isLoggingIn" class="login-container">
     <div class="login-card">
         <h2>Login</h2>
         <form>
             <div class="form-group">
-                <input type="text" [(ngModel)]="username" placeholder="User" name="username" required />
+                <input type="text" [(ngModel)]="username" placeholder="User" [ngModelOptions]="{standalone: true}" required />
             </div>
-            <p>{{username}}</p>
+            <!-- <p>{{username}}</p> -->
             <div class="form-group password-group">
                 <button type="button" class="eye-button" (click)="hidePassword = !hidePassword">
                     <span class="material-icons">
                         {{ hidePassword ? 'visibility_off' : 'visibility' }}
                     </span>
                 </button>
-                <input [type]="hidePassword ? 'password' : 'text'" placeholder="Password" required />
+                <input [type]="hidePassword ? 'password' : 'text'"  [(ngModel)]="password" [ngModelOptions]="{standalone: true}"  placeholder="Password" required />
             </div>
 
             <div class="options-row">
@@ -20,7 +23,7 @@
                 <a href="#">Olvidaste tu contraseña?</a>
             </div>
 
-            <button type="submit" class="login-button">Login</button>
+            <button type="submit" (click)="isLoginValid()" class="login-button">Login</button>
 
             <div class="signup-text">
                 No tienes cuenta, deseas crear una? <a href="#">Sign Up</a>

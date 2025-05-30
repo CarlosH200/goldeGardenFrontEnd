@@ -14,6 +14,12 @@
   color: #333;
 }
 
+.Allselect {
+  height: 35px;
+  border-color: #ececec;
+  border-radius: 8px;
+}
+
 .event-form {
   display: flex;
   flex-direction: column;
@@ -38,17 +44,20 @@
   font-size: 1rem;
 }
 
-.time-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+ .time-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 1rem; /* Espacio entre columnas */
+    text-align: center;
+  }
 
-.time-group div {
-  flex: 1;
-  min-width: 120px;
-}
-
+  .time-group label {
+    margin-bottom: 0.3rem;
+    padding: 0px;
+     /* Ajusta el margen según sea necesario para textos label en fechas */
+    margin: -1vh;
+  }
+  
 button[type="submit"] {
   background: #6200ea;
   color: white;

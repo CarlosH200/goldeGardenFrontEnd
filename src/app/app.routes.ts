@@ -4,9 +4,9 @@ import { EventCalendarComponent } from './components/event-calendar/event-calend
 import { EventComponent } from './components/event/event.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'EventCalendar', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'EventCalendar', component: EventCalendarComponent },
   { path: 'Event', component: EventComponent },
-  { path: '**', redirectTo: 'inicio' }
+  { path: '**', redirectTo: 'EventCalendar' }
 ];

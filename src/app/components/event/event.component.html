@@ -10,26 +10,35 @@
      <textarea name="comentario" rows="5" cols="50"></textarea>
     </div>
 
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="date">Fecha</label>
       <input type="date" id="date" required>
-    </div>
+    </div> -->
 
     <div class="form-group time-group">
-      <div>
-        <label for="start-time">Hora Inicio</label>
-        <input type="time" id="start-time" required>
-      </div>
-      <div>
-        <label for="end-time">Hora Fin</label>
-        <input type="time" id="end-time" required>
-      </div>
-    </div>
+  <label for="start-time">Fecha Entrega</label>
+  <label for="end-time">Fecha Recoger</label>
+  <input type="datetime-local" id="start-time" required>
+  <input type="datetime-local" id="end-time" required>
+</div>
+
+<div class="form-group time-group">
+  <label for="start-time">Fecha Inicio</label>
+  <label for="end-time">Fecha Fin</label>
+  <input type="datetime-local" id="start-time" required>
+  <input type="datetime-local" id="end-time" required>
+</div>
 
     <div class="form-group">
-      <label for="location">Ubicación</label>
-      <input type="text" id="location" placeholder="Ej. Sala 1 / Zoom">
-    </div>
+  <label for="location">Ubicación</label>
+  <select class="Allselect" id="location" required>
+    <option value="" disabled selected>Selecciona una opción</option>
+    <option value="sala1">Sala 1</option>
+    <option value="sala2">Sala 2</option>
+    <option value="zoom">Zoom</option>
+    <option value="teams">Microsoft Teams</option>
+  </select>
+</div>
 
     <div class="form-group">
       <label for="description">Descripción</label>

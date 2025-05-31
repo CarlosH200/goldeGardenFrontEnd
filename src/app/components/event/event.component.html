@@ -46,19 +46,24 @@
       <label for="title">Descripcion</label>
       <textarea name="comentario" rows="5" cols="50"></textarea>
     </div>
+
+    <!-- Inicia segmento para fechas de Evento -->
+    <div class="containerDates">
     <div class="form-group time-group">
       <label for="start-time">Fecha Entrega</label>
       <label for="end-time">Fecha Recoger</label>
       <input type="datetime-local" id="start-time" required />
       <input type="datetime-local" id="end-time" required />
     </div>
-
     <div class="form-group time-group">
       <label for="start-time">Fecha Inicio</label>
       <label for="end-time">Fecha Fin</label>
       <input type="datetime-local" id="start-time" required />
       <input type="datetime-local" id="end-time" required />
     </div>
+    </div>
+    <!-- Finaliza segmento para fechas de Evento -->
+
     <div class="row">
       <div class="col-md-6">
         <div class="form-group">
@@ -112,14 +117,13 @@
     </div>
 
     <div class="form-group">
-      <label for="description">Descripción</label>
+      <label for="description">Detalles Adicionales</label>
       <textarea
         id="description"
-        rows="4"
-        placeholder="Detalles adicionales..."
+        rows="5"
       ></textarea>
     </div>
 
-    <button type="submit">Guardar Evento</button>
+    <button class="botonDefault" type="">GUARDAR EVENTO</button>
   </form>
 </div>

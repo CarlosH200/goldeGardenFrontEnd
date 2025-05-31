@@ -4,7 +4,7 @@
   background: #eaeaea;
   padding: 2rem;
   border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
 }
 
@@ -44,20 +44,20 @@
   font-size: 1rem;
 }
 
- .time-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 1rem; /* Espacio entre columnas */
-    text-align: center;
-  }
+.time-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 1rem; /* Espacio entre columnas */
+  text-align: center;
+}
 
-  .time-group label {
-    margin-bottom: 0.3rem;
-    padding: 0px;
-     /* Ajusta el margen según sea necesario para textos label en fechas */
-    margin: -1vh;
-  }
-  
+.time-group label {
+  margin-bottom: 0.3rem;
+  padding: 0px;
+  /* Ajusta el margen según sea necesario para textos label en fechas */
+  margin: -1vh;
+}
+
 button[type="submit"] {
   background: #6200ea;
   color: white;
@@ -116,19 +116,19 @@ button[type="submit"]:hover {
   font-size: 20px;
   background: #333333;
   border-radius: 50%; /* para que sea círculo */
-  width: 40px;         /* ancho fijo igual a la altura */
-  height: 40px;        /* altura fija igual al ancho */
+  width: 40px; /* ancho fijo igual a la altura */
+  height: 40px; /* altura fija igual al ancho */
   border: 1px solid #333333; /* para que se note el borde */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;          /* elimina relleno extra */
+  padding: 0; /* elimina relleno extra */
   cursor: pointer;
   color: rgb(255, 255, 255);
 }
 /* finaliza segmento para buscador de cliente  */
 
-.botonDefault{
+.botonDefault {
   background: #333333;
   color: #ffffff;
   height: 55px;

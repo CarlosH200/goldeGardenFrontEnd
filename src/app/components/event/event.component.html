@@ -1,48 +1,123 @@
 <div class="event-form-container">
   <form class="event-form">
-    <div class="form-group">
-        <h2>Evento no.001</h2>
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">Evento no.001</h2>
+
+          <div class="d-flex align-items-center gap-2">
+            <!-- Ícono verde por defecto -->
+
+            <select class="form-select">
+              <option value="activo" selected>Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+            <span
+              class="material-icons text-success me-2"
+              style="font-size: 24px"
+              >check_circle</span
+            >
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Inicia buscacor de clientes para evento -->
+    <div class="input-btn-group">
+      <input
+        type="text"
+        id="title"
+        class="form-control"
+        placeholder="Cliente.."
+      />
+      <button type="button" class="botonesBuscador" aria-label="Buscar">
+        <span class="material-icons">search</span>
+      </button>
+      <button type="button" class="botonesBuscador" aria-label="Agregar">
+        <span class="material-icons">add</span>
+      </button>
+    </div>
+
+    <!-- Finaliza buscador de clientes para evento -->
+
     <div class="form-group">
       <label for="title">Título Evento</label>
-      <input type="text" id="title" required>
+      <input type="text" id="title" required />
       <label for="title">Descripcion</label>
-     <textarea name="comentario" rows="5" cols="50"></textarea>
+      <textarea name="comentario" rows="5" cols="50"></textarea>
+    </div>
+    <div class="form-group time-group">
+      <label for="start-time">Fecha Entrega</label>
+      <label for="end-time">Fecha Recoger</label>
+      <input type="datetime-local" id="start-time" required />
+      <input type="datetime-local" id="end-time" required />
     </div>
 
-    <!-- <div class="form-group">
-      <label for="date">Fecha</label>
-      <input type="date" id="date" required>
-    </div> -->
-
     <div class="form-group time-group">
-  <label for="start-time">Fecha Entrega</label>
-  <label for="end-time">Fecha Recoger</label>
-  <input type="datetime-local" id="start-time" required>
-  <input type="datetime-local" id="end-time" required>
-</div>
+      <label for="start-time">Fecha Inicio</label>
+      <label for="end-time">Fecha Fin</label>
+      <input type="datetime-local" id="start-time" required />
+      <input type="datetime-local" id="end-time" required />
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="organizador1">Ubicacion</label>
+          <select class="Allselect form-control" id="organizador1" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="sala2">Salon</option>
+            <option value="sala1">Area Verde</option>
+            <option value="zoom">Salon y Area Verde</option>
+          </select>
+        </div>
+      </div>
 
-<div class="form-group time-group">
-  <label for="start-time">Fecha Inicio</label>
-  <label for="end-time">Fecha Fin</label>
-  <input type="datetime-local" id="start-time" required>
-  <input type="datetime-local" id="end-time" required>
-</div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="organizador2">Organizador</label>
+          <select class="Allselect form-control" id="organizador2" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="sala4">Organizador04</option>
+            <option value="sala5">Organizador05</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-    <div class="form-group">
-  <label for="location">Ubicación</label>
-  <select class="Allselect" id="location" required>
-    <option value="" disabled selected>Selecciona una opción</option>
-    <option value="sala1">Sala 1</option>
-    <option value="sala2">Sala 2</option>
-    <option value="zoom">Zoom</option>
-    <option value="teams">Microsoft Teams</option>
-  </select>
-</div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="organizador1">Tipo Evento</label>
+          <select class="Allselect form-control" id="organizador1" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="sala1">Cumpleaños</option>
+            <option value="sala2">Boda</option>
+            <option value="zoom">Aniversario</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="organizador2">Capacidad Evento</label>
+          <select class="Allselect form-control" id="organizador2" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option value="sala4">50</option>
+            <option value="sala4">100</option>
+            <option value="sala4">200</option>
+            <option value="sala4">300</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
     <div class="form-group">
       <label for="description">Descripción</label>
-      <textarea id="description" rows="4" placeholder="Detalles adicionales..."></textarea>
+      <textarea
+        id="description"
+        rows="4"
+        placeholder="Detalles adicionales..."
+      ></textarea>
     </div>
 
     <button type="submit">Guardar Evento</button>

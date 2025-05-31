@@ -66,7 +66,7 @@ button[type="submit"] {
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.4s ease;
 }
 
 button[type="submit"]:hover {
@@ -84,3 +84,47 @@ button[type="submit"]:hover {
     flex-direction: column;
   }
 }
+
+/* inicia segmento para buscador de cliente */
+.input-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input-btn-group input {
+  flex-grow: 1;
+  min-width: 0;
+  height: 38px;
+  box-sizing: border-box;
+}
+
+.input-btn-group button {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  font-size: 16px;
+}
+
+.input-btn-group button .material-icons {
+  font-size: 20px;
+}
+
+.botonesBuscador {
+  font-size: 20px;
+  background: #333333;
+  border-radius: 50%; /* para que sea círculo */
+  width: 40px;         /* ancho fijo igual a la altura */
+  height: 40px;        /* altura fija igual al ancho */
+  border: 1px solid #333333; /* para que se note el borde */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;          /* elimina relleno extra */
+  cursor: pointer;
+  color: white;
+}
+
+/* finaliza segmento para buscador de cliente  */

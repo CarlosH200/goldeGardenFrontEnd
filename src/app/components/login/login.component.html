@@ -6,7 +6,7 @@
         <h2>Login</h2>
         <form>
             <div class="form-group">
-                <input type="text" [(ngModel)]="username" placeholder="User" [ngModelOptions]="{standalone: true}" required />
+                <input type="text" [(ngModel)]="usuario" placeholder="User" [ngModelOptions]="{standalone: true}" required />
             </div>
             <!-- <p>{{username}}</p> -->
             <div class="form-group password-group">
@@ -23,7 +23,7 @@
                 <a href="#">Olvidaste tu contraseña?</a>
             </div>
 
-            <button type="submit" (click)="isLoginValid()" class="login-button">Login</button>
+            <button type="submit" (click)="isLogin()" class="login-button">Login</button>
 
             <div class="signup-text">
                 No tienes cuenta, deseas crear una? <a href="#">Sign Up</a>

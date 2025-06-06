@@ -18,8 +18,8 @@ export class LoginComponent {
 
   isLoggingIn: boolean = false;
 
-  validUsername: String = 'a';
-  validPassword: String = 'a';
+  validUsername: String = '';
+  validPassword: String = '';
 
   isLoginValid() {
     console.log('Validando credenciales...');

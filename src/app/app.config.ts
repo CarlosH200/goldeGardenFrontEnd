@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouterModule } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http'; // ✅ IMPORTANTE
 

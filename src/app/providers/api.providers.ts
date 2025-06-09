@@ -1,6 +1,6 @@
 //Archivo para configurar direccion del servidor.
 export const urlApi = {
     apiServer: {
-        urlBase: "https://localhost:7217/api/",
+        urlBase: "http://localhost:9091/api/",
     }
 } 

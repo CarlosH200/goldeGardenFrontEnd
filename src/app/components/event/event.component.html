@@ -68,9 +68,7 @@
           <label for="organizador1">Ubicacion</label>
           <select class="Allselect form-control" id="organizador1" required>
             <option value="" disabled selected>Selecciona una opción</option>
-            <option value="sala2">Salon</option>
-            <option value="sala1">Area Verde</option>
-            <option value="zoom">Salon y Area Verde</option>
+            <option *ngFor="let ubicacion of ubicaciones" value="sala2"> ({{ ubicacion.id }}) {{ ubicacion.descripcion }}</option>
           </select>
         </div>
       </div>
@@ -81,7 +79,6 @@
           <select class="Allselect form-control" id="organizador2" required>
             <option value="" disabled selected>Selecciona una opción</option>
             <option value="sala4">Organizador04</option>
-            <option value="sala5">Organizador05</option>
           </select>
         </div>
       </div>
@@ -93,9 +90,7 @@
           <label for="organizador1">Tipo Evento</label>
           <select class="Allselect form-control" id="organizador1" required>
             <option value="" disabled selected>Selecciona una opción</option>
-            <option value="sala1">Cumpleaños</option>
-            <option value="sala2">Boda</option>
-            <option value="zoom">Aniversario</option>
+            <option *ngFor="let tEvento of tipoEvento" value="sala2"> ({{ tEvento.id }}) {{ tEvento.descripcion }}</option>
           </select>
         </div>
       </div>

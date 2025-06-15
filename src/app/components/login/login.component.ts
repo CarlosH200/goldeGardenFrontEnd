@@ -13,7 +13,7 @@ import { LoginModel } from '../../models/loginModel';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  isLoggingIn: boolean = false;
+  isLoggingIn: boolean = true;
   hidePassword: boolean = true;
   usuario: string = '';
   password: string = '';

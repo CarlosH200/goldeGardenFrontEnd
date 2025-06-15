@@ -6,7 +6,7 @@ import { EventCalendarComponent } from './components/event-calendar/event-calend
 export const routes: Routes = [
   { path: 'EventCalendar', component: EventCalendarComponent },
   { path: '', redirectTo: 'EventCalendar', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
+  // { path: 'login', component: LoginComponent },
   { path: 'Event', component: EventComponent },
   { path: '**', redirectTo: 'EventCalendar' }
 ];

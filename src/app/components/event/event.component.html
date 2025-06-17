@@ -78,7 +78,7 @@
           <label for="organizador2">Organizador</label>
           <select class="Allselect form-control" id="organizador2" required>
             <option value="" disabled selected>Selecciona una opción</option>
-            <option value="sala4">Organizador04</option>
+            <option *ngFor="let organizador of Organizadores" value="sala4">({{ organizador.id }}) {{ organizador.descripcion }}</option>
           </select>
         </div>
       </div>
@@ -101,9 +101,6 @@
           <select class="Allselect form-control" id="organizador2" required>
             <option value="" disabled selected>Selecciona una opción</option>
             <option value="sala4">50</option>
-            <option value="sala4">100</option>
-            <option value="sala4">200</option>
-            <option value="sala4">300</option>
           </select>
         </div>
       </div>

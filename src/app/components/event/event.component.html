@@ -1,116 +1,209 @@
 <div class="event-form-container">
-  <form class="event-form">
-    <div class="row mb-3">
-      <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-          <h2 class="mb-0">Evento no.001</h2>
-          <div class="d-flex align-items-center gap-2">
-            <!-- Ícono verde por defecto -->
-            <select class="form-select">
-              <option value="activo" selected>Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-            <span
-              class="material-icons text-success me-2"
-              style="font-size: 24px"
-              >check_circle</span
-            >
+  <!-- Pestañas -->
+  <ul class="nav custom-tabs mb-3">
+    <li class="nav-item">
+      <button
+        class="nav-link pestañaPersonalizada"
+        [ngClass]="{ 'active': selectedTab === 'documento' }"
+        (click)="selectedTab = 'documento'"
+      >
+        Documento
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button
+        class="nav-link pestañaPersonalizada"
+        [ngClass]="{ 'active': selectedTab === 'transacciones' }"
+        (click)="selectedTab = 'transacciones'"
+      >
+        Transacciones
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button
+        class="nav-link pestañaPersonalizada"
+        [ngClass]="{ 'active': selectedTab === 'pago' }"
+        (click)="selectedTab = 'pago'"
+      >
+        Pago
+      </button>
+    </li>
+  </ul>
+
+  <!-- Contenido de las pestañas -->
+
+  <!-- Documento -->
+  <div *ngIf="selectedTab === 'documento'">
+    <form class="event-form">
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Evento no.001</h2>
+            <div class="d-flex align-items-center gap-2">
+              <select class="form-select">
+                <option value="activo" selected>Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <span
+                class="material-icons text-success me-2"
+                style="font-size: 24px"
+                >check_circle</span
+              >
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Inicia buscacor de clientes para evento -->
-    <div class="input-btn-group">
-      <input
-        type="text"
-        id="title"
-        class="form-control"
-        placeholder="Cliente.."
-      />
-      <button type="button" class="botonesBuscador" aria-label="Buscar">
-        <span class="material-icons">search</span>
+      <!-- Buscador de clientes -->
+      <div class="input-btn-group mb-3">
+        <input
+          type="text"
+          id="cliente"
+          class="form-control"
+          placeholder="Cliente..."
+        />
+        <button type="button" class="btn btn-dark" aria-label="Buscar">
+          <span class="material-icons">search</span>
+        </button>
+        <button type="button" class="btn btn-dark" aria-label="Agregar">
+          <span class="material-icons">add</span>
+        </button>
+      </div>
+
+      <!-- Información del evento -->
+      <div class="form-group mb-3">
+        <label for="tituloEvento">Título Evento</label>
+        <input type="text" id="tituloEvento" class="form-control" required />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="descripcionEvento">Descripción</label>
+        <textarea
+          name="comentario"
+          id="descripcionEvento"
+          rows="5"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <!-- Fechas -->
+      <div class="containerDates">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="fechaEntrega">Fecha Entrega</label>
+            <input
+              type="datetime-local"
+              id="fechaEntrega"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="fechaRecoger">Fecha Recoger</label>
+            <input
+              type="datetime-local"
+              id="fechaRecoger"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="fechaInicio">Fecha Inicio</label>
+            <input
+              type="datetime-local"
+              id="fechaInicio"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="fechaFin">Fecha Fin</label>
+            <input
+              type="datetime-local"
+              id="fechaFin"
+              class="form-control"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Selectores -->
+      <div class="row mt-3">
+        <div class="col-md-6 mb-3">
+          <label for="ubicacion">Ubicación</label>
+          <select class="form-select" id="ubicacion" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option
+              *ngFor="let ubicacion of ubicaciones"
+              [value]="ubicacion.id"
+            >
+              ({{ ubicacion.id }}) {{ ubicacion.descripcion }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="organizador">Organizador</label>
+          <select class="form-select" id="organizador" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option
+              *ngFor="let organizador of Organizadores"
+              [value]="organizador.id"
+            >
+              ({{ organizador.id }}) {{ organizador.descripcion }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="tipoEvento">Tipo Evento</label>
+          <select class="form-select" id="tipoEvento" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option *ngFor="let tEvento of tipoEvento" [value]="tEvento.id">
+              ({{ tEvento.id }}) {{ tEvento.descripcion }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="capacidadEvento">Capacidad Evento</label>
+          <select class="form-select" id="capacidadEvento" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+            <option *ngFor="let capacidad of Capacidades" [value]="capacidad.id">
+              <!-- ({{ capacidad.id }})  -->
+              {{ capacidad.descripcion }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="detallesAdicionales">Detalles Adicionales</label>
+        <textarea
+          id="detallesAdicionales"
+          rows="5"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <button class="btn btn-dark w-100 fw-bold" type="submit">
+        GUARDAR EVENTO
       </button>
-      <button type="button" class="botonesBuscador" aria-label="Agregar">
-        <span class="material-icons">add</span>
-      </button>
-    </div>
+    </form>
+  </div>
 
-    <!-- Finaliza buscador de clientes para evento -->
+  <!-- Transacciones -->
+  <div *ngIf="selectedTab === 'transacciones'">
+    <h4>Transacciones</h4>
+    <p>Contenido de Transacciones...</p>
+  </div>
 
-    <div class="form-group">
-      <label for="title">Título Evento</label>
-      <input type="text" id="title" required />
-      <label for="title">Descripcion</label>
-      <textarea name="comentario" rows="5" cols="50"></textarea>
-    </div>
-
-    <!-- Inicia segmento para fechas de Evento -->
-    <div class="containerDates">
-      <div class="form-group time-group">
-        <label for="start-time">Fecha Entrega</label>
-        <label for="end-time">Fecha Recoger</label>
-        <input type="datetime-local" id="start-time" required />
-        <input type="datetime-local" id="end-time" required />
-      </div>
-      <div class="form-group time-group">
-        <label for="start-time">Fecha Inicio</label>
-        <label for="end-time">Fecha Fin</label>
-        <input type="datetime-local" id="start-time" required />
-        <input type="datetime-local" id="end-time" required />
-      </div>
-    </div>
-    <!-- Finaliza segmento para fechas de Evento -->
-
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label for="organizador1">Ubicacion</label>
-          <select class="Allselect form-control" id="organizador1" required>
-            <option value="" disabled selected>Selecciona una opción</option>
-            <option *ngFor="let ubicacion of ubicaciones" value="sala2"> ({{ ubicacion.id }}) {{ ubicacion.descripcion }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="form-group">
-          <label for="organizador2">Organizador</label>
-          <select class="Allselect form-control" id="organizador2" required>
-            <option value="" disabled selected>Selecciona una opción</option>
-            <option *ngFor="let organizador of Organizadores" value="sala4">({{ organizador.id }}) {{ organizador.descripcion }}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label for="organizador1">Tipo Evento</label>
-          <select class="Allselect form-control" id="organizador1" required>
-            <option value="" disabled selected>Selecciona una opción</option>
-            <option *ngFor="let tEvento of tipoEvento" value="sala2"> ({{ tEvento.id }}) {{ tEvento.descripcion }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="form-group">
-          <label for="organizador2">Capacidad Evento</label>
-          <select class="Allselect form-control" id="organizador2" required>
-            <option value="" disabled selected>Selecciona una opción</option>
-            <option value="sala4">50</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="description">Detalles Adicionales</label>
-      <textarea id="description" rows="5"></textarea>
-    </div>
-
-    <button class="botonDefault" type="">GUARDAR EVENTO</button>
-  </form>
+  <!-- Pago -->
+  <div *ngIf="selectedTab === 'pago'">
+    <h4>Pago</h4>
+    <p>Contenido de Pago...</p>
+  </div>
 </div>

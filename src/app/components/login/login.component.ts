@@ -13,7 +13,9 @@ import { LoginModel } from '../../models/loginModel';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  // Variale para validar si el usuario inicio sesión correctamente
   isLoggingIn: boolean = true;
+  // Variable para mostrar u ocultar la contraseña
   hidePassword: boolean = true;
   usuario: string = '';
   password: string = '';

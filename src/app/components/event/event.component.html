@@ -4,7 +4,7 @@
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
-        [ngClass]="{ 'active': selectedTab === 'documento' }"
+        [ngClass]="{ active: selectedTab === 'documento' }"
         (click)="selectedTab = 'documento'"
       >
         Documento
@@ -14,7 +14,7 @@
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
-        [ngClass]="{ 'active': selectedTab === 'transacciones' }"
+        [ngClass]="{ active: selectedTab === 'transacciones' }"
         (click)="selectedTab = 'transacciones'"
       >
         Transacciones
@@ -24,7 +24,7 @@
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
-        [ngClass]="{ 'active': selectedTab === 'pago' }"
+        [ngClass]="{ active: selectedTab === 'pago' }"
         (click)="selectedTab = 'pago'"
       >
         Pago
@@ -75,28 +75,33 @@
       <!-- Información del evento -->
       <div class="form-group mb-3">
         <label for="tituloEvento">Título Evento</label>
-        <input type="text" id="tituloEvento" class="form-control" required />
+        <input
+          type="text"
+          [(ngModel)]="pTituloEvento"
+          name="pTituloEvento"
+          class="form-control"
+          required
+        />
       </div>
-
       <div class="form-group mb-3">
         <label for="descripcionEvento">Descripción</label>
         <textarea
           name="comentario"
-          id="descripcionEvento"
+          id="pDescripcionEvento"
+          [(ngModel)]="pDescripcionEvento"
           rows="5"
           class="form-control"
         ></textarea>
       </div>
-
-      <!-- Fechas -->
       <div class="containerDates">
         <div class="row g-3">
           <div class="col-md-6">
             <label for="fechaEntrega">Fecha Entrega</label>
             <input
               type="datetime-local"
-              id="fechaEntrega"
+              name="pFechaEntregaEvento"
               class="form-control"
+              [(ngModel)]="pFechaEntregaEvento"
               required
             />
           </div>
@@ -104,8 +109,9 @@
             <label for="fechaRecoger">Fecha Recoger</label>
             <input
               type="datetime-local"
-              id="fechaRecoger"
+              name="pFechaEntregaEvento"
               class="form-control"
+              [(ngModel)]="pFechaEntregaEvento"
               required
             />
           </div>
@@ -113,8 +119,9 @@
             <label for="fechaInicio">Fecha Inicio</label>
             <input
               type="datetime-local"
-              id="fechaInicio"
+              name="pFechaInicioEvento"
               class="form-control"
+              [(ngModel)]="pFechaInicioEvento"
               required
             />
           </div>
@@ -122,8 +129,9 @@
             <label for="fechaFin">Fecha Fin</label>
             <input
               type="datetime-local"
-              id="fechaFin"
+              name="pFechaFinEvento"
               class="form-control"
+              [(ngModel)]="pFechaFinEvento"
               required
             />
           </div>
@@ -134,7 +142,12 @@
       <div class="row mt-3">
         <div class="col-md-6 mb-3">
           <label for="ubicacion">Ubicación</label>
-          <select class="form-select" id="ubicacion" required>
+          <select
+            class="form-select"
+            [(ngModel)]="pUbicacionEvento"
+            name="tipoEvento"
+            required
+          >
             <option value="" disabled selected>Selecciona una opción</option>
             <option
               *ngFor="let ubicacion of ubicaciones"
@@ -144,10 +157,14 @@
             </option>
           </select>
         </div>
-
         <div class="col-md-6 mb-3">
           <label for="organizador">Organizador</label>
-          <select class="form-select" id="organizador" required>
+          <select
+            class="form-select"
+            [(ngModel)]="pOrganizadorEvento"
+            name="pOrganizadorEvento"
+            required
+          >
             <option value="" disabled selected>Selecciona una opción</option>
             <option
               *ngFor="let organizador of Organizadores"
@@ -160,7 +177,12 @@
 
         <div class="col-md-6 mb-3">
           <label for="tipoEvento">Tipo Evento</label>
-          <select class="form-select" id="tipoEvento" required>
+          <select
+            class="form-select"
+            [(ngModel)]="pTipoEvento"
+            name="pTipoEvento"
+            required
+          >
             <option value="" disabled selected>Selecciona una opción</option>
             <option *ngFor="let tEvento of tipoEvento" [value]="tEvento.id">
               ({{ tEvento.id }}) {{ tEvento.descripcion }}
@@ -170,9 +192,17 @@
 
         <div class="col-md-6 mb-3">
           <label for="capacidadEvento">Capacidad Evento</label>
-          <select class="form-select" id="capacidadEvento" required>
+          <select
+            class="form-select"
+            [(ngModel)]="pCapacidadEvento"
+            name="pCapacidadEvento"
+            required
+          >
             <option value="" disabled selected>Selecciona una opción</option>
-            <option *ngFor="let capacidad of Capacidades" [value]="capacidad.id">
+            <option
+              *ngFor="let capacidad of Capacidades"
+              [value]="capacidad.id"
+            >
               <!-- ({{ capacidad.id }})  -->
               {{ capacidad.descripcion }}
             </option>

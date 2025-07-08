@@ -8,18 +8,38 @@ import { OrganizadorService } from '../../services/organizadorService';
 import { OrganizadorModel } from '../../models/organizadorModel';
 import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-event',
-  imports: [CommonModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './event.component.html',
-  styleUrl: './event.component.css'
+  styleUrl: './event.component.css',
 })
 export class EventComponent {
 
   // Variable para cambiar la pestaña seleccionada entre documento, transacciones y pago
   selectedTab: string = 'documento';
-  // Arreglo para almacenar las ubicaciones de la API getUbicaciones
+  // Vaiable para almacenar el titulo del evento
+  pTituloEvento: string = '';
+  // Variable para almacenar la descripcion del evento
+  pDescripcionEvento: string = '';
+  // Variable para almacenar la fecha de entrega del evento
+  pFechaEntregaEvento: string = '';
+  // Variable para almacenar la fecha de recoger del evento
+  pFechaRecogerEvento: string = '';
+  // Variable para almacenar la fecha de inicio del evento
+  pFechaInicioEvento: string = '';
+  // Variable para almacenar la fecha de fin del evento
+  pFechaFinEvento: string = '';
+  // Variable para almecenar el id de la uibicacion seleccionada (valor 1 por defecto si no hay seleccion)
+  pUbicacionEvento: number = 1 ;
+  // Variabpara almacenar al organizador del evento (valor 1 por defecto si no hay seleccion)
+  pOrganizadorEvento: number = 1;
+  // Variable para almacenar el tipo de evento (valor 1 por defecto si no hay seleccion)
+  pTipoEvento: number = 1;
+  // Variable para almacenar la capacidad del evento (valor 1 por defecto si no hay seleccion)
+  pCapacidadEvento: number = 1;
   ubicaciones: UbicacionesModel[] = [];
   // Arreglo para almacenar los tipos evento de la API getTipoEvento
   tipoEvento: TipoEventoModel[] = [];

@@ -40,6 +40,9 @@ export class EventComponent {
   pTipoEvento: number = 1;
   // Variable para almacenar la capacidad del evento (valor 1 por defecto si no hay seleccion)
   pCapacidadEvento: number = 1;
+  // Variable para almacenar detalles extras del evento
+  pDetallesEvento: string = '';
+  // Arreglo para almacenar las ubicaciones de la API getUbicaciones
   ubicaciones: UbicacionesModel[] = [];
   // Arreglo para almacenar los tipos evento de la API getTipoEvento
   tipoEvento: TipoEventoModel[] = [];

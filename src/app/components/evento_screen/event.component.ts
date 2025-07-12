@@ -9,12 +9,13 @@ import { OrganizadorModel } from '../../models/organizadorModel';
 import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
 import { FormsModule } from '@angular/forms';
+import { TransaccionScreenComponent } from '../transaccion-screen/transaccion-screen.component';
 
 @Component({
   selector: 'app-event',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,TransaccionScreenComponent],
   templateUrl: './event.component.html',
-  styleUrl: './event.component.css',
+  styleUrl: './evento.component.css',
 })
 export class EventComponent {
 

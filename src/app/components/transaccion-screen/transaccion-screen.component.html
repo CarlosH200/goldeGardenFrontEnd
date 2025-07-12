@@ -1,0 +1,43 @@
+<div class="transaccion-container">
+
+<div class="encabezado-evento-row" style="display: flex; justify-content: space-between; align-items: center;">
+  <p><strong>Evento no. 11</strong></p>
+  <p><strong>Cliente:</strong> Jose Francisco Teo Alvarado</p>
+</div>
+
+  <div class="form-row">
+    <input type="text" id="producto" [(ngModel)]="productoBuscado" placeholder="SKU, Descripcion, Familia...." />
+    <button class="buttonCircle" (click)="buscarProducto()" title="Buscar">
+      <i class="material-icons">search</i>
+    </button>
+    <button class="buttonCircle" (click)="agregarProducto()" title="Agregar">
+      <i class="material-icons">add</i>
+    </button>
+  </div>
+
+  <div class="form-row">
+    <input type="checkbox" (click)="verDetalleTransaccion()" id="">
+    <label name="ObsertacionTransTitulo">Detalle Producto</label>
+  </div>
+  <div class="form-row">
+    <textarea  *ngIf="viewDetailTransaccion == true" name="ObservacionTransaccion" rows="5" class="TexAreaDetailTrans"></textarea>
+
+  </div>
+
+  <div class="contenido-principal">
+    <div class="producto-card" *ngIf="productoEncontrado">
+      <h3>{{ productoEncontrado.nombre }}</h3>
+      <p>{{ productoEncontrado.descripcion }}</p>
+      <p class="precio">Q{{ productoEncontrado.precio }}</p>
+    </div>
+
+    <div class="resumen-box">
+      <h4>Resumen</h4>
+      <p>No hay productos en el carrito</p>
+      <hr />
+      <p><strong>Total:</strong> Q0.00</p>
+    </div>
+  </div>
+
+  <button class="btn-fab">+</button>
+</div>

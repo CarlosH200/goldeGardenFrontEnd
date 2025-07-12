@@ -193,6 +193,23 @@ label {
   font-size: 26px;
 }
 
+.inputBuscarTrans{
+  width: 60%;
+}
+.buttonCircle {
+  width: 50px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: none;
+  background-color: #343a40;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Asegura que no crezca por padding */
+  box-sizing: border-box; /* Incluye el borde en el tamaño */
+}
+
 /* Responsive */
 @media (max-width: 575.98px) {
   .input-btn-group {

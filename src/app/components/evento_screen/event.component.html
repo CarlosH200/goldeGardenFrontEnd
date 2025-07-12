@@ -64,10 +64,10 @@
           class="form-control"
           placeholder="Cliente..."
         />
-        <button type="button" class="btn btn-dark" aria-label="Buscar">
+        <button type="button" class="buttonCircle" aria-label="Buscar">
           <span class="material-icons">search</span>
         </button>
-        <button type="button" class="btn btn-dark" aria-label="Agregar">
+        <button type="button" class="buttonCircle" aria-label="Agregar">
           <span class="material-icons">add</span>
         </button>
       </div>
@@ -227,8 +227,7 @@
 
   <!-- Transacciones -->
   <div *ngIf="selectedTab === 'transacciones'">
-    <h4>Transacciones</h4>
-    <p>Contenido de Transacciones...</p>
+   <app-transaccion-screen></app-transaccion-screen>
   </div>
 
   <!-- Pago -->

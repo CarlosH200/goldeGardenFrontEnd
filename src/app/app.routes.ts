@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
-import { EventComponent } from './components/event/event.component';
 import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
+import { EventComponent } from './components/evento_screen/event.component';
 
 export const routes: Routes = [
   { path: 'EventCalendar', component: EventCalendarComponent },

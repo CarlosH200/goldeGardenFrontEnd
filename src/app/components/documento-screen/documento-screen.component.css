@@ -1,0 +1,184 @@
+/* Títulos dentro del formulario numero de evento */
+.event-form h2 {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #212529;
+}
+
+.event-form h4 {
+  font-weight: 600;
+  color: #292121;
+  margin-bottom: 20px;
+}
+
+/* Grupo de inputs con botón (buscador) */
+.input-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.input-btn-group input.form-control {
+  flex-grow: 1;
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+  box-shadow: none;
+  border: 1.5px solid #ced4da;
+  transition: border-color 0.3s ease;
+}
+
+.input-btn-group input.form-control:focus {
+  border-color: #343a40;
+  box-shadow: 0 0 6px #343a40a1;
+  outline: none;
+}
+
+.input-btn-group .btn {
+  width: 40px;              /* Ancho fijo */
+  height: 40px;             /* Alto igual al ancho = cuadrado */
+  padding: 0;
+  border-radius: 8px;       /* Bordes redondeados */
+  border: 1.5px solid #343a40;
+  background-color: #343a40;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+
+.input-btn-group .btn:hover {
+  background-color: #23272b;
+  border-color: #23272b;
+}
+
+/* Iconos Material */
+.material-icons {
+  vertical-align: middle;
+  user-select: none;
+}
+
+/* Selectores */
+.form-select {
+  border-radius: 6px;
+  width: 100%; /* el ancho se ajusta al contenido */
+  min-width: 120px;
+  max-width: 100%;
+  border: 1.5px solid #ced4da;
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+
+.form-select:focus {
+  border-color: #343a40;
+  box-shadow: 0 0 6px #343a40a1;
+  outline: none;
+}
+
+/* Inputs y Textareas */
+.form-control {
+  border-radius: 6px;
+  border: 1.5px solid #ced4da;
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-shadow: none;
+}
+
+.form-control:focus {
+  border-color: #343a40;
+  box-shadow: 0 0 6px #343a40a1;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Etiquetas */
+label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+/* Botón principal guardar */
+.btn.btn-dark.w-100 {
+  background-color: #343a40;
+  border-color: #343a40;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 12px 0;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(52, 58, 64, 0.3);
+}
+
+.btn.btn-dark.w-100:hover {
+  background-color: #23272b;
+  border-color: #23272b;
+  box-shadow: 0 6px 15px rgba(35, 39, 43, 0.5);
+}
+
+/* Contenedor fechas */
+.containerDates .form-control {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+/* Margen entre filas */
+.row.g-3 > div {
+  margin-bottom: 15px;
+}
+
+/* Pequeño espacio extra abajo */
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+/* Para ícono de check_circle en verde */
+.text-success {
+  color: #28a745 !important;
+  font-size: 26px;
+}
+
+.inputBuscarTrans{
+  width: 60%;
+}
+.buttonCircle {
+  width: 50px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: none;
+  background-color: #343a40;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Asegura que no crezca por padding */
+  box-sizing: border-box; /* Incluye el borde en el tamaño */
+}
+
+/* Responsive */
+@media (max-width: 575.98px) {
+  .input-btn-group {
+    flex-direction: column;
+  }
+
+  .input-btn-group input.form-control,
+  .input-btn-group .btn {
+    border-radius: 6px;
+  }
+
+  .input-btn-group .btn {
+    margin-top: 8px;
+  }
+
+  .containerDates .row.g-3 {
+    flex-direction: column;
+  }
+
+  .containerDates .row.g-3 > div {
+    margin-bottom: 20px;
+  }
+}

@@ -49,24 +49,24 @@
   min-height: 400px;
 }
 
-/* Títulos dentro del formulario */
+/* Títulos dentro del formulario
 .event-form h2 {
   font-weight: 700;
   font-size: 1.5rem;
   color: #212529;
-}
-
+} */
+/* 
 .event-form h4 {
   font-weight: 600;
   color: #212529;
   margin-bottom: 20px;
-}
+} */
 
 /* Grupo de inputs con botón (buscador) */
-.input-btn-group {
+/* .input-btn-group {
   display: flex;
   gap: 8px;
-}
+} */
 
 .input-btn-group input.form-control {
   flex-grow: 1;

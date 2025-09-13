@@ -1,8 +1,13 @@
 <app-side-bar *ngIf="isLoggingIn" ></app-side-bar>
 
-
 <div *ngIf="!isLoggingIn" class="login-container">
+
     <div class="login-card">
+        <button class="buttonTheme" (click)="theme.toggleTheme()">
+  <span class="material-icons">
+    {{ theme.isDarkTheme() ? 'dark_mode' : 'light_mode' }}
+  </span>
+</button>
         <h2>Login</h2>
         <form>
             <div class="form-group">
@@ -23,7 +28,7 @@
                 <a href="#">Olvidaste tu contraseña?</a>
             </div>
 
-            <button type="submit" (click)="isLogin()" class="login-button">Login</button>
+            <button type="submit" (click)="isLogin()" class="login-button">LOGIN</button>
 
             <div class="signup-text">
                 No tienes cuenta, deseas crear una? <a href="#">Sign Up</a>

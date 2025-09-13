@@ -4,6 +4,7 @@ import { SideBarComponent } from "../side-bar/side-bar.component";
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/authService';
 import { LoginModel } from '../../models/loginModel';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,7 @@ import { LoginModel } from '../../models/loginModel';
 })
 export class LoginComponent {
   // Variale para validar si el usuario inicio sesión correctamente
-  isLoggingIn: boolean = true;
+  isLoggingIn: boolean = false;
   // Variable para mostrar u ocultar la contraseña
   hidePassword: boolean = true;
   usuario: string = '';
@@ -22,7 +23,8 @@ export class LoginComponent {
   mensaje: string = '';
   success: boolean | null = null;
 
-  constructor(private authService: AuthService) { }
+  // inyeccion de los services
+  constructor(private authService: AuthService,  public theme: ThemeService) { }
 
   isLogin(): void {
     // console.log('Intentando iniciar sesión con:', this.usuario, this.password);

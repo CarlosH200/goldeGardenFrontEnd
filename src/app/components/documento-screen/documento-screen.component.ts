@@ -10,6 +10,7 @@ import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'app-documento-screen',
   imports: [FormsModule,CommonModule],
@@ -17,6 +18,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './documento-screen.component.css'
 })
 export class DocumentoScreenComponent {
+
   // Vaiable para almacenar el titulo del evento
   pTituloEvento: string = '';
   // Variable para almacenar la descripcion del evento
@@ -52,7 +54,7 @@ constructor(
     private ubicacionesService: UbicacionesService, 
     private TipoEventoService: TipoEventoService, 
     private OrganizadorService: OrganizadorService,
-    private CapacidadesService: CapacidadesService
+    private CapacidadesService: CapacidadesService,
 
     ) 
     { }
@@ -62,6 +64,8 @@ constructor(
     this.getTipoEvento();
     this.getOrganizador();
     this.getCapacidades();
+   
+
   }
 
   // Funcion para consumir el servicio de ubicaciones disponibles

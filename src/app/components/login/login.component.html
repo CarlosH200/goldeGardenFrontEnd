@@ -1,38 +1,57 @@
-<app-side-bar *ngIf="isLoggingIn" ></app-side-bar>
+<app-side-bar *ngIf="isLoggingIn"></app-side-bar>
 
 <div *ngIf="!isLoggingIn" class="login-container">
+  <div class="login-card">
+    <button class="buttonTheme" (click)="theme.toggleTheme()">
+      <span class="material-icons">
+        {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
+      </span>
+    </button>
+ <div class="logoEmpresa"></div>
 
-    <div class="login-card">
-        <button class="buttonTheme" (click)="theme.toggleTheme()">
-  <span class="material-icons">
-    {{ theme.isDarkTheme() ? 'dark_mode' : 'light_mode' }}
-  </span>
-</button>
-        <h2>Login</h2>
-        <form>
-            <div class="form-group">
-                <input type="text" [(ngModel)]="usuario" placeholder="User" [ngModelOptions]="{standalone: true}" required />
-            </div>
-            <!-- <p>{{username}}</p> -->
-            <div class="form-group password-group">
-                <button type="button" class="eye-button" (click)="hidePassword = !hidePassword">
-                    <span class="material-icons">
-                        {{ hidePassword ? 'visibility_off' : 'visibility' }}
-                    </span>
-                </button>
-                <input [type]="hidePassword ? 'password' : 'text'"  [(ngModel)]="password" [ngModelOptions]="{standalone: true}"  placeholder="Password" required />
-            </div>
 
-            <div class="options-row">
-                <div></div>
-                <a href="#">Olvidaste tu contraseña?</a>
-            </div>
+    <form>
+      <div class="form-group">
+        <input
+          type="text"
+          [(ngModel)]="usuario"
+          placeholder="User"
+          [ngModelOptions]="{ standalone: true }"
+          required
+        />
+      </div>
+      <!-- <p>{{username}}</p> -->
+      <div class="form-group password-group">
+        <button
+          type="button"
+          class="eye-button"
+          (click)="hidePassword = !hidePassword"
+        >
+          <span class="material-icons">
+            {{ hidePassword ? "visibility_off" : "visibility" }}
+          </span>
+        </button>
+        <input
+          [type]="hidePassword ? 'password' : 'text'"
+          [(ngModel)]="password"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="Password"
+          required
+        />
+      </div>
 
-            <button type="submit" (click)="isLogin()" class="login-button">LOGIN</button>
+      <div class="options-row">
+        <div></div>
+        <a href="#"></a>
+      </div>
 
-            <div class="signup-text">
+      <button type="submit" (click)="isLogin()" class="login-button">
+        LOGIN
+      </button>
+
+      <!-- <div class="signup-text">
                 No tienes cuenta, deseas crear una? <a href="#">Sign Up</a>
-            </div>
-        </form>
-    </div>
+            </div> -->
+    </form>
+  </div>
 </div>

@@ -1,122 +1,137 @@
-
 .navbar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 1rem;
-    background-color: var(--color-fondo);
-    color: var(--color-principal);
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  background-color: var(--color-fondo);
+  color: var(--color-principal);
 }
 
 .buttonTheme {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-principal);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-principal);
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 2000;
+}
+
+.logoEmpresa{
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin-left: auto;  
+    margin-right: auto;
+    margin-top: 10px;
+    background-image: var(--theme-image-url) !important; 
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .login-container {
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--color-fondo);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-fondo);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .login-card {
-    background-color: var(--color-fondoSecundario);
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-    width: 90%;
-    max-width: 450px;
-    box-sizing: border-box;
+  background-color: var(--color-fondoSecundario);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 450px;
+  box-sizing: border-box;
 }
 
 h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--color-texto);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-texto);
 }
 
 .form-group {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 input[type="email"],
 input[type="password"],
 input[type="text"] {
-    width: 100%;
-    padding: 0.75rem; /* Modificado: eliminando el espacio adicional a la izquierda */
-    padding-left: 0.75rem; /* Para asegurar que el placeholder no tenga espacio */
-    border: none;
-    border-bottom: 2px solid var(--color-principal);
-    outline: none;
-    font-size: 1rem;
-    box-sizing: border-box;
-    background-color: transparent;
-    color: var(--color-texto);
+  width: 100%;
+  padding: 0.75rem; /* Modificado: eliminando el espacio adicional a la izquierda */
+  padding-left: 0.75rem; /* Para asegurar que el placeholder no tenga espacio */
+  border: none;
+  border-bottom: 2px solid var(--color-principal);
+  outline: none;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: var(--color-texto);
 }
 
 .password-group {
-    position: relative;
+  position: relative;
 }
 
 .eye-button {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding-right: 0.5rem;
-    color: var(--color-principal);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-right: 0.5rem;
+  color: var(--color-principal);
 }
 
 .eye-button .material-icons {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 .options-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 .options-row a {
-    color: var(--color-texto);
-    font-size: 0.9rem;
-    text-decoration: none;
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
 .login-button {
-    width: 100%;
-    background-color: var(--color-principal);
-    color: var(--color-texto);
-    padding: 0.75rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  width: 100%;
+  background-color: var(--color-principal);
+  color: var(--color-texto-invertido);
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .login-button:hover {
-    background-color: var(--color-principal);
-    opacity: 0.8; /* todo el div se vuelve 50% transparente */
+  background-color: var(--color-principal);
+  opacity: 0.8; /* todo el div se vuelve 50% transparente */
 }
 
 .signup-text {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--color-texto);
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-texto);
 }
 
 .signup-text a {
-    color: var(--color-principal);
-    text-decoration: none;
-    font-weight: 500;
+  color: var(--color-principal);
+  text-decoration: none;
+  font-weight: 500;
 }

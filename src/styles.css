@@ -6,21 +6,45 @@
   /* Tema claro por defecto */
   --color-fondo: #ffffff;
   --color-fondoSecundario: #dfdede;
-  --color-principal: #139b01;
+  --color-principal: #004E24;
   --color-texto: #1b1b1b;
+  --color-texto-invertido: #ffffff;
   --color-secundario: #f2c94c;
+  --theme-image-url: url('assets/GoldenGardenLigthTheme.png');
 }
 
 /* tema obscuro */
 body.dark-theme {
   --color-fondo: #444444;
   --color-fondoSecundario: #2c2b2b;
-  --color-principal: #FFD700;
+  --color-principal: #E5B040;
   --color-texto: #ffffff;
+  --color-texto-invertido: #000000;
   --color-secundario: #03dac6;
+  --theme-image-url: url('assets/GoldenGardenDarckTheme.png');
 }
 
 /* fin segmento colores para el proyecto  */
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+
+
+
+/* Éxito */
+.mat-mdc-snack-bar-container.alerta-exito .mdc-snackbar__surface {
+  background-color: #4caf50 !important;
+  color: #000000 !important;
+  font-weight: bold;
+}
+
+/* Error */
+.mat-mdc-snack-bar-container.alerta-error .mdc-snackbar__surface {
+  background-color: #f44336 !important;
+  color: #000000 !important;
+  font-weight: bold;
+}
+

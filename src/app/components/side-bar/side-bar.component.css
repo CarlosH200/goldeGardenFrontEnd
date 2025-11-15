@@ -2,22 +2,28 @@
 .app-container {
   display: flex;
   height: 100vh;
-  background-color: #000;
-  color: #ffffff;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
   font-family: 'Segoe UI', sans-serif;
   position: relative;
 }
 
-/* Sidebar */
 .sidebar {
-  width: 250px;
-  background-color: #1c1c1c;
-  height: 100vh;
-  transition: transform 0.3s ease;
-  padding: 1rem 0;
-  overflow: hidden;
-  position: fixed;
-  z-index: 1000;
+    /* --- CAMBIOS CLAVE FLEXBOX --- */
+    display: flex;
+    flex-direction: column;
+    top: 0; 
+    bottom: 0; 
+    /* Hemos eliminado 'height: 100vh;' ya que 'top: 0;' y 'bottom: 0;' lo extienden */
+    /* ----------------------------- */
+
+    width: 250px;
+    background-color: var(--color-fondoSecundario);
+    transition: transform 0.3s ease;
+    padding: 1rem 0;
+    overflow: hidden;
+    position: fixed;
+    z-index: 1000;
 }
 
 .sidebar.closed {
@@ -27,29 +33,77 @@
 /* Perfil de usuario */
 .sidebar-profile {
   text-align: center;
-  padding: 1rem;
-  border-bottom: 1px solid #333;
+  padding: 0px;
+  border-bottom: 1px solid var(--color-texto-invertido);
+}
+
+
+.logoEmpresa{
+    width: 150px;
+    height: 150px;
+    display: block;
+    margin-left: auto;  
+    margin-right: auto;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    background-image: var(--theme-image-url) !important; 
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .sidebar-profile img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
   border: 2px solid #ffffff;
+  padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
-.sidebar-profile h3 {
+/* .sidebar-profile h3 {
   margin-top: 0.5rem;
   font-size: 1rem;
   color: #ffffff;
-}
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+} */
 
 /* Menú lateral */
 .sidebar-menu {
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0;
+    /* --- CAMBIO CLAVE FLEXBOX --- */
+    flex-grow: 1; /* Esto ocupa todo el espacio libre y empuja el siguiente elemento */
+    /* ----------------------------- */
+
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.sidebar-bottom {
+    /* Mantiene los estilos básicos de lista */
+    list-style: none;
+    padding: 0;
+    margin: 0; /* Elimina márgenes por defecto del UL */
+}
+
+.sidebar-bottom li {
+    /* Reutiliza los estilos de los otros LI para mantener la consistencia */
+    padding: 0.75rem 1.5rem; 
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-bottom li:hover {
+    background-color: #333;
+}
+
+.sidebar-bottom li .material-icons {
+    margin-right: 1rem;
+    color: var(--color-principal);
 }
 
 .sidebar-menu li {
@@ -66,7 +120,7 @@
 
 .sidebar-menu .material-icons {
   margin-right: 1rem;
-  color: #969696;
+  color: var(--color-principal);
 }
 
 /* Botón para mostrar sidebar */

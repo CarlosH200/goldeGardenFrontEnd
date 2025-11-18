@@ -20,16 +20,18 @@ body.dark-theme {
   --color-principal: #E5B040;
   --color-texto: #ffffff;
   --color-texto-invertido: #000000;
-  --color-secundario: #03dac6;
+  --color-secundario: #004E24;
   --theme-image-url: url('assets/GoldenGardenDarckTheme.png');
 }
 
 /* fin segmento colores para el proyecto  */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: var(--color-fondo); color: var(--color-texto); }
 
-
+h2, h3, h4, h5, h6, p, span, div {
+  color: var(--color-texto);
+}
 
 
 

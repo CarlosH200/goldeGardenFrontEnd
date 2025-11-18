@@ -9,6 +9,7 @@ import { OrganizadorModel } from '../../models/organizadorModel';
 import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
 import { FormsModule } from '@angular/forms';
+import { ThemeService } from '../../services/theme.service';
 
 
 @Component({
@@ -55,6 +56,7 @@ constructor(
     private TipoEventoService: TipoEventoService, 
     private OrganizadorService: OrganizadorService,
     private CapacidadesService: CapacidadesService,
+    public theme: ThemeService,
 
     ) 
     { }

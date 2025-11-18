@@ -2,12 +2,12 @@
 .event-form h2 {
   font-weight: 700;
   font-size: 1.5rem;
-  color: #212529;
+  color: var(--color-texto);
 }
 
 .event-form h4 {
   font-weight: 600;
-  color: #292121;
+  color: var(--color-texto);
   margin-bottom: 20px;
 }
 
@@ -38,7 +38,7 @@
   padding: 0;
   border-radius: 8px;       /* Bordes redondeados */
   border: 1.5px solid #343a40;
-  background-color: #343a40;
+  background-color: var(--color-principal);
   color: #fff;
   display: flex;
   align-items: center;
@@ -150,8 +150,8 @@ label {
   aspect-ratio: 1/1;
   border-radius: 50%;
   border: none;
-  background-color: #343a40;
-  color: white;
+  background-color: var(--color-principal);
+  color: #ffffff !important;
   display: flex;
   align-items: center;
   justify-content: center;

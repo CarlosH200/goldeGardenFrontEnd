@@ -14,7 +14,7 @@ import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-documento-screen',
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './documento-screen.component.html',
   styleUrl: './documento-screen.component.css'
 })
@@ -33,7 +33,7 @@ export class DocumentoScreenComponent {
   // Variable para almacenar la fecha de fin del evento
   pFechaFinEvento: string = '';
   // Variable para almecenar el id de la uibicacion seleccionada (valor 1 por defecto si no hay seleccion)
-  pUbicacionEvento: number = 1 ;
+  pUbicacionEvento: number = 1;
   // Variabpara almacenar al organizador del evento (valor 1 por defecto si no hay seleccion)
   pOrganizadorEvento: number = 1;
   // Variable para almacenar el tipo de evento (valor 1 por defecto si no hay seleccion)
@@ -51,22 +51,21 @@ export class DocumentoScreenComponent {
   // Arreglo para almacenar las capacidades de la API getCapacidades
   Capacidades: CapacidadesModel[] = [];
 
-constructor(
-    private ubicacionesService: UbicacionesService, 
-    private TipoEventoService: TipoEventoService, 
+  constructor(
+    private ubicacionesService: UbicacionesService,
+    private TipoEventoService: TipoEventoService,
     private OrganizadorService: OrganizadorService,
     private CapacidadesService: CapacidadesService,
     public theme: ThemeService,
 
-    ) 
-    { }
+  ) { }
 
   ngOnInit(): void {
     this.getUbicaciones();
     this.getTipoEvento();
     this.getOrganizador();
     this.getCapacidades();
-   
+
 
   }
 

@@ -15,6 +15,7 @@
 .input-btn-group {
   display: flex;
   gap: 8px;
+  width: 60%;
 }
 
 .input-btn-group input.form-control {
@@ -56,6 +57,7 @@
 .material-icons {
   vertical-align: middle;
   user-select: none;
+  color: var(--color-texto-invertido) !important;
 }
 
 /* Selectores */
@@ -105,20 +107,22 @@ label {
 
 /* Botón principal guardar */
 .btn.btn-dark.w-100 {
-  background-color: #343a40;
-  border-color: #343a40;
+  background-color: var(--color-principal);
+  border-color: var(--color-principal);
   font-weight: 700;
   font-size: 1.1rem;
   padding: 12px 0;
   border-radius: 8px;
   transition: background-color 0.3s ease;
-  box-shadow: 0 4px 10px rgba(52, 58, 64, 0.3);
+  color: var(--color-texto-invertido);
+  box-shadow: 0 4px 10px var(--color-fondo);
 }
 
 .btn.btn-dark.w-100:hover {
-  background-color: #23272b;
-  border-color: #23272b;
-  box-shadow: 0 6px 15px rgba(35, 39, 43, 0.5);
+  background-color: var(--color-secundario);
+  border-color: var(--color-secundario);
+  box-shadow: 0 6px 15px var(--color-secundario);
+  color: var(--color-texto);
 }
 
 /* Contenedor fechas */
@@ -152,7 +156,7 @@ label {
   border-radius: 50%;
   border: none;
   background-color: var(--color-principal);
-  color: #ffffff !important;
+  color: var(--color-texto-invertido) !important;
   display: flex;
   align-items: center;
   justify-content: center;

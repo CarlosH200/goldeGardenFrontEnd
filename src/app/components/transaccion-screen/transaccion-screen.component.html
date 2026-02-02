@@ -1,17 +1,17 @@
 <div class="transaccion-container">
 
-<div class="encabezado-evento-row" style="display: flex; justify-content: space-between; align-items: center;">
+<div class="encabezado">
   <p><strong>Evento no. 11</strong></p>
-  <p><strong>Cliente:</strong> Jose Francisco Teo Alvarado</p>
+  <p class="textoInvertido"><strong>Cliente:</strong> Jose Francisco Teo Alvarado</p>
 </div>
 
   <div class="form-row">
-    <input type="text" id="producto" [(ngModel)]="productoBuscado" placeholder="SKU, Descripcion, Familia...." />
+    <input class="inputbuscador" type="text" id="producto" [(ngModel)]="productoBuscado" placeholder="SKU, Descripcion, Familia...." />
     <button class="buttonCircle" (click)="buscarProducto()" title="Buscar">
       <i class="material-icons">search</i>
     </button>
     <button class="buttonCircle" (click)="agregarProducto()" title="Agregar">
-      <i class="material-icons">add</i>
+      <i class="material-icons">add_box</i>
     </button>
   </div>
 
@@ -33,11 +33,17 @@
 
     <div class="resumen-box">
       <h4>Resumen</h4>
-      <p>No hay productos en el carrito</p>
+      <h3>{{ productoEncontrado.nombre }}</h3>
+      <p>{{ productoEncontrado.descripcion }}</p>
+      <p class="precio">Q{{ productoEncontrado.precio }}</p>
       <hr />
-      <p><strong>Total:</strong> Q0.00</p>
+      <p class="textoNoInvertido"><strong class="textoNoInvertido">Total:</strong> Q0.00</p>
     </div>
   </div>
 
-  <button class="btn-fab">+</button>
+  
+
+   <button class="buttonCircle btn-fab" (click)="buscarProducto()" title="Buscar">
+      <i class="material-icons">playlist_add</i>
+    </button>
 </div>

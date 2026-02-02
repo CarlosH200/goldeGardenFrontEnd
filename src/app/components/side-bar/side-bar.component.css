@@ -1,3 +1,10 @@
+html, body {
+  margin: 0;
+  padding: 0;
+   background: var(--color-fondo);
+}
+
+
 /* Contenedor principal */
 .app-container {
   display: flex;
@@ -34,7 +41,6 @@
 .sidebar-profile {
   text-align: center;
   padding: 0px;
-  border-bottom: 1px solid var(--color-texto-invertido);
 }
 
 
@@ -123,7 +129,7 @@
   color: var(--color-principal);
 }
 
-/* Botón para mostrar sidebar */
+/* Botón para mostrar sidebar
 .sidebar-toggle {
   position: fixed;
   top: 1.5rem;
@@ -134,46 +140,31 @@
   border-radius: 50%;
   padding: 0.5rem;
   /* box-shadow: 0 0 1px #a1a1a1; */
-  cursor: pointer;
-}
+  /* cursor: pointer;
+} */
 
 .sidebar-toggle .material-icons {
   color: #000;
-}
+} 
 
 body {
   background-color: var(--color-fondo);
   color: var(--color-texto);
   /* Opcional: Elimina el margen por defecto que algunos navegadores aplican al body */
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Contenido principal */
 .main-content {
   flex: 1;
-  margin-left: 250px;
-  padding: 2rem;
-  transition: margin-left 0.3s ease;
+  margin-left: 215px;
+  padding: 0;
+  /* transition: margin-left 0.3s ease; */
   background-color: var(--color-fondo);
   color: var(--color-texto);
 }
 
-.sidebar.closed ~ .main-content {
+/* .sidebar.closed ~ .main-content {
   margin-left: 0;
-}
-
-.mainButton{
-   font-size: 20px;
-  background: #333333;
-  border-radius: 50%; /* para que sea círculo */
-  width: 45px; /* ancho fijo igual a la altura */
-  height: 45px; /* altura fija igual al ancho */
-  border: 2px solid #333333; /* para que se note el borde */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0; /* elimina relleno extra */
-  cursor: pointer;
-  color: #ffffff !important;
-}
+} */

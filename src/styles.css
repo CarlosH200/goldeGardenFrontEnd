@@ -1,40 +1,53 @@
 /* You can add global styles to this file, and also import other style files */
 
-
 /* Segmento para colores globales del proyecto */
 :root {
   /* Tema claro por defecto */
   --color-fondo: #ffffff;
   --color-fondoSecundario: #dfdede;
-  --color-principal: #004E24;
+  --color-principal: #004e24;
   --color-texto: #1b1b1b;
   --color-texto-invertido: #ffffff;
   --color-secundario: #f2c94c;
-  --theme-image-url: url('assets/GoldenGardenLigthTheme.png');
+  --color-Shadow: #b3b3b3;
+  --theme-image-url: url("assets/GoldenGardenLigthTheme.png");
 }
 
 /* tema obscuro */
 body.dark-theme {
-  --color-fondo: #444444;
+  --color-fondo: #535353;
   --color-fondoSecundario: #2c2b2b;
-  --color-principal: #E5B040;
+  --color-principal: #e5b040;
   --color-texto: #ffffff;
   --color-texto-invertido: #000000;
-  --color-secundario: #004E24;
-  --theme-image-url: url('assets/GoldenGardenDarckTheme.png');
+  --color-secundario: #004e24;
+  --color-Shadow: #535353;
+  --theme-image-url: url("assets/GoldenGardenDarckTheme.png");
 }
 
 /* fin segmento colores para el proyecto  */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: var(--color-fondo); color: var(--color-texto); }
-
-h2, h3, h4, h5, h6, p, span, div {
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--color-fondo);
   color: var(--color-texto);
 }
 
-
-
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div {
+  color: var(--color-texto);
+}
 
 /* Éxito */
 .mat-mdc-snack-bar-container.alerta-exito .mdc-snackbar__surface {
@@ -49,4 +62,3 @@ h2, h3, h4, h5, h6, p, span, div {
   color: #000000 !important;
   font-weight: bold;
 }
-

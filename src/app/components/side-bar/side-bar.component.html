@@ -1,5 +1,5 @@
 <div class="app-container" >
-    <div class="sidebar" [class.closed]="isSidebarClosed">
+    <div class="sidebar">
         <div class="sidebar-profile">
             <div class="logoEmpresa"></div>
             <button class="buttonTheme" (click)="theme.toggleTheme()">
@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <button class="sidebar-toggle" *ngIf="isSidebarClosed" (click)="toggleSidebar()">
+    <button class="sidebar-toggle">
         <span class="material-icons mainButton">menu</span>
     </button>
 

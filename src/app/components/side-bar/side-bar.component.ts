@@ -12,7 +12,7 @@ import { AuthService } from '../../services/authService';
   styleUrl: './side-bar.component.css'
 })
 export class SideBarComponent {
-   isSidebarClosed = false;
+  //  isSidebarClosed = false;
 
   constructor(
     private router: Router,
@@ -20,13 +20,13 @@ export class SideBarComponent {
     private authService: AuthService,
   ) {}
 
-  toggleSidebar() {
-    this.isSidebarClosed = !this.isSidebarClosed;
-  }
+  // toggleSidebar() {
+  //   this.isSidebarClosed = !this.isSidebarClosed;
+  // }
 
   navigateTo(route: string) {
     this.router.navigate([route]);
-    this.isSidebarClosed = true;
+    // this.isSidebarClosed = true;
   }
 
   // DEBE CAMBIAR AL TENER TOKENS INTEGRADOS

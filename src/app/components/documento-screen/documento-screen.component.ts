@@ -65,8 +65,6 @@ export class DocumentoScreenComponent {
     this.getTipoEvento();
     this.getOrganizador();
     this.getCapacidades();
-
-
   }
 
   // Funcion para consumir el servicio de ubicaciones disponibles

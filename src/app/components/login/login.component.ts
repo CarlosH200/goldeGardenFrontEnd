@@ -24,7 +24,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 })
 export class LoginComponent {
   // Variale para validar si el usuario inicio sesión correctamente
-  isLoggingIn: boolean = false;
+  isLoggingIn: boolean = true;
   // Variable para mostrar u ocultar la contraseña
   hidePassword: boolean = true;
   usuario: string = '';

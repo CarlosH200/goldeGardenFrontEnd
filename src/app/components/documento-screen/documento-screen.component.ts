@@ -10,6 +10,9 @@ import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
+import { EstadoService } from '../../services/estadoService';
+import { EstadosModel } from '../../models/estadoModel';
+import { ClienteModel } from '../../models/clienteModel';
 
 
 @Component({
@@ -20,6 +23,22 @@ import { ThemeService } from '../../services/theme.service';
 })
 export class DocumentoScreenComponent {
 
+  // Modelo para datos del cliente
+  clienteForm: Partial<ClienteModel> = {
+    nit: '',
+    nombre: '',
+    apellido: '',
+    email: '',
+    dpi: '',
+    direccion: '',
+    telefono: '',
+    celular: '',
+    tipoCliente: 1,
+    observacion01: '',
+    observacion02: ''
+  };
+  // Variable para desplegar inputs para crear cliente
+  dataCreateClient: number = 0;
   // Vaiable para almacenar el titulo del evento
   pTituloEvento: string = '';
   // Variable para almacenar la descripcion del evento
@@ -50,12 +69,15 @@ export class DocumentoScreenComponent {
   Organizadores: OrganizadorModel[] = [];
   // Arreglo para almacenar las capacidades de la API getCapacidades
   Capacidades: CapacidadesModel[] = [];
+  // Arreglo para almacenar lso estados del API getEstados
+  Estados: EstadosModel[] = [];
 
   constructor(
     private ubicacionesService: UbicacionesService,
     private TipoEventoService: TipoEventoService,
     private OrganizadorService: OrganizadorService,
     private CapacidadesService: CapacidadesService,
+    private EstadosService: EstadoService,
     public theme: ThemeService,
 
   ) { }
@@ -65,6 +87,31 @@ export class DocumentoScreenComponent {
     this.getTipoEvento();
     this.getOrganizador();
     this.getCapacidades();
+    this.getEstados();
+  }
+
+guardarCliente(): void {
+
+  const clienteGuardar: ClienteModel = {
+    ...this.clienteForm as ClienteModel, // casteo seguro
+    estado: 1,
+    fechaRegistro: new Date().toISOString(),
+    // username: this.usuarioActual  // pendiente de implementar
+  };
+
+  console.log(clienteGuardar);
+
+  // aquí llamas a tu servicio HTTP
+}
+
+  // Funcion para mostrar inputs de crear cliente
+  showCreateClient(): void {
+    this.dataCreateClient = 1;
+  }
+
+  // Funcion para ocultar inputs de crear cliente
+  hideCreateClient(): void {
+    this.dataCreateClient = 0;
   }
 
   // Funcion para consumir el servicio de ubicaciones disponibles
@@ -98,5 +145,16 @@ export class DocumentoScreenComponent {
       error: (err) => console.error('Error al cargar Capacidades', err)
     });
   }
+
+  // Funcion para consumir el servicio de capacidades disponibles
+  getEstados(): void {
+    this.EstadosService.getEstados().subscribe({
+      next: (data) => this.Estados = data,
+      error: (err) => console.error('Error al cargar Estados', err)
+    });
+  }
+
+
+
 
 }

@@ -6,8 +6,9 @@
           <h2 class="mb-0">Evento no.001</h2>
           <div class="select-icon-wrapper">
             <select class="form-select">
-              <option value="activo" selected>Activo</option>
-              <option value="inactivo">Inactivo</option>
+              <option *ngFor="let estado of Estados" [value]="estado.id">
+                {{ estado.descripcion }} ({{ estado.id }})
+              </option>
             </select>
           </div>
         </div>
@@ -25,10 +26,89 @@
       <button type="button" class="buttonCircle" aria-label="Buscar">
         <span class="material-icons">search</span>
       </button>
-      <button type="button" class="buttonCircle" aria-label="Agregar">
+      <button type="button" class="buttonCircle" (click)="showCreateClient()" *ngIf="dataCreateClient === 0" aria-label="Agregar">
         <span class="material-icons">add</span>
       </button>
+       <button type="button" class="buttonCircle buttonSave" (click)="guardarCliente()" *ngIf="dataCreateClient === 1" aria-label="Guardar">
+        <span class="material-icons">save</span>
+      </button>
+       <button type="button" class="buttonCircle buttonCancel" (click)="hideCreateClient()" *ngIf="dataCreateClient === 1" aria-label="Cancelar">
+        <span class="material-icons">cancel</span>
+      </button>
     </div>
+
+    <!-- APARTADO PARA CREAR CLIENTE QUE SE MUESTRA SOLO AL CREARLO -->
+    <div class="containerNewClient" *ngIf="dataCreateClient === 1">
+      <div class="client-card">
+        <div class="client-card-header">
+          <span class="material-icons">person</span>
+          <h5>Nuevo Cliente</h5>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label>NIT</label>
+            <input [(ngModel)]="clienteForm.nit" name="nit" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Nombre</label>
+            <input [(ngModel)]="clienteForm.nombre" name="nombre" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Apellido</label>
+            <input [(ngModel)]="clienteForm.apellido" name="apellido" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-6">
+            <label>Email</label>
+            <input [(ngModel)]="clienteForm.email" name="email" type="email" class="form-control" />
+          </div>
+
+          <div class="col-md-6">
+            <label>DPI</label>
+            <input [(ngModel)]="clienteForm.dpi" name="dpi" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-12">
+            <label>Dirección</label>
+            <input [(ngModel)]="clienteForm.direccion" name="direccion" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Teléfono</label>
+            <input [(ngModel)]="clienteForm.telefono" name="telefono" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Celular</label>
+            <input [(ngModel)]="clienteForm.celular" name="celular" type="text" class="form-control" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Tipo Cliente</label>
+            <select [(ngModel)]="clienteForm.tipoCliente" name="tipoCliente" class="form-select">
+              <option value="1">Normal</option>
+              <option value="2">Frecuente</option>
+              <option value="3">Empresa</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label>Observación 01</label>
+            <textarea [(ngModel)]="clienteForm.observacion01" name="observacion01" class="form-control" rows="2"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label>Observación 02</label>
+            <textarea [(ngModel)]="clienteForm.observacion02" name="observacion02" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APARTADO PARA CREAR CLIENTE QUE SE MUESTRA SOLO AL CREARLO -->
 
     <!-- Información del evento -->
     <div class="form-group mb-3">

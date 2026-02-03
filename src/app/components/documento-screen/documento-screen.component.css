@@ -47,7 +47,37 @@
 /* input buscador con boton */
 
 
+/* APARTADO DE ESTILOS CONTAINER PARA CREAR CLIENTE */
+.client-card {
+  background: var(--color-fondo);
+  border: 1px solid var(--color-fondoSecundario);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 14px var(--color-fondoSecundario, 0.06);
+  margin-bottom: 100px;
+}
 
+.client-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-principal);
+}
+
+.client-card-header h5 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.client-card-header .material-icons {
+  font-size: 22px;
+  color: var(--color-principal) !important;
+}
+
+/* APARTADO DE ESTILOS CONTAINER PARA CREAR CLIENTE */
 
 .input-btn-group input.form-control {
   flex-grow: 1;
@@ -214,10 +244,21 @@ label {
   border-radius: 14px;
   border: none;
   background-color: var(--color-principal);
-  color: var(--color-texto-invertido);
+  color: var(--color-texto);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+
+.buttonCancel {
+  background-color: red;
+  color: #ffffff;
+}
+
+.buttonSave {
+  background-color: #0f0fa8;
+  color: #ffffff;
 }
 
 

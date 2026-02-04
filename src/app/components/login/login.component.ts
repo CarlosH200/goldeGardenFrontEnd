@@ -42,33 +42,52 @@ export class LoginComponent {
   ) { }
 
 isLogin(): void {
-    this.isLoading = true; // 1. Activamos la pantalla de carga al presionar el botón
+  this.isLoading = true; 
 
-    this.authService.login(this.usuario, this.password).subscribe({
-      next: (res: LoginModel) => {
-        this.success = res.success;
-        this.mensaje = res.mensaje;
+  this.authService.login(this.usuario, this.password).subscribe({
+    next: (res: LoginModel) => {
+      this.success = res.success;
+      this.mensaje = res.mensaje;
 
-        if (res.success) {
-          this.snackBar.open(this.mensaje, 'Cerrar', { duration: 4000 });
-          
-          // 2. Simulamos un pequeño delay para que se aprecie la carga y luego mostramos el contenido
-          setTimeout(() => {
-            this.isLoading = false;
-            this.isLoggingIn = true;
-          }, 1500); 
+      if (res.success) {
+        // Restauramos tu configuración original de éxito
+        this.snackBar.open(this.mensaje, 'Cerrar', {
+          duration: 3000,
+          panelClass: ['alerta-exito'], 
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
 
-        } else {
-          this.isLoading = false; // 3. Si falla, quitamos la carga para mostrar el error
-          this.snackBar.open(this.mensaje, 'Cerrar', { duration: 3000 });
-          this.isLoggingIn = false;
-        }
-      },
-      error: (err) => {
+        setTimeout(() => {
+          this.isLoading = false;
+          this.isLoggingIn = true;
+        }, 1500); 
+
+      } else {
         this.isLoading = false;
-        this.mensaje = 'Error al conectar con el servidor';
-        // ... tu snackbar de error
+        // Restauramos tu configuración original de error
+        this.snackBar.open(this.mensaje, 'Cerrar', {
+          duration: 3000,
+          panelClass: ['alerta-error'],
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+        this.isLoggingIn = false;
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.isLoading = false;
+      this.success = false;
+      this.mensaje = 'Error al conectar con el servidor';
+      // Restauramos tu configuración original de error de red
+      this.snackBar.open(this.mensaje, 'Cerrar', {
+        duration: 3000,
+        panelClass: ['alerta-error'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+      console.error(err);
+    }
+  });
+}
 }

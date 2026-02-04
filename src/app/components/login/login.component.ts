@@ -23,8 +23,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
+  // variable para validar el estado de carga
+  isLoading: boolean = false;
   // Variale para validar si el usuario inicio sesión correctamente
-  isLoggingIn: boolean = true;
+  isLoggingIn: boolean = false;
   // Variable para mostrar u ocultar la contraseña
   hidePassword: boolean = true;
   usuario: string = '';
@@ -39,41 +41,34 @@ export class LoginComponent {
     private snackBar: MatSnackBar
   ) { }
 
-  isLogin(): void {
-  this.authService.login(this.usuario, this.password).subscribe({
-    next: (res: LoginModel) => {
-      this.success = res.success;
-      this.mensaje = res.mensaje;
+isLogin(): void {
+    this.isLoading = true; // 1. Activamos la pantalla de carga al presionar el botón
 
-      if (res.success) {
-        this.snackBar.open(this.mensaje, 'Cerrar', {
-          duration: 3000,
-          panelClass: ['alerta-exito'], // opcional para estilos
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-        });
-        this.isLoggingIn = true;
-      } else {
-        this.snackBar.open(this.mensaje, 'Cerrar', {
-          duration: 3000,
-          panelClass: ['alerta-error'],
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-        });
-        this.isLoggingIn = false;
+    this.authService.login(this.usuario, this.password).subscribe({
+      next: (res: LoginModel) => {
+        this.success = res.success;
+        this.mensaje = res.mensaje;
+
+        if (res.success) {
+          this.snackBar.open(this.mensaje, 'Cerrar', { duration: 4000 });
+          
+          // 2. Simulamos un pequeño delay para que se aprecie la carga y luego mostramos el contenido
+          setTimeout(() => {
+            this.isLoading = false;
+            this.isLoggingIn = true;
+          }, 1500); 
+
+        } else {
+          this.isLoading = false; // 3. Si falla, quitamos la carga para mostrar el error
+          this.snackBar.open(this.mensaje, 'Cerrar', { duration: 3000 });
+          this.isLoggingIn = false;
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.mensaje = 'Error al conectar con el servidor';
+        // ... tu snackbar de error
       }
-    },
-    error: (err) => {
-      this.success = false;
-      this.mensaje = 'Error al conectar con el servidor';
-      this.snackBar.open(this.mensaje, 'Cerrar', {
-        duration: 3000,
-        panelClass: ['alerta-error'],
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
-      console.error(err);
-    }
-  });
-}
+    });
+  }
 }

@@ -1,3 +1,19 @@
+
+<!-- APARTADO DE PANTALLA ESTADO DE CARGA -->
+ <div *ngIf="isLoading" class="loading-overlay">
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+</div>
+
+<div *ngIf="!isLoading">
+  <div *ngIf="isLoggingIn">
+     <app-side-bar></app-side-bar>
+     </div>
+</div>
+<!-- APARTADO DE PANTALLA ESTADO DE CARGA -->
+
 <app-side-bar *ngIf="isLoggingIn"></app-side-bar>
 
 <div *ngIf="!isLoggingIn" class="login-container">

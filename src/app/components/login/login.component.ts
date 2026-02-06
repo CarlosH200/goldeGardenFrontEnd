@@ -44,13 +44,13 @@ export class LoginComponent implements AfterViewInit {
     this.focusUser();
   }
 
-  // ✅ NUEVO: función segura
+  // esta función se encarga de enfocar el input del usuario después de que la vista se haya inicializado
   private focusUser() {
     setTimeout(() => {
       if (this.userInput?.nativeElement) {
         this.userInput.nativeElement.focus();
       }
-    }, 200); // 🔥 delay real para que no lo pierda por el DOM
+    }, 200); //delay real para que no lo pierda por el DOM
   }
 
   isLogin(): void {
@@ -84,7 +84,7 @@ export class LoginComponent implements AfterViewInit {
             verticalPosition: 'bottom',
           });
 
-          // 🔥 cuando falla, volver a enfocar usuario
+          //cuando falla, volver a enfocar input usuario
           this.focusUser();
         }
       },
@@ -102,7 +102,7 @@ export class LoginComponent implements AfterViewInit {
 
         console.error(err);
 
-        // 🔥 al error también enfoca usuario
+        // al generar error también enfoca input usuario
         this.focusUser();
       }
     });

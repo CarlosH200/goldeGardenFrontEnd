@@ -1,20 +1,19 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SideBarComponent } from "../side-bar/side-bar.component";
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+
 import { AuthService } from '../../services/authService';
 import { LoginModel } from '../../models/loginModel';
 import { ThemeService } from '../../services/theme.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
-
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     FormsModule,
-    SideBarComponent,
     CommonModule,
     MatSnackBarModule
   ],
@@ -22,72 +21,90 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   styleUrls: ['./login.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent {
-  // variable para validar el estado de carga
+export class LoginComponent implements AfterViewInit {
+
+  @ViewChild('userInput') userInput!: ElementRef<HTMLInputElement>;
+
   isLoading: boolean = false;
-  // Variale para validar si el usuario inicio sesión correctamente
-  isLoggingIn: boolean = false;
-  // Variable para mostrar u ocultar la contraseña
   hidePassword: boolean = true;
+
   usuario: string = '';
   password: string = '';
   mensaje: string = '';
   success: boolean | null = null;
 
-  // inyeccion de los services
   constructor(
-    private authService: AuthService,  
+    private authService: AuthService,
     public theme: ThemeService,
-    private snackBar: MatSnackBar
-  ) { }
+    private snackBar: MatSnackBar,
+    private router: Router
+  ) {}
 
-isLogin(): void {
-  this.isLoading = true; 
+  ngAfterViewInit(): void {
+    this.focusUser();
+  }
 
-  this.authService.login(this.usuario, this.password).subscribe({
-    next: (res: LoginModel) => {
-      this.success = res.success;
-      this.mensaje = res.mensaje;
+  // ✅ NUEVO: función segura
+  private focusUser() {
+    setTimeout(() => {
+      if (this.userInput?.nativeElement) {
+        this.userInput.nativeElement.focus();
+      }
+    }, 200); // 🔥 delay real para que no lo pierda por el DOM
+  }
 
-      if (res.success) {
-        // Restauramos tu configuración original de éxito
-        this.snackBar.open(this.mensaje, 'Cerrar', {
-          duration: 3000,
-          panelClass: ['alerta-exito'], 
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
-        });
+  isLogin(): void {
+    this.isLoading = true;
 
-        setTimeout(() => {
+    this.authService.login(this.usuario, this.password).subscribe({
+      next: (res: LoginModel) => {
+        this.success = res.success;
+        this.mensaje = res.mensaje;
+
+        if (res.success) {
+          this.snackBar.open(this.mensaje, 'Cerrar', {
+            duration: 3000,
+            panelClass: ['alerta-exito'],
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          });
+
+          setTimeout(() => {
+            this.isLoading = false;
+            this.router.navigate(['/home']);
+          }, 1500);
+
+        } else {
           this.isLoading = false;
-          this.isLoggingIn = true;
-        }, 1500); 
 
-      } else {
+          this.snackBar.open(this.mensaje, 'Cerrar', {
+            duration: 3000,
+            panelClass: ['alerta-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          });
+
+          // 🔥 cuando falla, volver a enfocar usuario
+          this.focusUser();
+        }
+      },
+      error: (err) => {
         this.isLoading = false;
-        // Restauramos tu configuración original de error
+        this.success = false;
+        this.mensaje = 'Error al conectar con el servidor';
+
         this.snackBar.open(this.mensaje, 'Cerrar', {
           duration: 3000,
           panelClass: ['alerta-error'],
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom',
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
         });
-        this.isLoggingIn = false;
+
+        console.error(err);
+
+        // 🔥 al error también enfoca usuario
+        this.focusUser();
       }
-    },
-    error: (err) => {
-      this.isLoading = false;
-      this.success = false;
-      this.mensaje = 'Error al conectar con el servidor';
-      // Restauramos tu configuración original de error de red
-      this.snackBar.open(this.mensaje, 'Cerrar', {
-        duration: 3000,
-        panelClass: ['alerta-error'],
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
-      console.error(err);
-    }
-  });
-}
+    });
+  }
 }

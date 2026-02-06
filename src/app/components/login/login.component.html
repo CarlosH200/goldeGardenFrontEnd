@@ -1,34 +1,26 @@
-
 <!-- APARTADO DE PANTALLA ESTADO DE CARGA -->
- <div *ngIf="isLoading" class="loading-overlay">
+<div *ngIf="isLoading" class="loading-overlay">
   <div class="spinner-container">
     <div class="spinner"></div>
     <p>Cargando...</p>
   </div>
 </div>
-
-<div *ngIf="!isLoading">
-  <div *ngIf="isLoggingIn">
-     <app-side-bar></app-side-bar>
-     </div>
-</div>
 <!-- APARTADO DE PANTALLA ESTADO DE CARGA -->
 
-<app-side-bar *ngIf="isLoggingIn"></app-side-bar>
-
-<div *ngIf="!isLoggingIn" class="login-container">
+<div *ngIf="!isLoading" class="login-container">
   <div class="login-card">
     <button class="buttonTheme" (click)="theme.toggleTheme()">
       <span class="material-icons">
         {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
       </span>
     </button>
- <div class="logoEmpresa"></div>
 
+    <div class="logoEmpresa"></div>
 
     <form>
       <div class="form-group">
         <input
+          #userInput
           type="text"
           [(ngModel)]="usuario"
           placeholder="User"
@@ -36,9 +28,10 @@
           required
         />
       </div>
-      <!-- <p>{{username}}</p> -->
+
       <div class="form-group password-group">
         <button
+          tabindex="-1"
           type="button"
           class="eye-button"
           (click)="hidePassword = !hidePassword"
@@ -47,6 +40,7 @@
             {{ hidePassword ? "visibility_off" : "visibility" }}
           </span>
         </button>
+
         <input
           [type]="hidePassword ? 'password' : 'text'"
           [(ngModel)]="password"
@@ -56,18 +50,9 @@
         />
       </div>
 
-      <div class="options-row">
-        <div></div>
-        <a href="#"></a>
-      </div>
-
       <button type="submit" (click)="isLogin()" class="login-button">
         LOGIN
       </button>
-
-      <!-- <div class="signup-text">
-                No tienes cuenta, deseas crear una? <a href="#">Sign Up</a>
-            </div> -->
     </form>
   </div>
 </div>

@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
-import { EventCalendarComponent } from './components/event-calendar/event-calendar.component';
-import { EventComponent } from './components/evento_screen/event.component';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
 
 export const routes: Routes = [
-  { path: 'EventCalendar', component: EventCalendarComponent },
-  { path: '', redirectTo: 'EventCalendar', pathMatch: 'full' },
-  // { path: 'login', component: LoginComponent },
-  { path: 'Event', component: EventComponent },
-  { path: '**', redirectTo: 'EventCalendar' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  { path: 'login', component: LoginComponent },
+
+  // 🔥 ESTA ES TU APP COMPLETA (sidebar + main-content)
+  { path: 'home', component: SideBarComponent },
+
+  { path: '**', redirectTo: 'login' }
 ];

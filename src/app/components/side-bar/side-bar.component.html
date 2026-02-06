@@ -1,55 +1,39 @@
-<div class="app-container" >
-    <div class="sidebar">
-        <div class="sidebar-profile">
-            <div class="logoEmpresa"></div>
-            <button class="buttonTheme" (click)="theme.toggleTheme()">
-                <span class="material-icons">
-                    {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
-                </span>
-            </button>
-        </div>
+<div class="app-container">
+  <div class="sidebar">
+    <div class="sidebar-profile">
+      <div class="logoEmpresa"></div>
 
-
-        <ul class="sidebar-menu">
-            <li (click)="navigateTo('/EventCalendar')">
-                <span class="material-icons">calendar_month</span>
-                Calendario Eventos
-            </li>
-            <li (click)="navigateTo('/Event')">
-                <span class="material-icons">celebration</span>
-                Eventos
-            </li>
-            <li (click)="navigateTo('/gift')">
-                <span class="material-icons">redeem</span>
-                Gift Code
-            </li>
-            <li (click)="navigateTo('/review')">
-                <span class="material-icons">star</span>
-                Top Review
-            </li>
-            <li (click)="navigateTo('/settings')">
-                <span class="material-icons">settings</span>
-                Settings
-            </li>
-            <li (click)="navigateTo('/support')">
-                <span class="material-icons">support</span>
-                Support
-            </li>
-            </ul>
-
-        <div class="sidebar-bottom">
-            <li (click)="handleLogout()">
-                <span class="material-icons">logout</span>
-                Sign Out
-            </li>
-        </div>
-    </div>
-
-    <button class="sidebar-toggle">
-        <span class="material-icons mainButton">menu</span>
+       <button class="buttonTheme" (click)="theme.toggleTheme()">
+      <span class="material-icons">
+        {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
+      </span>
     </button>
-
-    <div class="main-content">
-        <router-outlet></router-outlet>
     </div>
+
+    <ul class="sidebar-menu">
+      <li
+        *ngFor="let item of menu"
+        (click)="selectMenu(item)"
+        [class.active]="item.enabled"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+        {{ item.nombre }}
+      </li>
+    </ul>
+
+    <div class="sidebar-bottom">
+      <li (click)="handleLogout()">
+        <span class="material-icons">logout</span>
+        Sign Out
+      </li>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle">
+    <span class="material-icons mainButton">menu</span>
+  </button>
+
+  <div class="main-content">
+    <ng-container *ngComponentOutlet="activeComponent"></ng-container>
+  </div>
 </div>

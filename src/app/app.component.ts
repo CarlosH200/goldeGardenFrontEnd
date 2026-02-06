@@ -9,7 +9,7 @@ import { EventCalendarComponent } from "./components/event-calendar/event-calend
   selector: 'app-root',
   imports: [
     FormsModule,
-    LoginComponent
+    RouterOutlet
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

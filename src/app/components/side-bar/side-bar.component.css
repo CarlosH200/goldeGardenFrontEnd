@@ -5,6 +5,19 @@ html, body {
 }
 
 
+.buttonTheme {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-principal);
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 2000 !important
+}
+
+
+
 /* Contenedor principal */
 .app-container {
   display: flex;

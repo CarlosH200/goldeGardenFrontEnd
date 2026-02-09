@@ -25,7 +25,7 @@ export class LoginComponent implements AfterViewInit {
 
   @ViewChild('userInput') userInput!: ElementRef<HTMLInputElement>;
 
-  isLoading: boolean = false;
+  isLoading: boolean = false; //reggreasr a false despues
   hidePassword: boolean = true;
 
   usuario: string = '';
@@ -63,7 +63,7 @@ export class LoginComponent implements AfterViewInit {
 
         if (res.success) {
           this.snackBar.open(this.mensaje, 'Cerrar', {
-            duration: 3000,
+            duration: 4000,
             panelClass: ['alerta-exito'],
             horizontalPosition: 'center',
             verticalPosition: 'bottom',

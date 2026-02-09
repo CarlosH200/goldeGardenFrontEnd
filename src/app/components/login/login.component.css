@@ -17,7 +17,21 @@
   z-index: 2000 !important
 }
 
-
+/* imagen para pantalla de carga con tema claro y oscuro */
+.logoLoadingEmpresa{
+    width: 150px;
+    height: 125px; /* <-- antes 150px, esto quita el espacio extra */
+    display: flex;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center;
+    justify-content: center;
+    background-image: var(--theme-image-url) !important; 
+    background-size: contain;
+    background-repeat: no-repeat;
+    padding-bottom: 0px !important;
+    background-position: center; /* <-- importante */
+}
 
 /* estilos pantalla de carga */
 .loading-overlay {
@@ -26,24 +40,70 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--color-fondo); /* <--- DEFINE AQUÍ TU COLOR */
+  background-color: var(--color-fondo);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Asegura que esté por encima de todo */
-  color:var(--color-texto);
-  flex-direction: column;
+  z-index: 9999;
+  color: var(--color-texto);
 }
 
-/* Un spinner simple para que el usuario vea movimiento */
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
+/* contenedor interno */
+.spinner-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+}
+
+/* APARTADO PUNTOS DE CARGA DEBAJO DE IMAGEN */
+.spinner{
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border-top: 4px solid var(--color-principal);
-  width: 80px;
-  height: 80px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
+  background: var(--color-principal);
+  animation: dots 1.3s infinite linear;
+  margin: 0;
+
+  /* 🔥 CLAVE PARA QUE NO SE DESALINEE */
+  transform: translateX(-45px);
+}
+
+@keyframes dots{
+  0%{
+    box-shadow:
+      30px 0 var(--color-secundario),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-secundario);
+  }
+  33%{
+    box-shadow:
+      30px 0 var(--color-principal),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-secundario);
+  }
+  66%{
+    box-shadow:
+      30px 0 var(--color-secundario),
+      60px 0 var(--color-principal),
+      90px 0 var(--color-secundario);
+  }
+  100%{
+    box-shadow:
+      30px 0 var(--color-secundario),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-principal);
+  }
+}
+/* APARTADO PUNTOS DE CARGA DEBAJO DE IMAGEN */
+
+
+
+/* QUITAMOS EL MARGEN DEFAULT DEL P */
+.spinner-container p{
+  margin: 0;
 }
 
 @keyframes spin {
@@ -51,6 +111,7 @@
   100% { transform: rotate(360deg); }
 }
 /* estilos pantalla de carga */
+
 
 
 .logoEmpresa{

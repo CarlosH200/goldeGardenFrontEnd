@@ -2,12 +2,12 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild, OnInit } from '@angular/core';
 
-import { AuthService } from '../../services/authService';
 import { LoginModel } from '../../models/loginModel';
 import { ThemeService } from '../../services/theme.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/authService';
 
 @Component({
   selector: 'app-login',
@@ -21,15 +21,16 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   styleUrls: ['./login.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit {
 
   @ViewChild('userInput') userInput!: ElementRef<HTMLInputElement>;
 
-  isLoading: boolean = false; //reggreasr a false despues
+  isLoading: boolean = false;
   hidePassword: boolean = true;
 
   usuario: string = '';
   password: string = '';
+
   mensaje: string = '';
   success: boolean | null = null;
 
@@ -40,20 +41,37 @@ export class LoginComponent implements AfterViewInit {
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    // ✅ Si ya está logueado, no tiene sentido mostrar login
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['home']); // 👈 sin slash
+    }
+  }
+
   ngAfterViewInit(): void {
     this.focusUser();
   }
 
-  // esta función se encarga de enfocar el input del usuario después de que la vista se haya inicializado
   private focusUser() {
     setTimeout(() => {
       if (this.userInput?.nativeElement) {
         this.userInput.nativeElement.focus();
       }
-    }, 200); //delay real para que no lo pierda por el DOM
+    }, 200);
   }
 
   isLogin(): void {
+    if (!this.usuario || !this.password) {
+      this.snackBar.open('Ingrese usuario y contraseña', 'Cerrar', {
+        duration: 2500,
+        panelClass: ['alerta-error'],
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+      this.focusUser();
+      return;
+    }
+
     this.isLoading = true;
 
     this.authService.login(this.usuario, this.password).subscribe({
@@ -63,16 +81,17 @@ export class LoginComponent implements AfterViewInit {
 
         if (res.success) {
           this.snackBar.open(this.mensaje, 'Cerrar', {
-            duration: 4000,
+            duration: 3000,
             panelClass: ['alerta-exito'],
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           });
 
+          // ✅ Navegar respetando el baseHref (SIN slash)
           setTimeout(() => {
             this.isLoading = false;
-            this.router.navigate(['/home']);
-          }, 1500);
+            this.router.navigate(['home']);
+          }, 800);
 
         } else {
           this.isLoading = false;
@@ -84,7 +103,6 @@ export class LoginComponent implements AfterViewInit {
             verticalPosition: 'bottom',
           });
 
-          //cuando falla, volver a enfocar input usuario
           this.focusUser();
         }
       },
@@ -96,13 +114,11 @@ export class LoginComponent implements AfterViewInit {
         this.snackBar.open(this.mensaje, 'Cerrar', {
           duration: 3000,
           panelClass: ['alerta-error'],
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
         });
 
         console.error(err);
-
-        // al generar error también enfoca input usuario
         this.focusUser();
       }
     });

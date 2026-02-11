@@ -66,15 +66,13 @@
   background: var(--color-principal);
   animation: dots 1.3s infinite linear;
   margin: 0;
-
-  /* 🔥 CLAVE PARA QUE NO SE DESALINEE */
   transform: translateX(-45px);
 }
 
 @keyframes dots{
-  0%{
+  10%{
     box-shadow:
-      30px 0 var(--color-secundario),
+      30px 0 var(--color-principal),
       60px 0 var(--color-secundario),
       90px 0 var(--color-secundario);
   }

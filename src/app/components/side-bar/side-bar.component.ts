@@ -51,6 +51,8 @@ export class SideBarComponent {
   }
 
   handleLogout() {
-     this.router.navigate(['/login']);
-  }
+  this.authService.logout();      // ✅ borra sesión
+  this.router.navigate(['login']); // ✅ sin slash (respeta baseHref)
+}
+
 }

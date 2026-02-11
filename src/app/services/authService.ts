@@ -1,43 +1,52 @@
-// src/app/services/auth.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Router } from '@angular/router'; // Dejamos el Router por si lo necesitas después
+import { Observable, tap } from 'rxjs';
 import { LoginModel } from '../models/loginModel';
 import { urlApi } from '../providers/api.providers';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly endpoint = 'auth/login';
-  private readonly baseUrl: string = this.ensureTrailingSlash(urlApi.apiServer.urlBase);
-  // Asume que usas esta clave en localStorage o similar
-  private readonly IS_LOGGED_IN_KEY = 'isLoggedInState'; 
+  private platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient, private router: Router) {} 
+  private readonly endpoint = 'auth/login';
+  private readonly baseUrl: string = this.ensureTrailingSlash(urlApi.apiServer.urlBase);
 
-  login(usuario: string, password: string): Observable<LoginModel> {
-    const body = { usuario, password };
-    const url = `${this.baseUrl}${this.endpoint}`;
-    return this.http.post<LoginModel>(url, body);
-  }
+  private readonly IS_LOGGED_IN_KEY = 'isLoggedInState';
 
-  // ----------------------------------------------------
-  // 💡 FUNCIÓN TEMPORAL DE CIERRE DE SESIÓN Y RECARGA
- logoutAndReload(): void {
-    // 1. Limpia la variable de estado que te mantiene logueado
-    localStorage.removeItem(this.IS_LOGGED_IN_KEY); 
-    
-    // 2. Fuerzando una recarga completa del navegador.
-    // Esto reinicia toda la aplicación desde cero y fuerza la verificación de sesión.
-    window.location.reload(); 
-  }
-  // ----------------------------------------------------
+  constructor(private http: HttpClient) {}
 
-  // 🔧 Asegura que la base URL tenga una barra final
-  private ensureTrailingSlash(url: string): string {
-    return url.endsWith('/') ? url : url + '/';
-  }
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  login(usuario: string, password: string): Observable<LoginModel> {
+    const body = { usuario, password };
+    const url = `${this.baseUrl}${this.endpoint}`;
+
+    return this.http.post<LoginModel>(url, body).pipe(
+      tap(() => {
+        if (!this.isBrowser()) return;
+        localStorage.setItem(this.IS_LOGGED_IN_KEY, 'true');
+      })
+    );
+  }
+
+  isLoggedIn(): boolean {
+    if (!this.isBrowser()) return false;
+    return localStorage.getItem(this.IS_LOGGED_IN_KEY) === 'true';
+  }
+
+  logout(): void {
+    if (this.isBrowser()) {
+      localStorage.removeItem(this.IS_LOGGED_IN_KEY);
+    }
+  }
+
+  private ensureTrailingSlash(url: string): string {
+    return url.endsWith('/') ? url : url + '/';
+  }
 }

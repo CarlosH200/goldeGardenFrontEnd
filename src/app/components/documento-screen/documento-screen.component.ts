@@ -13,7 +13,10 @@ import { ThemeService } from '../../services/theme.service';
 import { EstadoService } from '../../services/estadoService';
 import { EstadosModel } from '../../models/estadoModel';
 import { ClienteModel } from '../../models/clienteModel';
+import { ClientesService } from '../../services/cliente.service';
+import { ClienteCreateRequest } from '../../models/clienteCreateRequest';
 
+// ✅ NUEVO IMPORT
 
 @Component({
   selector: 'app-documento-screen',
@@ -37,6 +40,7 @@ export class DocumentoScreenComponent {
     observacion01: '',
     observacion02: ''
   };
+
   // Variable para desplegar inputs para crear cliente
   dataCreateClient: number = 0;
   // Vaiable para almacenar el titulo del evento
@@ -80,6 +84,8 @@ export class DocumentoScreenComponent {
     private EstadosService: EstadoService,
     public theme: ThemeService,
 
+    // ✅ NUEVO SERVICE
+    private clientesService: ClientesService,
   ) { }
 
   ngOnInit(): void {
@@ -90,19 +96,102 @@ export class DocumentoScreenComponent {
     this.getEstados();
   }
 
-guardarCliente(): void {
+  // ==========================================================
+  // ✅ GUARDAR CLIENTE (FUNCIONAL)
+  // ==========================================================
+  guardarCliente(): void {
 
-  const clienteGuardar: ClienteModel = {
-    ...this.clienteForm as ClienteModel, // casteo seguro
-    estado: 1,
-    fechaRegistro: new Date().toISOString(),
-    // username: this.usuarioActual  // pendiente de implementar
-  };
+    // ✅ 1) Validaciones mínimas (para evitar error @Tipo_Cliente)
+    if (!this.clienteForm.nit || this.clienteForm.nit.trim() === '') {
+      alert('El NIT es obligatorio');
+      return;
+    }
 
-  console.log(clienteGuardar);
+    if (!this.clienteForm.nombre || this.clienteForm.nombre.trim() === '') {
+      alert('El Nombre es obligatorio');
+      return;
+    }
 
-  // aquí llamas a tu servicio HTTP
-}
+    if (!this.clienteForm.tipoCliente || this.clienteForm.tipoCliente <= 0) {
+      alert('Debe seleccionar Tipo Cliente');
+      return;
+    }
+
+    // ✅ 2) LIMPIEZA de datos para BIGINT (evita error nvarchar -> bigint)
+    const nitLimpio = (this.clienteForm.nit ?? '').replace(/\D/g, '');
+    const telLimpio = (this.clienteForm.telefono ?? '').replace(/\D/g, '');
+    const celLimpio = (this.clienteForm.celular ?? '').replace(/\D/g, '');
+
+    // ⚠️ Si queda vacío después de limpiar, no lo mandes vacío
+    if (!nitLimpio) {
+      alert('El NIT debe ser numérico');
+      return;
+    }
+
+    // ==========================================================
+    // ✅ 3) ARMAMOS EL BODY EXACTO QUE TU API ESPERA
+    // ==========================================================
+    const body: ClienteCreateRequest = {
+      nit: nitLimpio,
+      nombre: (this.clienteForm.nombre ?? '').trim(),
+      apellido: (this.clienteForm.apellido ?? '').trim(),
+      email: (this.clienteForm.email ?? '').trim(),
+      dpi: (this.clienteForm.dpi ?? '').trim(),
+      direccion: (this.clienteForm.direccion ?? '').trim(),
+      telefono: telLimpio || '0',
+      celular: celLimpio || '0',
+      tipoCliente: Number(this.clienteForm.tipoCliente),
+      observacion01: (this.clienteForm.observacion01 ?? '').trim(),
+      observacion02: (this.clienteForm.observacion02 ?? '').trim(),
+
+      // ⚠️ IMPORTANTE: tu API lo exige
+      // Por ahora lo dejamos fijo hasta que lo conectes con sesión real
+      username: 'admin'
+    };
+
+    console.log('Body enviado a API:', body);
+
+    // ==========================================================
+    // ✅ 4) CONSUMIR API
+    // ==========================================================
+    this.clientesService.insertCliente(body).subscribe({
+      next: (res) => {
+
+        if (res?.success) {
+          alert(res.mensaje || 'Cliente creado correctamente');
+
+          // ✅ Limpia el formulario al guardar
+          this.clienteForm = {
+            nit: '',
+            nombre: '',
+            apellido: '',
+            email: '',
+            dpi: '',
+            direccion: '',
+            telefono: '',
+            celular: '',
+            tipoCliente: 1,
+            observacion01: '',
+            observacion02: ''
+          };
+
+          // opcional: ocultar inputs
+          this.dataCreateClient = 0;
+
+        } else {
+          alert(res?.mensaje || 'No se pudo guardar el cliente');
+          console.error('Respuesta API:', res);
+        }
+      },
+      error: (err) => {
+        console.error('Error API:', err);
+
+        // Si el backend manda error detallado:
+        const msg = err?.error?.mensaje || 'Error al conectar con el servidor';
+        alert(msg);
+      }
+    });
+  }
 
   // Funcion para mostrar inputs de crear cliente
   showCreateClient(): void {
@@ -153,8 +242,4 @@ guardarCliente(): void {
       error: (err) => console.error('Error al cargar Estados', err)
     });
   }
-
-
-
-
 }

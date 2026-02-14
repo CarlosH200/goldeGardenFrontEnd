@@ -142,12 +142,23 @@ export class DocumentoScreenComponent {
           ]
         }
       });
-
       return;
     }
 
+    // VALIDACION DEL TIPO CLIENTE: Asegura que se haya seleccionado un tipo cliente válido (no nulo, no vacío, no cero)
     if (!this.clienteForm.tipoCliente || this.clienteForm.tipoCliente <= 0) {
-      alert('Debe seleccionar Tipo Cliente');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'Debe seleccionar un Tipo Cliente válido.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'Tipo Cliente Actual', valor: this.clienteForm.tipoCliente },
+          ]
+        }
+      });
       return;
     }
 
@@ -162,7 +173,18 @@ export class DocumentoScreenComponent {
 
     // ⚠️ Si queda vacío después de limpiar, no lo mandes vacío
     if (!nitLimpio) {
-      alert('El NIT debe ser numérico');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos el NIT debe ser numérico.',
+          mensaje: 'NIT Actual: ' + this.clienteForm.nit,
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'NIT Actual', valor: this.clienteForm.nit },
+          ]
+        }
+      });
       return;
     }
 

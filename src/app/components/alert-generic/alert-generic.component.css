@@ -1,6 +1,8 @@
 /* =========================
    TITULO (centrado real)
 ========================= */
+
+
 .title {
   display: flex;
   align-items: center;
@@ -33,15 +35,15 @@
 
 /* Colores por tipo */
 .success {
-  color: #16a34a !important;
+  color: var(--color-success) !important;
 }
 
 .error {
-  color: #dc2626 !important;
+  color: var(--color-error) !important;
 }
 
 .warning {
-  color: #d97706 !important;
+  color: var(--color-warning) !important;
 }
 
 /* =========================
@@ -50,7 +52,7 @@
 .mensaje-principal {
   margin: 8px 0 14px 0;
   font-size: 14px;
-  color: #374151;
+  color: var(--color-texto) !important;
   line-height: 1.5;
 }
 
@@ -58,8 +60,9 @@
    DETALLES (caja pro)
 ========================= */
 .caja-info {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
+  background: var(--color-fondo);
+  border: 1px solid transparent;
+  color: var(--color-texto) !important;
   border-radius: 16px;
   padding: 14px 14px;
 }
@@ -80,7 +83,7 @@
 
 .label {
   font-weight: 800;
-  color: #111827;
+  color: var(--color-texto);
   min-width: 70px;
 }
 

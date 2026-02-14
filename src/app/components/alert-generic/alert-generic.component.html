@@ -1,6 +1,11 @@
-<h2 mat-dialog-title [ngClass]="data.tipo">
-  {{ data.icon }} {{ data.titulo }}
+<h2 mat-dialog-title class="title" [ngClass]="data.tipo">
+  <span class="material-symbols-outlined icon">
+    {{ data.icon }}
+  </span>
+  <span class="titulo-texto">{{ data.titulo }}</span>
 </h2>
+
+
 
 <mat-dialog-content>
   <p class="mensaje-principal">{{ data.mensaje }}</p>
@@ -13,6 +18,8 @@
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-flat-button color="primary" mat-dialog-close>Aceptar</button>
+<mat-dialog-actions align="end" class="acciones">
+  <button mat-flat-button class="btn-aceptar" mat-dialog-close>
+    Aceptar
+  </button>
 </mat-dialog-actions>

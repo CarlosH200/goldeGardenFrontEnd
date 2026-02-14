@@ -1,0 +1,122 @@
+/* =========================
+   TITULO (centrado real)
+========================= */
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 👈 centra todo horizontalmente */
+  gap: 10px;
+
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.titulo-texto {
+  line-height: 1.2;
+}
+
+/* herencia de color */
+.title .icon,
+.title .titulo-texto {
+  color: inherit;
+}
+
+
+/* Colores por tipo */
+.success {
+  color: #16a34a !important;
+}
+
+.error {
+  color: #dc2626 !important;
+}
+
+.warning {
+  color: #d97706 !important;
+}
+
+/* =========================
+   MENSAJE
+========================= */
+.mensaje-principal {
+  margin: 8px 0 14px 0;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* =========================
+   DETALLES (caja pro)
+========================= */
+.caja-info {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px 14px;
+}
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+
+  padding: 8px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.fila:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 800;
+  color: #111827;
+  min-width: 70px;
+}
+
+.valor {
+  color: #374151;
+  text-align: right;
+  word-break: break-word;
+  max-width: 240px;
+}
+
+/* =========================
+   ACCIONES + BOTON PRO
+========================= */
+.acciones {
+  padding: 14px 24px 18px 24px;
+}
+
+/* botón elegante */
+.btn-aceptar {
+  border-radius: 16px !important;
+  padding: 10px 22px !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  letter-spacing: 0.2px !important;
+
+  /* look más premium */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* efecto hover elegante */
+.btn-aceptar:hover {
+  filter: brightness(0.97);
+}
+
+/* quita el feo ripple si querés (opcional) */
+/*
+:host ::ng-deep .mat-mdc-button-persistent-ripple {
+  display: none !important;
+}
+*/

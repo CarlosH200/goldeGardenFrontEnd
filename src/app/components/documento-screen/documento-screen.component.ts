@@ -17,12 +17,13 @@ import { ClientesService } from '../../services/cliente.service';
 import { ClienteCreateRequest } from '../../models/clienteCreateRequest';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 // ✅ NUEVO IMPORT
 
 @Component({
   selector: 'app-documento-screen',
-  imports: [FormsModule, CommonModule,],
+  imports: [FormsModule, CommonModule,MatIconModule,],
   templateUrl: './documento-screen.component.html',
   styleUrl: './documento-screen.component.css'
 })
@@ -40,7 +41,9 @@ export class DocumentoScreenComponent {
     celular: '',
     tipoCliente: 1,
     observacion01: '',
-    observacion02: ''
+    observacion02: '',
+    estado: 1, // Agregado para mostrar en el modal, aunque tu API lo maneje internamente
+    fechaRegistro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
   // Variable para desplegar inputs para crear cliente
@@ -167,11 +170,15 @@ export class DocumentoScreenComponent {
           titulo: 'Cliente Creado Correctamente',
           mensaje: res.mensaje || 'Los datos del cliente han sido almacenados.',
           tipo: 'success', // Esto activará el color verde y el check ✅
+          icon: 'check_circle', // Icono de éxito
           detalles: [
-            { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
             { etiqueta: 'NIT', valor: this.clienteForm.nit },
-            { etiqueta: 'Email', valor: this.clienteForm.email },
-            { etiqueta: 'DPI', valor: this.clienteForm.dpi }
+            { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+            { etiqueta: 'Correo', valor: this.clienteForm.email },
+            { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
+            { etiqueta: 'Estado', valor: this.clienteForm.estado },
+            { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro},
+
           ]
         }
       });

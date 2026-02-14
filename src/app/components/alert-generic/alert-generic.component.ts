@@ -5,7 +5,7 @@ import { AlertGenericModel } from '../../models/alertGerenicModel';
 
 @Component({
   selector: 'app-alert-generic',
-  imports: [CommonModule, MatDialogContent, MatDialogActions],
+  imports: [CommonModule, MatDialogContent, MatDialogActions,],
   templateUrl: './alert-generic.component.html',
   styleUrl: './alert-generic.component.css'
 })

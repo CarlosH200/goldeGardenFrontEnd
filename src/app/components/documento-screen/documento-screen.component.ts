@@ -23,7 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-documento-screen',
-  imports: [FormsModule, CommonModule,MatIconModule,],
+  imports: [FormsModule, CommonModule, MatIconModule,],
   templateUrl: './documento-screen.component.html',
   styleUrl: './documento-screen.component.css'
 })
@@ -88,7 +88,7 @@ export class DocumentoScreenComponent {
     private CapacidadesService: CapacidadesService,
     private EstadosService: EstadoService,
     public theme: ThemeService,
-    public dialog: MatDialog, 
+    public dialog: MatDialog,
 
     // ✅ NUEVO SERVICE
     private clientesService: ClientesService,
@@ -103,18 +103,46 @@ export class DocumentoScreenComponent {
   }
 
   // ==========================================================
-  // ✅ GUARDAR CLIENTE (FUNCIONAL)
+  // BLOQUE GUARDAR CLIENTE
   // ==========================================================
   guardarCliente(): void {
 
-    // ✅ 1) Validaciones mínimas (para evitar error @Tipo_Cliente)
+    //Validaciones mínimas (para evitar error @Tipo_Cliente)
+    //
+
+    // Valida que el nit tenga contenido y no sea solo espacios con la nueva alerta generica integrada
     if (!this.clienteForm.nit || this.clienteForm.nit.trim() === '') {
-      alert('El NIT es obligatorio');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El NIT es obligatorio y debe contener caracteres válidos.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'NIT Actual', valor: this.clienteForm.nit },
+          ]
+        }
+      });
+
       return;
     }
 
+    // Valida que el nombre se ingrese y sea valido (no solo espacios) con la nueva alerta generica integrada
     if (!this.clienteForm.nombre || this.clienteForm.nombre.trim() === '') {
-      alert('El Nombre es obligatorio');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El Nombre es obligatorio y debe contener caracteres válidos.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'Nombre Actual', valor: this.clienteForm.nombre },
+          ]
+        }
+      });
+
       return;
     }
 
@@ -123,8 +151,12 @@ export class DocumentoScreenComponent {
       return;
     }
 
-    // ✅ 2) LIMPIEZA de datos para BIGINT (evita error nvarchar -> bigint)
-    const nitLimpio = (this.clienteForm.nit ?? '').replace(/\D/g, '');
+    //LIMPIEZA de datos para BIGINT (evita error nvarchar -> bigint)
+    const nitRaw = (this.clienteForm.nit ?? '').trim();
+    const nitLimpio = /^c\s*\/?\s*f$/i.test(nitRaw)
+      ? 'C/F'
+      : nitRaw.replace(/\D/g, '');
+
     const telLimpio = (this.clienteForm.telefono ?? '').replace(/\D/g, '');
     const celLimpio = (this.clienteForm.celular ?? '').replace(/\D/g, '');
 
@@ -150,40 +182,40 @@ export class DocumentoScreenComponent {
       observacion01: (this.clienteForm.observacion01 ?? '').trim(),
       observacion02: (this.clienteForm.observacion02 ?? '').trim(),
 
-      // ⚠️ IMPORTANTE: tu API lo exige
-      // Por ahora lo dejamos fijo hasta que lo conectes con sesión real
+      //IMPORTANTE: el API lo requiere para funcionar
+      // Por ahora es un dato quemado hasta consumir el AuthService y parametrizarlo con el usuario real que hace la petición
       username: 'admin'
     };
 
     console.log('Body enviado a API:', body);
 
     // ==========================================================
-    // ✅ 4) CONSUMIR API
+    // CONSUMO DE SERVICIO CREAR CLIENTE (api crear cliente)
     // ==========================================================
     this.clientesService.insertCliente(body).subscribe({
-  next: (res) => {
-    if (res?.success) {
-      // 1. Abrimos el modal con la estructura genérica que definimos
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Cliente Creado Correctamente',
-          mensaje: res.mensaje || 'Los datos del cliente han sido almacenados.',
-          tipo: 'success', // Esto activará el color verde y el check ✅
-          icon: 'check_circle', // Icono de éxito
-          detalles: [
-            { etiqueta: 'NIT', valor: this.clienteForm.nit },
-            { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
-            { etiqueta: 'Correo', valor: this.clienteForm.email },
-            { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
-            { etiqueta: 'Estado', valor: this.clienteForm.estado },
-            { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro},
+      next: (res) => {
+        if (res?.success) {
+          // 1. Abrimos el modal con la estructura genérica que definimos
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Cliente Creado Correctamente',
+              mensaje: res.mensaje || 'Los datos del cliente han sido almacenados.',
+              tipo: 'success', // Controla el tipo de mensaje (puedes usar esto para cambiar colores o íconos en el modal)
+              icon: 'check_circle', // Icono de éxito
+              detalles: [
+                { etiqueta: 'NIT', valor: this.clienteForm.nit },
+                { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+                { etiqueta: 'Correo', valor: this.clienteForm.email },
+                { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
+                { etiqueta: 'Estado', valor: this.clienteForm.estado },
+                { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro },
 
-          ]
-        }
-      });
+              ]
+            }
+          });
 
-          // ✅ Limpia el formulario al guardar
+          //Limpia el formulario de cliente al guardar
           this.clienteForm = {
             nit: '',
             nombre: '',
@@ -198,7 +230,7 @@ export class DocumentoScreenComponent {
             observacion02: ''
           };
 
-          // opcional: ocultar inputs
+          // OCULTA LOS INPUTS LUEGO DE QUE SE GUARDO EL NUEVO CLIENTE
           this.dataCreateClient = 0;
 
         } else {
@@ -211,7 +243,25 @@ export class DocumentoScreenComponent {
 
         // Si el backend manda error detallado:
         const msg = err?.error?.mensaje || 'Error al conectar con el servidor';
-        alert(msg);
+        // alert(msg);
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Error al Crear Cliente',
+            mensaje: msg.mensaje || 'Error sin descripcion.',
+            tipo: 'error', // Controla el tipo de mensaje (puedes usar esto para cambiar colores o íconos en el modal)
+            icon: 'error', // Icono de error
+            detalles: [
+              { etiqueta: 'NIT', valor: this.clienteForm.nit },
+              { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+              { etiqueta: 'Correo', valor: this.clienteForm.email },
+              { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
+              { etiqueta: 'Estado', valor: this.clienteForm.estado },
+              { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro },
+
+            ]
+          }
+        });
       }
     });
   }

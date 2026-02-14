@@ -1,0 +1,18 @@
+<h2 mat-dialog-title [ngClass]="data.tipo">
+  {{ data.icon }} {{ data.titulo }}
+</h2>
+
+<mat-dialog-content>
+  <p class="mensaje-principal">{{ data.mensaje }}</p>
+
+  <div *ngIf="data.detalles && data.detalles.length > 0" class="caja-info">
+    <div *ngFor="let item of data.detalles" class="fila">
+      <span class="label">{{ item.etiqueta }}:</span>
+      <span class="valor">{{ item.valor }}</span>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" mat-dialog-close>Aceptar</button>
+</mat-dialog-actions>

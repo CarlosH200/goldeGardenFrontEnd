@@ -15,12 +15,14 @@ import { EstadosModel } from '../../models/estadoModel';
 import { ClienteModel } from '../../models/clienteModel';
 import { ClientesService } from '../../services/cliente.service';
 import { ClienteCreateRequest } from '../../models/clienteCreateRequest';
+import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
+import { MatDialog } from '@angular/material/dialog';
 
 // ✅ NUEVO IMPORT
 
 @Component({
   selector: 'app-documento-screen',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule,],
   templateUrl: './documento-screen.component.html',
   styleUrl: './documento-screen.component.css'
 })
@@ -83,6 +85,7 @@ export class DocumentoScreenComponent {
     private CapacidadesService: CapacidadesService,
     private EstadosService: EstadoService,
     public theme: ThemeService,
+    public dialog: MatDialog, 
 
     // ✅ NUEVO SERVICE
     private clientesService: ClientesService,
@@ -155,10 +158,23 @@ export class DocumentoScreenComponent {
     // ✅ 4) CONSUMIR API
     // ==========================================================
     this.clientesService.insertCliente(body).subscribe({
-      next: (res) => {
-
-        if (res?.success) {
-          alert(res.mensaje || 'Cliente creado correctamente');
+  next: (res) => {
+    if (res?.success) {
+      // 1. Abrimos el modal con la estructura genérica que definimos
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Cliente Creado Correctamente',
+          mensaje: res.mensaje || 'Los datos del cliente han sido almacenados.',
+          tipo: 'success', // Esto activará el color verde y el check ✅
+          detalles: [
+            { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+            { etiqueta: 'NIT', valor: this.clienteForm.nit },
+            { etiqueta: 'Email', valor: this.clienteForm.email },
+            { etiqueta: 'DPI', valor: this.clienteForm.dpi }
+          ]
+        }
+      });
 
           // ✅ Limpia el formulario al guardar
           this.clienteForm = {

@@ -15,7 +15,7 @@ export class AlertGenericComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: AlertGenericModel, public dialogRef: MatDialogRef<AlertGenericComponent>) {}
 
   
-  cerrar(): void {
+  closeDialog(): void {
     this.dialogRef.close(true);
   }
 

@@ -128,6 +128,28 @@ export class DocumentoScreenComponent {
       return;
     }
 
+    // Valida que el TRelefono o Telefono tenga contenido y no sea solo espacios con la nueva alerta generica integrada
+    if (
+      (!this.clienteForm.telefono || this.clienteForm.telefono.trim() === '') &&
+      (!this.clienteForm.celular || this.clienteForm.celular.trim() === '')
+    ) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El Teléfono o Celular es obligatorio y debe contener caracteres válidos.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'Teléfono Actual', valor: this.clienteForm.telefono },
+            { etiqueta: 'Celular Actual', valor: this.clienteForm.celular },
+          ]
+        }
+      });
+
+      return;
+    }
+
     // Valida que el nombre se ingrese y sea valido (no solo espacios) con la nueva alerta generica integrada
     if (!this.clienteForm.nombre || this.clienteForm.nombre.trim() === '') {
       this.dialog.open(AlertGenericComponent, {
@@ -144,6 +166,41 @@ export class DocumentoScreenComponent {
       });
       return;
     }
+
+    // Valida que el Apellido se ingrese y sea valido (no solo espacios) con la nueva alerta generica integrada
+    if (!this.clienteForm.apellido || this.clienteForm.apellido.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El Apellido es obligatorio y debe contener caracteres válidos.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'Apellido Actual', valor: this.clienteForm.apellido },
+          ]
+        }
+      });
+      return;
+    }
+
+    // Valida que la Direccion se ingrese y sea valido (no solo espacios) con la nueva alerta generica integrada
+    if (!this.clienteForm.direccion || this.clienteForm.direccion.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'La Dirección es obligatoria y debe contener caracteres válidos.',
+          tipo: 'warning',
+          icon: 'warning',
+          detalles: [
+            { etiqueta: 'Dirección Actual', valor: this.clienteForm.direccion },
+          ]
+        }
+      });
+      return;
+    }
+
 
     // VALIDACION DEL TIPO CLIENTE: Asegura que se haya seleccionado un tipo cliente válido (no nulo, no vacío, no cero)
     if (!this.clienteForm.tipoCliente || this.clienteForm.tipoCliente <= 0) {
@@ -171,7 +228,7 @@ export class DocumentoScreenComponent {
     const telLimpio = (this.clienteForm.telefono ?? '').replace(/\D/g, '');
     const celLimpio = (this.clienteForm.celular ?? '').replace(/\D/g, '');
 
-    // ⚠️ Si queda vacío después de limpiar, no lo mandes vacío
+    // VALIDACION PARA EVITAR ENVIAR NIT VACIO
     if (!nitLimpio) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
@@ -189,18 +246,18 @@ export class DocumentoScreenComponent {
     }
 
     // ==========================================================
-    // ✅ 3) ARMAMOS EL BODY EXACTO QUE TU API ESPERA
+    // BODY QUE ESPERA EL API INSERT CLIENTE
     // ==========================================================
     const body: ClienteCreateRequest = {
       nit: nitLimpio,
       nombre: (this.clienteForm.nombre ?? '').trim(),
       apellido: (this.clienteForm.apellido ?? '').trim(),
-      email: (this.clienteForm.email ?? '').trim(),
-      dpi: (this.clienteForm.dpi ?? '').trim(),
+      email: (this.clienteForm.email ?? 'correo@generico.com').trim(),
+      dpi: (this.clienteForm.dpi ?? '0000000000000').trim(),
       direccion: (this.clienteForm.direccion ?? '').trim(),
-      telefono: telLimpio || '0',
-      celular: celLimpio || '0',
-      tipoCliente: Number(this.clienteForm.tipoCliente),
+      telefono: telLimpio || '00000000',
+      celular: celLimpio || '00000000',
+      tipoCliente: Number(this.clienteForm.tipoCliente ?? 1), // Asegura que siempre se envíe un número válido, por defecto 1
       observacion01: (this.clienteForm.observacion01 ?? '').trim(),
       observacion02: (this.clienteForm.observacion02 ?? '').trim(),
 

@@ -47,8 +47,11 @@ export class DocumentoScreenComponent {
   };
 
   // VARIABLES PARA BUSQUEDA DE CLIENTES
+  // Array para almacenar los clientes encontrados en la búsqueda
   clientesEncontrados: ClienteModel[] = [];
+  // variable para almacenar el texto de búsqueda del cliente
   busquedaCliente: string = '';
+  // array para almacenar el cliente seleccionado de la búsqueda (inicialmente null)
   clienteSeleccionado: ClienteModel | null = null;
   // Variable para desplegar inputs para crear cliente
   dataCreateClient: number = 0;
@@ -94,7 +97,7 @@ export class DocumentoScreenComponent {
     public theme: ThemeService,
     public dialog: MatDialog,
 
-    // ✅ NUEVO SERVICE
+    //NUEVO SERVICE
     private clientesService: ClientesService,
   ) { }
 
@@ -106,38 +109,41 @@ export class DocumentoScreenComponent {
     this.getEstados();
   }
 
-// FUNCION PARA BUSCAR CLIENTES CON EL NUEVO METODO EN EL SERVICE
+  // FUNCION PARA BUSCAR CLIENTES CON EL NUEVO METODO EN EL SERVICE
   buscarClientes(): void {
 
-  if (!this.busquedaCliente || this.busquedaCliente.trim() === '') {
-    return;
-  }
+    // limpia el cliente seleccionado cada vez que se hace una nueva búsqueda para evitar confusiones si el usuario cambia de opinión o busca otro cliente
+    this.clienteSeleccionado = null;
 
-  this.clientesService.buscarClientes(this.busquedaCliente).subscribe({
-    next: (res) => {
-      if (res?.success) {
-        this.clientesEncontrados = res.data;
-        console.log('Clientes encontrados:', this.clientesEncontrados);
-      } else {
+    if (!this.busquedaCliente || this.busquedaCliente.trim() === '') {
+      return;
+    }
+
+    this.clientesService.buscarClientes(this.busquedaCliente).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.clientesEncontrados = res.data;
+          console.log('Clientes encontrados:', this.clientesEncontrados);
+        } else {
+          this.clientesEncontrados = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error al buscar clientes', err);
         this.clientesEncontrados = [];
       }
-    },
-    error: (err) => {
-      console.error('Error al buscar clientes', err);
-      this.clientesEncontrados = [];
-    }
-  });
-}
+    });
+  }
 
-seleccionarCliente(cliente: ClienteModel): void {
-  this.clienteSeleccionado = cliente;
+  seleccionarCliente(cliente: ClienteModel): void {
+    this.clienteSeleccionado = cliente;
 
-  // Limpia resultados (oculta lista)
-  this.clientesEncontrados = [];
+    // Limpia resultados (oculta lista)
+    this.clientesEncontrados = [];
 
-  // Limpia input si quieres
-  this.busquedaCliente = '';
-}
+    // Limpia input si quieres
+    this.busquedaCliente = '';
+  }
 
   // ==========================================================
   // BLOQUE GUARDAR CLIENTE

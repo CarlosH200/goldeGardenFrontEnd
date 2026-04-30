@@ -1,7 +1,7 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, RouterModule } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http'; // ✅ IMPORTANTE
+import { provideHttpClient, withFetch } from '@angular/common/http'; // IMPORTANTE
 
 import { routes } from './app.routes';
 
@@ -10,6 +10,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient() // ✅ AGREGA ESTO
+    provideHttpClient(withFetch()) // AGREGA ESTO
   ]
 };

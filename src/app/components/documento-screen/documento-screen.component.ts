@@ -43,9 +43,13 @@ export class DocumentoScreenComponent {
     observacion01: '',
     observacion02: '',
     estado: 1, // Agregado para mostrar en el modal, aunque tu API lo maneje internamente
-    fechaRegistro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
+    fecha_Registro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
+  // VARIABLES PARA BUSQUEDA DE CLIENTES
+  clientesEncontrados: ClienteModel[] = [];
+  busquedaCliente: string = '';
+  clienteSeleccionado: ClienteModel | null = null;
   // Variable para desplegar inputs para crear cliente
   dataCreateClient: number = 0;
   // Vaiable para almacenar el titulo del evento
@@ -101,6 +105,39 @@ export class DocumentoScreenComponent {
     this.getCapacidades();
     this.getEstados();
   }
+
+// FUNCION PARA BUSCAR CLIENTES CON EL NUEVO METODO EN EL SERVICE
+  buscarClientes(): void {
+
+  if (!this.busquedaCliente || this.busquedaCliente.trim() === '') {
+    return;
+  }
+
+  this.clientesService.buscarClientes(this.busquedaCliente).subscribe({
+    next: (res) => {
+      if (res?.success) {
+        this.clientesEncontrados = res.data;
+        console.log('Clientes encontrados:', this.clientesEncontrados);
+      } else {
+        this.clientesEncontrados = [];
+      }
+    },
+    error: (err) => {
+      console.error('Error al buscar clientes', err);
+      this.clientesEncontrados = [];
+    }
+  });
+}
+
+seleccionarCliente(cliente: ClienteModel): void {
+  this.clienteSeleccionado = cliente;
+
+  // Limpia resultados (oculta lista)
+  this.clientesEncontrados = [];
+
+  // Limpia input si quieres
+  this.busquedaCliente = '';
+}
 
   // ==========================================================
   // BLOQUE GUARDAR CLIENTE
@@ -288,7 +325,7 @@ export class DocumentoScreenComponent {
                 { etiqueta: 'Correo', valor: this.clienteForm.email },
                 { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
                 { etiqueta: 'Estado', valor: this.clienteForm.estado },
-                { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro },
+                { etiqueta: 'Fecha Creación', valor: this.clienteForm.fecha_Registro },
 
               ]
             }
@@ -336,7 +373,7 @@ export class DocumentoScreenComponent {
               { etiqueta: 'Correo', valor: this.clienteForm.email },
               { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
               { etiqueta: 'Estado', valor: this.clienteForm.estado },
-              { etiqueta: 'Fecha Creación', valor: this.clienteForm.fechaRegistro },
+              { etiqueta: 'Fecha Creación', valor: this.clienteForm.fecha_Registro },
 
             ]
           }
@@ -347,11 +384,14 @@ export class DocumentoScreenComponent {
 
   // Funcion para mostrar inputs de crear cliente
   showCreateClient(): void {
+    this.clienteSeleccionado = null;
     this.dataCreateClient = 1;
   }
 
   // Funcion para ocultar inputs de crear cliente
   hideCreateClient(): void {
+    this.clientesEncontrados = [];
+    this.clienteSeleccionado = null;
     this.dataCreateClient = 0;
   }
 

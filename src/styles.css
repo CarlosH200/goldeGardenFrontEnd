@@ -27,7 +27,7 @@ body.dark-theme {
   --color-texto-invertido: #000000;
   --color-secundario: #004e24;
   --color-Shadow: #535353;
-  --theme-image-url: url("assets/GoldenGardenDarckTheme.png");
+  --theme-image-url: url("assets/GoldenGardenLigthTheme.png"); 
   /* APARTADO COLORES ALERTAS */
   --color-success: #16a34a;
   --color-error: #dc2626;

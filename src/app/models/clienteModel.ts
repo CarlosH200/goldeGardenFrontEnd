@@ -1,6 +1,5 @@
 export interface ClienteModel {
-  id?: number;
-
+  id: number;
   nit: string;
   nombre: string;
   apellido: string;
@@ -11,15 +10,18 @@ export interface ClienteModel {
   celular: string;
   tipoCliente: number;
 
-  fechaRegistro?: string;
-  observacion01?: string;
-  observacion02?: string;
-  estado?: number;
+  fecha_Registro: string;
 
-  username?: string;
-  mUsername?: string;
-  fechaHora?: string;
-  mFechaHora?: string;
+  observacion01: string;
+  observacion02: string;
 
-  consecutivoInterno?: number;
+  estado: number;
+
+  username: string;
+  m_Username: string;
+
+  fecha_Hora: string;
+  m_Fecha_Hora: string | null;
+
+  consecutivo_Interno: number;
 }

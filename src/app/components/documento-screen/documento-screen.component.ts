@@ -18,6 +18,8 @@ import { ClienteCreateRequest } from '../../models/clienteCreateRequest';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { EventosService } from '../../services/eventosService';
+import { AuthService } from '../../services/authService';
 
 // ✅ NUEVO IMPORT
 
@@ -46,6 +48,8 @@ export class DocumentoScreenComponent {
     fecha_Registro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
+  // VARIABLE PARA ALMACENAR EL ID DEL EVENTO CREADO
+  idEventoCreado: number | null = null;
   // VARIABLES PARA BUSQUEDA DE CLIENTES
   // Array para almacenar los clientes encontrados en la búsqueda
   clientesEncontrados: ClienteModel[] = [];
@@ -60,13 +64,13 @@ export class DocumentoScreenComponent {
   // Variable para almacenar la descripcion del evento
   pDescripcionEvento: string = '';
   // Variable para almacenar la fecha de entrega del evento
-  pFechaEntregaEvento: string = '';
+  pFechaEntregaEvento: string = this.getFechaConHora(7, 0);
   // Variable para almacenar la fecha de recoger del evento
-  pFechaRecogerEvento: string = '';
+  pFechaRecogerEvento: string = this.getFechaConHora(23, 0);
   // Variable para almacenar la fecha de inicio del evento
-  pFechaInicioEvento: string = '';
+  pFechaInicioEvento: string = this.getFechaConHora(6, 0);
   // Variable para almacenar la fecha de fin del evento
-  pFechaFinEvento: string = '';
+  pFechaFinEvento: string = this.getFechaConHora(23, 59);
   // Variable para almecenar el id de la uibicacion seleccionada (valor 1 por defecto si no hay seleccion)
   pUbicacionEvento: number = 1;
   // Variabpara almacenar al organizador del evento (valor 1 por defecto si no hay seleccion)
@@ -89,6 +93,7 @@ export class DocumentoScreenComponent {
   Estados: EstadosModel[] = [];
 
   constructor(
+    private eventosService: EventosService,
     private ubicacionesService: UbicacionesService,
     private TipoEventoService: TipoEventoService,
     private OrganizadorService: OrganizadorService,
@@ -96,6 +101,7 @@ export class DocumentoScreenComponent {
     private EstadosService: EstadoService,
     public theme: ThemeService,
     public dialog: MatDialog,
+    private authService: AuthService,
 
     //NUEVO SERVICE
     private clientesService: ClientesService,
@@ -108,6 +114,221 @@ export class DocumentoScreenComponent {
     this.getCapacidades();
     this.getEstados();
   }
+
+
+  // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
+  getFechaConHora(hora: number, minutos: number): string {
+    const now = new Date();
+
+    now.setHours(hora, minutos, 0, 0);
+
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - offset * 60000);
+
+    return local.toISOString().slice(0, 16);
+  }
+
+
+  // INICIO FUNCION PARA GUARDAR EVENTO
+  guardarEvento(): void {
+
+    if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El título del evento es obligatorio.',
+          tipo: 'warning',
+          icon: 'warning'
+        }
+      });
+      return;
+    }
+
+    if (!this.clienteSeleccionado) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Cliente requerido',
+          mensaje: 'Debes seleccionar un cliente.',
+          tipo: 'warning',
+          icon: 'warning'
+        }
+      });
+      return;
+    }
+
+    const body = {
+      titulo: this.pTituloEvento,
+      descripcion: this.pDescripcionEvento,
+
+      fecha_Ini: this.pFechaInicioEvento,
+      fecha_Fin: this.pFechaFinEvento,
+      fecha_Entrega: this.pFechaEntregaEvento,
+      fecha_Recepcion: this.pFechaRecogerEvento,
+
+      ubicacion: this.pUbicacionEvento,
+      organizador: this.pOrganizadorEvento,
+      tipo_Evento: this.pTipoEvento,
+      capacidad_Evento: this.pCapacidadEvento,
+
+      observacion: this.pDetallesEvento,
+
+      url_Evento: this.pTituloEvento.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
+
+      username: this.authService.getUsername(),
+
+      id_cliente: this.clienteSeleccionado.id
+    };
+
+    console.log('BODY EVENTO:', body);
+
+    this.eventosService.insertarEvento(body).subscribe({
+      next: (res) => {
+        if (res.success) {
+
+          const idEvento = res.id;
+
+          // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
+          this.idEventoCreado = idEvento;
+          // NUEVO
+          this.cargarEventoPorId(idEvento);
+          console.log('ID EVENTO:', idEvento);
+
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Evento creado',
+              mensaje: res.mensaje,
+              tipo: 'success',
+              icon: 'check_circle',
+              detalles: [
+                { etiqueta: 'ID Evento', valor: idEvento },
+                { etiqueta: 'Título', valor: this.pTituloEvento }
+              ]
+            }
+          });
+
+          // 🔥 FUTURO: documentos
+          // this.subirDocumento(idEvento);
+
+        } else {
+          console.error(res);
+        }
+      },
+      error: (err) => {
+        console.error(err);
+
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Error',
+            mensaje: err?.error?.mensaje || 'Error al guardar evento',
+            tipo: 'error',
+            icon: 'error'
+          }
+        });
+      }
+    });
+  }
+  // FIN FUNCION PARA GUARDAR EVENTO
+
+
+  // FUNCION PARA LLAMMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
+  buscarEvento(): void {
+    if (!this.idEventoCreado) {
+      console.warn('Debes ingresar un ID');
+      return;
+    }
+
+    this.cargarEventoPorId(this.idEventoCreado);
+  }
+
+  // ==========================================================
+  // CARGAR EVENTO POR ID (CON CLIENTE)
+  // ==========================================================
+  cargarEventoPorId(id: number | null): void {
+
+    if (!id) return;
+
+    this.eventosService.obtenerEvento(id).subscribe({
+      next: (res: any) => {
+
+        if (res?.success && res?.data) {
+
+          const evento = res.data;
+
+          console.log('EVENTO CARGADO:', evento);
+
+          // =========================
+          // EVENTO
+          // =========================
+          this.pTituloEvento = evento.titulo;
+          this.pDescripcionEvento = evento.descripcion;
+
+          this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
+          this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
+          this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
+          this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
+
+          this.pUbicacionEvento = evento.ubicacion;
+          this.pOrganizadorEvento = evento.organizador;
+          this.pTipoEvento = evento.tipo_Evento;
+          this.pCapacidadEvento = evento.capacidad_Evento;
+
+          this.pDetallesEvento = evento.observacion || '';
+
+          // =========================
+          // CLIENTE (SIN MÉTODO INEXISTENTE)
+          // =========================
+          const idCliente = evento.id_cliente;
+
+          if (idCliente) {
+
+            this.clientesService.buscarClientes(idCliente).subscribe({
+              next: (resCli: any) => {
+
+                if (resCli?.success && resCli?.data?.length > 0) {
+
+                  // tomamos el primero si viene como lista
+                  this.clienteSeleccionado = resCli.data[0];
+
+                  console.log('CLIENTE CARGADO:', this.clienteSeleccionado);
+                } else {
+                  this.clienteSeleccionado = null;
+                }
+
+              },
+              error: (err: any) => {
+                console.error('Error al cargar cliente', err);
+                this.clienteSeleccionado = null;
+              }
+            });
+
+          } else {
+            this.clienteSeleccionado = null;
+          }
+
+        }
+
+      },
+      error: (err: any) => {
+        console.error('Error al cargar evento', err);
+      }
+    });
+  }
+
+  // FUNCION QUE FORMATEA LAS FECHAS QUE VIENEN DE LA API PARA MOSTRARLAS EN LOS INPUTS DE FECHA}
+  formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    const date = new Date(fecha);
+    const offset = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - offset * 60000);
+
+    return local.toISOString().slice(0, 16);
+  }
+  // FIN FUNCION QUE FORMATEA LAS FECHAS QUE VIENEN DE LA API PARA MOSTRARLAS EN LOS INPUTS DE FECHA
 
   // FUNCION PARA BUSCAR CLIENTES CON EL NUEVO METODO EN EL SERVICE
   buscarClientes(): void {
@@ -306,7 +527,7 @@ export class DocumentoScreenComponent {
 
       //IMPORTANTE: el API lo requiere para funcionar
       // Por ahora es un dato quemado hasta consumir el AuthService y parametrizarlo con el usuario real que hace la petición
-      username: 'admin'
+      username: this.authService.getUsername(),
     };
 
     console.log('Body enviado a API:', body);

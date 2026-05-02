@@ -3,7 +3,9 @@
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
-          <h2 class="mb-0">Evento no.001</h2>
+          <h2 class="mb-0" *ngIf="idEventoCreado">
+            Evento No. {{ idEventoCreado }}
+          </h2>
           <div class="select-icon-wrapper">
             <select class="form-select">
               <option *ngFor="let estado of Estados" [value]="estado.id">
@@ -14,6 +16,11 @@
         </div>
       </div>
     </div>
+
+    <input type="number" [(ngModel)]="idEventoCreado" name="idEventoCreado">
+<button type="button" (click)="buscarEvento()">
+  Buscar evento
+</button>
 
     <!-- Buscador de clientes -->
     <div class="input-btn-group mb-3">
@@ -58,7 +65,7 @@
           </strong>
 
           <div class="d-flex align-items-center gap-2">
-            
+
             <!-- texto -->
             <strong>
               {{ clienteSeleccionado.estado == 1 ? 'Activo' : 'Inactivo' }}
@@ -176,7 +183,7 @@
         </div>
         <div class="col-md-6">
           <label for="fechaRecoger">Fecha Recoger</label>
-          <input type="datetime-local" name="pFechaEntregaEvento" class="form-control" [(ngModel)]="pFechaEntregaEvento"
+          <input type="datetime-local" name="pFechaRecogerEvento" class="form-control" [(ngModel)]="pFechaRecogerEvento"
             required />
         </div>
         <div class="col-md-6">
@@ -239,7 +246,7 @@
       <textarea name="pDetallesEvento" [(ngModel)]="pDetallesEvento" rows="5" class="form-control"></textarea>
     </div>
 
-    <button class="btn btn-dark w-100 fw-bold" type="submit">
+    <button class="btn btn-dark w-100 fw-bold" (click)="guardarEvento()" type="submit">
       GUARDAR EVENTO
     </button>
   </form>

@@ -249,75 +249,84 @@ export class DocumentoScreenComponent {
   // ==========================================================
   cargarEventoPorId(id: number | null): void {
 
-    if (!id) return;
+  if (!id) return;
 
-    this.eventosService.obtenerEvento(id).subscribe({
-      next: (res: any) => {
+  this.eventosService.obtenerEvento(id).subscribe({
+    next: (res: any) => {
 
-        if (res?.success && res?.data) {
+      if (res?.success && res?.data) {
 
-          const evento = res.data;
+        const evento = res.data;
 
-          console.log('EVENTO CARGADO:', evento);
+        console.log('EVENTO CARGADO:', evento);
 
-          // =========================
-          // EVENTO
-          // =========================
-          this.pTituloEvento = evento.titulo;
-          this.pDescripcionEvento = evento.descripcion;
+        // =========================
+        // EVENTO
+        // =========================
+        this.pTituloEvento = evento.titulo;
+        this.pDescripcionEvento = evento.descripcion;
 
-          this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
-          this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
-          this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
-          this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
+        this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
+        this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
+        this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
+        this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
 
-          this.pUbicacionEvento = evento.ubicacion;
-          this.pOrganizadorEvento = evento.organizador;
-          this.pTipoEvento = evento.tipo_Evento;
-          this.pCapacidadEvento = evento.capacidad_Evento;
+        this.pUbicacionEvento = evento.ubicacion;
+        this.pOrganizadorEvento = evento.organizador;
+        this.pTipoEvento = evento.tipo_Evento;
+        this.pCapacidadEvento = evento.capacidad_Evento;
 
-          this.pDetallesEvento = evento.observacion || '';
+        this.pDetallesEvento = evento.observacion || '';
 
-          // =========================
-          // CLIENTE (SIN MÉTODO INEXISTENTE)
-          // =========================
-          const idCliente = evento.id_cliente;
+        // =========================
+        // CLIENTE (DESDE EVENTO - JOIN SQL)
+        // =========================
+        this.clienteSeleccionado = null;
 
-          if (idCliente) {
+        if (evento.id_cliente) {
 
-            this.clientesService.buscarClientes(idCliente).subscribe({
-              next: (resCli: any) => {
+          this.clienteSeleccionado = {
+            id: evento.id_cliente,
 
-                if (resCli?.success && resCli?.data?.length > 0) {
+            nit: evento.cliente_NIT || '',
+            nombre: evento.cliente_Nombre || '',
+            apellido: evento.cliente_Apellido || '',
+            email: evento.cliente_Email || '',
+            telefono: evento.cliente_Telefono || '',
+            direccion: evento.cliente_Direccion || '',
 
-                  // tomamos el primero si viene como lista
-                  this.clienteSeleccionado = resCli.data[0];
+            dpi: '',
+            celular: '',
+            tipoCliente: 0,
 
-                  console.log('CLIENTE CARGADO:', this.clienteSeleccionado);
-                } else {
-                  this.clienteSeleccionado = null;
-                }
+            fecha_Registro: '',
+            observacion01: '',
+            observacion02: '',
 
-              },
-              error: (err: any) => {
-                console.error('Error al cargar cliente', err);
-                this.clienteSeleccionado = null;
-              }
-            });
+            estado: 1,
+            username: '',
+            m_Username: '',
+            fecha_Hora: '',
+            m_Fecha_Hora: null,
+            consecutivo_Interno: 0
 
-          } else {
-            this.clienteSeleccionado = null;
-          }
+          } as ClienteModel;
 
+          console.log('CLIENTE CARGADO DESDE EVENTO:', this.clienteSeleccionado);
         }
 
-      },
-      error: (err: any) => {
-        console.error('Error al cargar evento', err);
+      } else {
+        console.warn('Evento no encontrado');
+        this.clienteSeleccionado = null;
       }
-    });
-  }
 
+    },
+    error: (err: any) => {
+      console.error('Error al cargar evento', err);
+      this.clienteSeleccionado = null;
+    }
+  });
+}
   // FUNCION QUE FORMATEA LAS FECHAS QUE VIENEN DE LA API PARA MOSTRARLAS EN LOS INPUTS DE FECHA}
   formatearFecha(fecha: string): string {
     if (!fecha) return '';

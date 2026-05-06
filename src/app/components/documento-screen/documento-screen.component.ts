@@ -327,6 +327,65 @@ export class DocumentoScreenComponent {
     }
   });
 }
+
+
+// FUNCION PARA LIMPIAR LA PANTALLA
+limpiarPantalla(): void {
+
+  // =========================
+  // EVENTO
+  // =========================
+  this.idEventoCreado = null;
+
+  this.pTituloEvento = '';
+  this.pDescripcionEvento = '';
+
+  this.pFechaEntregaEvento = this.getFechaConHora(7, 0);
+  this.pFechaRecogerEvento = this.getFechaConHora(23, 0);
+  this.pFechaInicioEvento = this.getFechaConHora(6, 0);
+  this.pFechaFinEvento = this.getFechaConHora(23, 59);
+
+  this.pUbicacionEvento = 1;
+  this.pOrganizadorEvento = 1;
+  this.pTipoEvento = 1;
+  this.pCapacidadEvento = 1;
+
+  this.pDetallesEvento = '';
+
+  // =========================
+  // CLIENTE
+  // =========================
+  this.clienteSeleccionado = null;
+  this.clientesEncontrados = [];
+  this.busquedaCliente = '';
+
+  // =========================
+  // FORM CREAR CLIENTE
+  // =========================
+  this.dataCreateClient = 0;
+
+  this.clienteForm = {
+    nit: '',
+    nombre: '',
+    apellido: '',
+    email: '',
+    dpi: '',
+    direccion: '',
+    telefono: '',
+    celular: '',
+    tipoCliente: 1,
+    observacion01: '',
+    observacion02: ''
+  };
+
+  console.log('Pantalla limpiada');
+}
+// FIN FUNCION PARA LIMPIAR LA PANTALLA
+
+
+
+
+
   // FUNCION QUE FORMATEA LAS FECHAS QUE VIENEN DE LA API PARA MOSTRARLAS EN LOS INPUTS DE FECHA}
   formatearFecha(fecha: string): string {
     if (!fecha) return '';

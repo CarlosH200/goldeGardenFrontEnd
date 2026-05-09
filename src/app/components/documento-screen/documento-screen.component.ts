@@ -48,6 +48,10 @@ export class DocumentoScreenComponent {
     fecha_Registro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
+
+  // VARIABLES PARA EL MODO DE EDICION DE ESTADOS Y ESTADO POR DEFECTO AL CRER UN EVENTO
+  pEstadoEvento: number = 1;
+  modoEdicion: boolean = false;
   // VARIABLE PARA ALMACENAR EL ID DEL EVENTO CREADO
   idEventoCreado: number | null = null;
   // VARIABLES PARA BUSQUEDA DE CLIENTES
@@ -107,13 +111,16 @@ export class DocumentoScreenComponent {
     private clientesService: ClientesService,
   ) { }
 
-  ngOnInit(): void {
-    this.getUbicaciones();
-    this.getTipoEvento();
-    this.getOrganizador();
-    this.getCapacidades();
-    this.getEstados();
-  }
+ ngOnInit(): void {
+
+  this.limpiarPantalla();
+
+  this.getUbicaciones();
+  this.getTipoEvento();
+  this.getOrganizador();
+  this.getCapacidades();
+  this.getEstados();
+}
 
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
@@ -129,109 +136,114 @@ export class DocumentoScreenComponent {
   }
 
 
-  // INICIO FUNCION PARA GUARDAR EVENTO
-  guardarEvento(): void {
+ // INICIO FUNCION PARA GUARDAR EVENTO
+guardarEvento(): void {
 
-    if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Datos incompletos',
-          mensaje: 'El título del evento es obligatorio.',
-          tipo: 'warning',
-          icon: 'warning'
-        }
-      });
-      return;
-    }
+  if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
+    this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Datos incompletos',
+        mensaje: 'El título del evento es obligatorio.',
+        tipo: 'warning',
+        icon: 'warning'
+      }
+    });
+    return;
+  }
 
-    if (!this.clienteSeleccionado) {
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Cliente requerido',
-          mensaje: 'Debes seleccionar un cliente.',
-          tipo: 'warning',
-          icon: 'warning'
-        }
-      });
-      return;
-    }
+  if (!this.clienteSeleccionado) {
+    this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Cliente requerido',
+        mensaje: 'Debes seleccionar un cliente.',
+        tipo: 'warning',
+        icon: 'warning'
+      }
+    });
+    return;
+  }
 
-    const body = {
-      titulo: this.pTituloEvento,
-      descripcion: this.pDescripcionEvento,
+  const body = {
+    titulo: this.pTituloEvento,
+    descripcion: this.pDescripcionEvento,
 
-      fecha_Ini: this.pFechaInicioEvento,
-      fecha_Fin: this.pFechaFinEvento,
-      fecha_Entrega: this.pFechaEntregaEvento,
-      fecha_Recepcion: this.pFechaRecogerEvento,
+    fecha_Ini: this.pFechaInicioEvento,
+    fecha_Fin: this.pFechaFinEvento,
+    fecha_Entrega: this.pFechaEntregaEvento,
+    fecha_Recepcion: this.pFechaRecogerEvento,
 
-      ubicacion: this.pUbicacionEvento,
-      organizador: this.pOrganizadorEvento,
-      tipo_Evento: this.pTipoEvento,
-      capacidad_Evento: this.pCapacidadEvento,
+    ubicacion: this.pUbicacionEvento,
+    organizador: this.pOrganizadorEvento,
+    tipo_Evento: this.pTipoEvento,
+    capacidad_Evento: this.pCapacidadEvento,
 
-      observacion: this.pDetallesEvento,
+    observacion: this.pDetallesEvento,
 
-      url_Evento: this.pTituloEvento.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
+    // ESTADO
+    estado: this.pEstadoEvento,
 
-      username: this.authService.getUsername(),
+    url_Evento: this.pTituloEvento.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
 
-      id_cliente: this.clienteSeleccionado.id
-    };
+    username: this.authService.getUsername(),
 
-    console.log('BODY EVENTO:', body);
+    id_cliente: this.clienteSeleccionado.id
+  };
 
-    this.eventosService.insertarEvento(body).subscribe({
-      next: (res) => {
-        if (res.success) {
+  console.log('BODY EVENTO:', body);
 
-          const idEvento = res.id;
+  this.eventosService.insertarEvento(body).subscribe({
+    next: (res) => {
+      if (res.success) {
 
-          // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
-          this.idEventoCreado = idEvento;
-          // NUEVO
-          this.cargarEventoPorId(idEvento);
-          console.log('ID EVENTO:', idEvento);
+        const idEvento = res.id;
 
-          this.dialog.open(AlertGenericComponent, {
-            width: '450px',
-            data: {
-              titulo: 'Evento creado',
-              mensaje: res.mensaje,
-              tipo: 'success',
-              icon: 'check_circle',
-              detalles: [
-                { etiqueta: 'ID Evento', valor: idEvento },
-                { etiqueta: 'Título', valor: this.pTituloEvento }
-              ]
-            }
-          });
+        // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
+        this.idEventoCreado = idEvento;
 
-          // 🔥 FUTURO: documentos
-          // this.subirDocumento(idEvento);
+        // NUEVO
+        this.cargarEventoPorId(idEvento);
 
-        } else {
-          console.error(res);
-        }
-      },
-      error: (err) => {
-        console.error(err);
+        console.log('ID EVENTO:', idEvento);
 
         this.dialog.open(AlertGenericComponent, {
           width: '450px',
           data: {
-            titulo: 'Error',
-            mensaje: err?.error?.mensaje || 'Error al guardar evento',
-            tipo: 'error',
-            icon: 'error'
+            titulo: 'Evento creado',
+            mensaje: res.mensaje,
+            tipo: 'success',
+            icon: 'check_circle',
+            detalles: [
+              { etiqueta: 'ID Evento', valor: idEvento },
+              { etiqueta: 'Título', valor: this.pTituloEvento }
+            ]
           }
         });
+
+        // 🔥 FUTURO: documentos
+        // this.subirDocumento(idEvento);
+
+      } else {
+        console.error(res);
       }
-    });
-  }
-  // FIN FUNCION PARA GUARDAR EVENTO
+    },
+    error: (err) => {
+      console.error(err);
+
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Error',
+          mensaje: err?.error?.mensaje || 'Error al guardar evento',
+          tipo: 'error',
+          icon: 'error'
+        }
+      });
+    }
+  });
+}
+// FIN FUNCION PARA GUARDAR EVENTO
 
 
   // FUNCION PARA LLAMMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
@@ -245,9 +257,9 @@ export class DocumentoScreenComponent {
   }
 
   // ==========================================================
-  // CARGAR EVENTO POR ID (CON CLIENTE)
-  // ==========================================================
-  cargarEventoPorId(id: number | null): void {
+// CARGAR EVENTO POR ID (CON CLIENTE)
+// ==========================================================
+cargarEventoPorId(id: number | null): void {
 
   if (!id) return;
 
@@ -277,6 +289,14 @@ export class DocumentoScreenComponent {
         this.pCapacidadEvento = evento.capacidad_Evento;
 
         this.pDetallesEvento = evento.observacion || '';
+
+        // =========================
+        // ESTADO DOCUMENTO
+        // =========================
+        this.pEstadoEvento = evento.estado;
+
+        // HABILITAR CAMBIO DE ESTADO
+        this.modoEdicion = true;
 
         // =========================
         // CLIENTE (DESDE EVENTO - JOIN SQL)
@@ -327,60 +347,66 @@ export class DocumentoScreenComponent {
     }
   });
 }
+  // FUNCION PARA LIMPIAR LA PANTALLA
+  limpiarPantalla(): void {
 
+    // =========================
+    // EVENTO
+    // =========================
+    this.idEventoCreado = null;
 
-// FUNCION PARA LIMPIAR LA PANTALLA
-limpiarPantalla(): void {
+    this.pTituloEvento = '';
+    this.pDescripcionEvento = '';
 
-  // =========================
-  // EVENTO
-  // =========================
+    this.pFechaEntregaEvento = this.getFechaConHora(7, 0);
+    this.pFechaRecogerEvento = this.getFechaConHora(23, 0);
+    this.pFechaInicioEvento = this.getFechaConHora(6, 0);
+    this.pFechaFinEvento = this.getFechaConHora(23, 59);
+
+    this.pUbicacionEvento = 1;
+    this.pOrganizadorEvento = 1;
+    this.pTipoEvento = 1;
+    this.pCapacidadEvento = 1;
+
+    this.pDetallesEvento = '';
+
+    // =========================
+    // CLIENTE
+    // =========================
+    this.clienteSeleccionado = null;
+    this.clientesEncontrados = [];
+    this.busquedaCliente = '';
+
+    // =========================
+    // FORM CREAR CLIENTE
+    // =========================
+    this.dataCreateClient = 0;
+
+    this.clienteForm = {
+      nit: '',
+      nombre: '',
+      apellido: '',
+      email: '',
+      dpi: '',
+      direccion: '',
+      telefono: '',
+      celular: '',
+      tipoCliente: 1,
+      observacion01: '',
+      observacion02: ''
+    };
+
+// SEGMENTO PARA CONTROLAR ESTADOS Y MODO EDICION
   this.idEventoCreado = null;
 
-  this.pTituloEvento = '';
-  this.pDescripcionEvento = '';
+  // estado por defecto ACTIVO
+  this.pEstadoEvento = 1;
 
-  this.pFechaEntregaEvento = this.getFechaConHora(7, 0);
-  this.pFechaRecogerEvento = this.getFechaConHora(23, 0);
-  this.pFechaInicioEvento = this.getFechaConHora(6, 0);
-  this.pFechaFinEvento = this.getFechaConHora(23, 59);
+  // bloquear cambio de estado en nuevos
+  this.modoEdicion = false;
 
-  this.pUbicacionEvento = 1;
-  this.pOrganizadorEvento = 1;
-  this.pTipoEvento = 1;
-  this.pCapacidadEvento = 1;
-
-  this.pDetallesEvento = '';
-
-  // =========================
-  // CLIENTE
-  // =========================
-  this.clienteSeleccionado = null;
-  this.clientesEncontrados = [];
-  this.busquedaCliente = '';
-
-  // =========================
-  // FORM CREAR CLIENTE
-  // =========================
-  this.dataCreateClient = 0;
-
-  this.clienteForm = {
-    nit: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    dpi: '',
-    direccion: '',
-    telefono: '',
-    celular: '',
-    tipoCliente: 1,
-    observacion01: '',
-    observacion02: ''
-  };
-
-  console.log('Pantalla limpiada');
-}
-// FIN FUNCION PARA LIMPIAR LA PANTALLA
+  }
+  // FIN FUNCION PARA LIMPIAR LA PANTALLA
 
 
 

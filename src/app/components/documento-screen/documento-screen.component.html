@@ -5,13 +5,13 @@
 
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-      <!-- 🔍 IZQUIERDA: BUSCADOR -->
+      <!--IZQUIERDA: BUSCADOR -->
       <div class="d-flex align-items-center gap-2">
         <input 
           type="text" 
           [(ngModel)]="idEventoCreado" 
           name="idEventoCreado"
-          class="form-control"
+          class="input-btn-group form-control"
           placeholder="ID Evento"
           style="width: 140px;"
         >
@@ -24,21 +24,28 @@
         </button>
       </div>
 
-      <!-- 🧾 CENTRO: TÍTULO -->
+      <!--CENTRO: TÍTULO -->
       <div class="text-center flex-grow-1">
         <h2 class="mb-0" *ngIf="idEventoCreado">
           Evento No. {{ idEventoCreado }}
         </h2>
       </div>
 
-      <!-- ⚙️ DERECHA: ACCIONES -->
+      <!--DERECHA: ACCIONES -->
       <div class="d-flex align-items-center gap-2">
 
-        <select class="form-select" style="min-width: 180px;">
-          <option *ngFor="let estado of Estados" [value]="estado.id">
-            {{ estado.descripcion }} ({{ estado.id }})
-          </option>
-        </select>
+       <select 
+  class="form-select"
+  style="min-width: 180px;"
+  [(ngModel)]="pEstadoEvento"
+  name="pEstadoEvento"
+  [disabled]="!modoEdicion">
+
+  <option *ngFor="let estado of Estados" [value]="estado.id">
+    {{ estado.descripcion }} ({{ estado.id }})
+  </option>
+
+</select>
 
         <button 
           type="button" 

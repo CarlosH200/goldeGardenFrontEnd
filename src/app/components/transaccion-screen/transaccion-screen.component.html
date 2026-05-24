@@ -1,49 +1,229 @@
 <div class="transaccion-container">
 
-<div class="encabezado">
-  <p><strong>Evento no. 11</strong></p>
-  <p class="textoInvertido"><strong>Cliente:</strong> Jose Francisco Teo Alvarado</p>
-</div>
+  <!-- ENCABEZADO -->
+  <div class="encabezado">
+    <div>
+      <p><strong class="textoInvertido">Evento no. 11</strong></p>
+      <p class="textoInvertido">
+        <strong class="textoInvertido">Cliente:</strong> Jose Francisco Teo Alvarado
+      </p>
+    </div>
 
+    <div class="badge-items textoInvertido">
+      {{ transacciones.length }} Items
+    </div>
+  </div>
+
+  <!-- BUSCADOR -->
   <div class="form-row">
-    <input class="inputbuscador" type="text" id="producto" [(ngModel)]="productoBuscado" placeholder="SKU, Descripcion, Familia...." />
+
+    <div class="buscador-wrapper">
+      <input class="inputbuscador" type="text" id="producto" [(ngModel)]="productoBuscado" (input)="filtrarProductos()"
+        placeholder="SKU, Descripcion, Familia...." />
+
+      <!-- LISTADO BUSQUEDA -->
+      <div class="dropdown-productos" *ngIf="mostrarDropdown">
+
+        <div class="item-producto" *ngFor="let producto of productosFiltrados" (click)="seleccionarProducto(producto)">
+
+          <div class="item-info">
+            <h4>{{ producto.nombre }}</h4>
+
+            <p>{{ producto.descripcion }}</p>
+
+            <small class="textoNoInvertido">
+              Stock: {{ producto.stock }}
+            </small>
+          </div>
+
+          <div class="item-precio">
+            Q{{ producto.precio.toFixed(2) }}
+          </div>
+
+        </div>
+
+        <div class="sin-resultados" *ngIf="productosFiltrados.length === 0">
+          No se encontraron productos
+        </div>
+
+      </div>
+    </div>
+
     <button class="buttonCircle" (click)="buscarProducto()" title="Buscar">
       <i class="material-icons">search</i>
     </button>
-    <button class="buttonCircle" (click)="agregarProducto()" title="Agregar">
-      <i class="material-icons">add_box</i>
-    </button>
-  </div>
-
-  <div class="form-row">
-    <input type="checkbox" (click)="verDetalleTransaccion()" id="">
-    <label name="ObsertacionTransTitulo">Detalle Producto</label>
-  </div>
-  <div class="form-row">
-    <textarea  *ngIf="viewDetailTransaccion == true" name="ObservacionTransaccion" rows="5" class="TexAreaDetailTrans"></textarea>
 
   </div>
 
+  <!-- PRODUCTO SELECCIONADO -->
   <div class="contenido-principal">
+
     <div class="producto-card" *ngIf="productoEncontrado">
-      <h3>{{ productoEncontrado.nombre }}</h3>
-      <p>{{ productoEncontrado.descripcion }}</p>
-      <p class="precio">Q{{ productoEncontrado.precio }}</p>
+
+      <div class="producto-top">
+
+        <div>
+
+          <h3>{{ productoEncontrado.nombre }}</h3>
+
+          <p>{{ productoEncontrado.descripcion }}</p>
+
+          <small class="textoNoInvertido">
+            Existencia: {{ productoEncontrado.stock }}
+          </small>
+
+        </div>
+
+        <span class="precio-tag">
+          Q{{ productoEncontrado.precio.toFixed(2) }}
+        </span>
+
+      </div>
+
+      <div class="cantidad-row">
+
+        <button class="buttonCantidad" (click)="disminuirCantidad()">
+          -
+        </button>
+
+        <input type="text" min="1" [(ngModel)]="cantidad" class="inputCantidad textoNoInvertido" />
+
+        <button class="buttonCantidad" (click)="aumentarCantidad()">
+          +
+        </button>
+
+      </div>
+
+      <!-- DETALLE -->
+      <div class="form-row detalle-row">
+
+        <input type="checkbox" [(ngModel)]="viewDetailTransaccion" />
+
+        <label class="textoNoInvertido">
+          Detalle Producto
+        </label>
+
+      </div>
+
+      <div *ngIf="viewDetailTransaccion">
+
+        <textarea [(ngModel)]="detalleProducto" rows="4" class="TexAreaDetailTrans"
+          placeholder="Observaciones o detalle de la transacción..."></textarea>
+
+      </div>
+
+      <button class="btn-agregar" (click)="agregarProducto()">
+        <i class="material-icons">playlist_add</i>
+        Agregar Transacción
+      </button>
+
     </div>
 
+    <!-- RESUMEN -->
     <div class="resumen-box">
-      <h4>Resumen</h4>
-      <h3>{{ productoEncontrado.nombre }}</h3>
-      <p>{{ productoEncontrado.descripcion }}</p>
-      <p class="precio">Q{{ productoEncontrado.precio }}</p>
+
+      <h3 class="tituloResumen">
+        Resumen
+      </h3>
+
+      <div class="resumen-item">
+        <span class="textoNoInvertido">Productos:</span>
+        <strong>{{ transacciones.length }}</strong>
+      </div>
+
+      <div class="resumen-item">
+        <span class="textoNoInvertido">Total Unidades:</span>
+        <strong>{{ totalUnidades }}</strong>
+      </div>
+
       <hr />
-      <p class="textoNoInvertido"><strong class="textoNoInvertido">Total:</strong> Q0.00</p>
+
+      <div class="total-general">
+        <span class="textoNoInvertido">Total:</span>
+        <strong>
+          Q{{ totalGeneral.toFixed(2) }}
+        </strong>
+      </div>
+
     </div>
+
   </div>
 
-  
+  <!-- TABLA TRANSACCIONES -->
+  <div class="tabla-container" *ngIf="transacciones.length > 0">
 
-   <button class="buttonCircle btn-fab" (click)="buscarProducto()" title="Buscar">
-      <i class="material-icons">playlist_add</i>
-    </button>
+    <div class="tabla-header">
+      <h3>Listado de Transacciones</h3>
+    </div>
+
+    <div class="tabla-scroll">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let item of transacciones; let i = index">
+
+            <td>
+              <div class="producto-tabla">
+
+                <strong>{{ item.nombre }}</strong>
+
+                <small>{{ item.descripcion }}</small>
+
+                <small *ngIf="item.detalle" class="detalle-extra">
+                  {{ item.detalle }}
+                </small>
+
+              </div>
+            </td>
+
+            <td>{{ item.cantidad }}</td>
+
+            <td>
+              Q{{ item.precio.toFixed(2) }}
+            </td>
+
+            <td>
+              Q{{ item.subtotal.toFixed(2) }}
+            </td>
+
+            <td>
+
+              <button class="buttonDelete" (click)="eliminarProducto(i)">
+                <i class="material-icons">delete</i>
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+  <!-- TOTAL FINAL -->
+  <div class="footer-total" *ngIf="transacciones.length > 0">
+
+    <div>
+      <span>Total General</span>
+      <h1>Q{{ totalGeneral.toFixed(2) }}</h1>
+    </div>
+
+  </div>
+
 </div>

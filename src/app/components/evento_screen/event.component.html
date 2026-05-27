@@ -1,10 +1,8 @@
 <div class="event-form-container">
-
   <!-- ===================================================== -->
   <!-- PESTAÑAS -->
   <!-- ===================================================== -->
   <ul class="nav custom-tabs mb-3">
-
     <!-- DOCUMENTO -->
     <li class="nav-item">
       <button
@@ -37,48 +35,36 @@
         Pago
       </button>
     </li>
-
   </ul>
 
   <!-- ===================================================== -->
   <!-- DOCUMENTO -->
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'documento'">
-
     <app-documento-screen
-
       (eventoCreado)="idEventoCreado = $event"
-
-      (clienteCompletoChange)="clienteSeleccionadoData = $event">
-
+      (clienteCompletoChange)="clienteSeleccionadoData = $event"
+    >
     </app-documento-screen>
-
   </div>
 
   <!-- ===================================================== -->
   <!-- TRANSACCIONES -->
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'transacciones'">
-
     <app-transaccion-screen
-
       [idEvento]="idEventoCreado"
-
-      [cliente]="clienteSeleccionadoData">
-
+      [cliente]="clienteSeleccionadoData"
+    >
     </app-transaccion-screen>
-
   </div>
 
   <!-- ===================================================== -->
   <!-- PAGO -->
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'pago'">
-
     <h4>Pago</h4>
 
     <p>Contenido de Pago...</p>
-
   </div>
-
 </div>

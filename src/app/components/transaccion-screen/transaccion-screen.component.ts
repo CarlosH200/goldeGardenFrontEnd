@@ -222,7 +222,7 @@ ngOnChanges(changes: SimpleChanges): void {
 
       username: this.authService.getUsername(),
 
-      observacion_01: this.productoEncontrado.nombre,
+      observacion_01: this.detalleProducto,
 
       observacion_02: `Cantidad: ${this.cantidad}`,
 

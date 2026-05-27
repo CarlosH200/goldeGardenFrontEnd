@@ -1,5 +1,4 @@
 export interface TransaccionModel {
-
   id: number;
 
   id_cliente: number;

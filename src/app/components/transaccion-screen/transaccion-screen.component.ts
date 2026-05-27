@@ -218,7 +218,7 @@ ngOnChanges(changes: SimpleChanges): void {
       monto: subtotal,
 
       descripcion:
-        this.detalleProducto?.trim() || this.productoEncontrado.nombre,
+        this.productoEncontrado.nombre?.trim() || this.productoEncontrado.nombre,
 
       username: this.authService.getUsername(),
 

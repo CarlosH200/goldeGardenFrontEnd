@@ -1,12 +1,12 @@
 export interface TransaccionModel {
 
-  id?: number;
+  id: number;
 
   id_cliente: number;
 
-  id_evento?: number;
+  id_evento: number;
 
-  id_producto?: number;
+  id_producto: number;
 
   tipo_Transaccion: number;
 
@@ -14,11 +14,23 @@ export interface TransaccionModel {
 
   descripcion: string;
 
+  fecha_Transaccion: string;
+
+  estado: number;
+
   username: string;
 
-  observacion_01?: string;
+  m_Username: string;
 
-  observacion_02?: string;
+  fecha_Hora: string;
 
-  cantidad?: number;
+  m_Fecha_Hora: string | null;
+
+  consecutivo_Interno: number;
+
+  observacion_01: string;
+
+  observacion_02: string;
+
+  cantidad: number;
 }

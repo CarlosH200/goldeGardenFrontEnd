@@ -21,9 +21,6 @@ import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
 import { Component, Output, EventEmitter } from '@angular/core';
 
-
-
-
 @Component({
   selector: 'app-documento-screen',
   imports: [FormsModule, CommonModule, MatIconModule],
@@ -38,9 +35,6 @@ export class DocumentoScreenComponent {
   // Evento para recibir el id del cliente seleccionado
   @Output()
   clienteCompletoChange = new EventEmitter<any>();
-
- 
-
 
   // Modelo para datos del cliente
   clienteForm: Partial<ClienteModel> = {
@@ -105,6 +99,7 @@ export class DocumentoScreenComponent {
   Capacidades: CapacidadesModel[] = [];
   // Arreglo para almacenar lso estados del API getEstados
   Estados: EstadosModel[] = [];
+
 
   constructor(
     private eventosService: EventosService,
@@ -210,6 +205,9 @@ export class DocumentoScreenComponent {
           // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
           this.idEventoCreado = idEvento;
 
+          // Emite el evento al componente padre para que lo reciba
+          this.eventoCreado.emit(idEvento);
+
           // EMITIR EL ID DEL EVENTO CREADO PARA QUE LOS COMPONENTES DE TRANSACCIONES Y DOCUMENTOS LO RECIBAN
           this.eventoCreado.emit(idEvento);
 
@@ -277,6 +275,9 @@ export class DocumentoScreenComponent {
           const evento = res.data;
 
           console.log('EVENTO CARGADO:', evento);
+
+          // EMITIR EVENTO AL PADRE
+          this.eventoCreado.emit(evento.id);
 
           // =========================
           // EVENTO
@@ -450,19 +451,18 @@ export class DocumentoScreenComponent {
     });
   }
 
-seleccionarCliente(cliente: ClienteModel): void {
+  seleccionarCliente(cliente: ClienteModel): void {
+    this.clienteSeleccionado = cliente;
 
-  this.clienteSeleccionado = cliente;
+    // OCULTA RESULTADOS
+    this.clientesEncontrados = [];
 
-  // OCULTA RESULTADOS
-  this.clientesEncontrados = [];
+    // LIMPIA BUSQUEDA
+    this.busquedaCliente = '';
 
-  // LIMPIA BUSQUEDA
-  this.busquedaCliente = '';
-
-  // ENVIA CLIENTE COMPLETO
-  this.clienteCompletoChange.emit(cliente);
-}
+    // ENVIA CLIENTE COMPLETO
+    this.clienteCompletoChange.emit(cliente);
+  }
 
   // ==========================================================
   // BLOQUE GUARDAR CLIENTE

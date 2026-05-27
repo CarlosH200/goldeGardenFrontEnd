@@ -28,4 +28,14 @@ export class TransaccionesService {
       body
     );
   }
+
+  // ==========================================================
+// BUSCAR TRANSACCIONES POR EVENTO
+// ==========================================================
+buscarTransaccionesEvento(idEvento: number): Observable<any> {
+
+  return this.http.get<any>(
+    `${this.apiUrl}/evento/${idEvento}`
+  );
+}
 }

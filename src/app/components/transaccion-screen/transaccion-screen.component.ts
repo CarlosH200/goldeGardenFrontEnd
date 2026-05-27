@@ -6,7 +6,7 @@ import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-transaccion-screen',
@@ -14,13 +14,29 @@ import { Component, Input } from '@angular/core';
   templateUrl: './transaccion-screen.component.html',
   styleUrl: './transaccion-screen.component.css',
 })
-export class TransaccionScreenComponent {
+
+export class TransaccionScreenComponent implements OnChanges {
   constructor(
     private productosService: ProductosService,
     private authService: AuthService,
     private transaccionesService: TransaccionesService,
     private dialog: MatDialog,
   ) {}
+ 
+  
+  // ==========================================================
+// DETECTAR CAMBIOS EN EVENTO
+// ==========================================================
+ngOnChanges(changes: SimpleChanges): void {
+
+  if (changes['idEvento']) {
+
+    if (this.idEvento) {
+
+      this.cargarTransacciones();
+    }
+  }
+}
 
   // input para recibir el id del evento o cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
   @Input() idEvento: number | null = null;
@@ -295,6 +311,62 @@ export class TransaccionScreenComponent {
       },
     });
   }
+
+
+
+// ==========================================================
+// CARGAR TRANSACCIONES DEL EVENTO
+// ==========================================================
+cargarTransacciones(): void {
+
+  if (!this.idEvento) {
+    return;
+  }
+
+  this.transaccionesService
+    .buscarTransaccionesEvento(this.idEvento)
+    .subscribe({
+
+      next: (res) => {
+
+        if (res?.success) {
+
+          this.transacciones = res.data.map((t: any) => ({
+
+            id: t.id_producto,
+
+            cantidad: Number(t.cantidad),
+
+            subtotal: Number(t.monto),
+
+            detalle: t.descripcion,
+
+            precio:
+              Number(t.monto) / Number(t.cantidad),
+
+            nombre: t.observacion_01,
+
+            descripcion: t.descripcion
+          }));
+
+          console.log(
+            'TRANSACCIONES CARGADAS:',
+            this.transacciones
+          );
+        }
+      },
+
+      error: (err) => {
+
+        console.error(
+          'Error al cargar transacciones',
+          err
+        );
+      }
+    });
+}
+
+  
 
   // ==========================================================
   // ELIMINAR PRODUCTO

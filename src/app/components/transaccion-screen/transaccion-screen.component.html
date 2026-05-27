@@ -3,9 +3,9 @@
   <!-- ENCABEZADO -->
   <div class="encabezado">
     <div>
-      <p><strong class="textoInvertido">Evento no. 11</strong></p>
+      <p><strong class="textoInvertido">Evento #{{ idEvento }}</strong></p>
       <p class="textoInvertido">
-        <strong class="textoInvertido">Cliente:</strong> Jose Francisco Teo Alvarado
+        <strong class="textoInvertido">Cliente:</strong> {{cliente?.nombre || 'N/A'}} {{cliente?.apellido || ''}}
       </p>
     </div>
 

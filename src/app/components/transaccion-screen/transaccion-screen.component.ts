@@ -1,20 +1,31 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+// import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { ProductosService } from '../../services/productos.service';
+import { AuthService } from '../../services/authService';
+import { TransaccionesService } from '../../services/transacciones.service';
+import { MatDialog } from '@angular/material/dialog';
+import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-transaccion-screen',
   imports: [FormsModule, CommonModule],
   templateUrl: './transaccion-screen.component.html',
-  styleUrl: './transaccion-screen.component.css'
+  styleUrl: './transaccion-screen.component.css',
 })
 export class TransaccionScreenComponent {
-
   constructor(
-    private productosService: ProductosService
-  ) { }
+    private productosService: ProductosService,
+    private authService: AuthService,
+    private transaccionesService: TransaccionesService,
+    private dialog: MatDialog,
+  ) {}
+
+  // input para recibir el id del evento o cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
+  @Input() idEvento: number | null = null;
+  // input para recibir el id del cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
+  @Input() cliente: any = null;
 
   productoBuscado = '';
 
@@ -38,9 +49,7 @@ export class TransaccionScreenComponent {
   // FILTRAR PRODUCTOS DESDE API
   // ==========================================================
   filtrarProductos() {
-
     if (!this.productoBuscado.trim()) {
-
       this.productosFiltrados = [];
 
       this.mostrarDropdown = false;
@@ -50,100 +59,84 @@ export class TransaccionScreenComponent {
 
     this.loadingProductos = true;
 
-    this.productosService
-      .buscarProductos(this.productoBuscado)
-      .subscribe({
+    this.productosService.buscarProductos(this.productoBuscado).subscribe({
+      next: (response) => {
+        this.productosFiltrados = response.data.map((p: any) => ({
+          id: p.id,
 
-        next: (response) => {
+          sku: p.codigo,
 
-          this.productosFiltrados =
-            response.data.map((p: any) => ({
+          nombre: p.descripcion,
 
-              id: p.id,
+          descripcion: p.descripcion_Alterna,
 
-              sku: p.codigo,
+          precio: p.precio_Venta,
 
-              nombre: p.descripcion,
+          stock: p.cantidad,
 
-              descripcion: p.descripcion_Alterna,
+          ultimoCosto: p.ultimo_Costo,
+        }));
 
-              precio: p.precio_Venta,
+        this.mostrarDropdown = true;
 
-              stock: p.cantidad,
+        this.loadingProductos = false;
+      },
 
-              ultimoCosto: p.ultimo_Costo
-            }));
+      error: (error) => {
+        console.error(error);
 
-          this.mostrarDropdown = true;
+        this.loadingProductos = false;
 
-          this.loadingProductos = false;
-        },
+        this.productosFiltrados = [];
 
-        error: (error) => {
-
-          console.error(error);
-
-          this.loadingProductos = false;
-
-          this.productosFiltrados = [];
-
-          this.mostrarDropdown = false;
-        }
-      });
+        this.mostrarDropdown = false;
+      },
+    });
   }
 
   // ==========================================================
   // BUSCAR PRODUCTO EXACTO
   // ==========================================================
   buscarProducto() {
-
     if (!this.productoBuscado.trim()) {
       return;
     }
 
-    this.productosService
-      .buscarProductos(this.productoBuscado)
-      .subscribe({
+    this.productosService.buscarProductos(this.productoBuscado).subscribe({
+      next: (response) => {
+        if (response.data.length > 0) {
+          const p = response.data[0];
 
-        next: (response) => {
+          this.productoEncontrado = {
+            id: p.id,
 
-          if (response.data.length > 0) {
+            sku: p.codigo,
 
-            const p = response.data[0];
+            nombre: p.descripcion,
 
-            this.productoEncontrado = {
+            descripcion: p.descripcion_Alterna,
 
-              id: p.id,
+            precio: p.precio_Venta,
 
-              sku: p.codigo,
+            stock: p.cantidad,
 
-              nombre: p.descripcion,
+            ultimoCosto: p.ultimo_Costo,
+          };
 
-              descripcion: p.descripcion_Alterna,
-
-              precio: p.precio_Venta,
-
-              stock: p.cantidad,
-
-              ultimoCosto: p.ultimo_Costo
-            };
-
-            this.mostrarDropdown = false;
-          }
-        },
-
-        error: (error) => {
-
-          console.error(error);
+          this.mostrarDropdown = false;
         }
-      });
+      },
+
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   // ==========================================================
   // SELECCIONAR PRODUCTO
   // ==========================================================
   seleccionarProducto(producto: any) {
-
     this.productoEncontrado = producto;
 
     this.productoBuscado = producto.nombre;
@@ -155,8 +148,35 @@ export class TransaccionScreenComponent {
   // AGREGAR PRODUCTO
   // ==========================================================
   agregarProducto() {
-
     if (!this.productoEncontrado) {
+      return;
+    }
+
+    if (!this.idEvento) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Evento requerido',
+          mensaje:
+            'Debes crear o cargar un evento antes de agregar transacciones.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+
+      return;
+    }
+    if (!this.cliente) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Cliente requerido',
+          mensaje: 'Debes seleccionar un cliente.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+
       return;
     }
 
@@ -165,55 +185,121 @@ export class TransaccionScreenComponent {
       return;
     }
 
-    const subtotal =
-      this.productoEncontrado.precio * this.cantidad;
+    const subtotal = this.productoEncontrado.precio * this.cantidad;
 
-    // VALIDAR SI YA EXISTE
-    const existe =
-      this.transacciones.find(
-        x => x.id === this.productoEncontrado.id
-      );
+    // ==========================================================
+    // BODY API
+    // ==========================================================
+    const body = {
+      id_cliente: this.cliente.id,
 
-    if (existe) {
+      id_evento: this.idEvento,
 
-      existe.cantidad += this.cantidad;
+      id_producto: this.productoEncontrado.id,
 
-      existe.subtotal =
-        existe.cantidad * existe.precio;
+      tipo_Transaccion: 1,
 
-      return;
-    }
+      monto: subtotal,
 
-    this.transacciones.push({
+      descripcion:
+        this.detalleProducto?.trim() || this.productoEncontrado.nombre,
 
-      ...this.productoEncontrado,
+      username: this.authService.getUsername(),
+
+      observacion_01: this.productoEncontrado.nombre,
+
+      observacion_02: `Cantidad: ${this.cantidad}`,
 
       cantidad: this.cantidad,
+    };
 
-      detalle: this.detalleProducto,
+    console.log('BODY TRANSACCION:', body);
 
-      subtotal
+    // ==========================================================
+    // INSERTAR EN API
+    // ==========================================================
+    this.transaccionesService.insertTransaccion(body).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          // ==========================================
+          // VALIDAR SI YA EXISTE EN GRID
+          // ==========================================
+          const existe = this.transacciones.find(
+            (x) => x.id === this.productoEncontrado.id,
+          );
+
+          if (existe) {
+            existe.cantidad += this.cantidad;
+
+            existe.subtotal = existe.cantidad * existe.precio;
+          } else {
+            this.transacciones.push({
+              ...this.productoEncontrado,
+
+              cantidad: this.cantidad,
+
+              detalle: this.detalleProducto,
+
+              subtotal,
+            });
+          }
+
+          // RESET
+          this.cantidad = 1;
+
+          this.detalleProducto = '';
+
+          this.productoBuscado = '';
+
+          this.productoEncontrado = null;
+
+          this.viewDetailTransaccion = false;
+
+          this.productosFiltrados = [];
+
+          // ALERTA
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Transacción agregada',
+              mensaje: 'El producto fue agregado correctamente.',
+              tipo: 'success',
+              icon: 'check_circle',
+              detalles: [
+                {
+                  etiqueta: 'Producto',
+                  valor: body.observacion_01,
+                },
+                {
+                  etiqueta: 'Monto',
+                  valor: body.monto,
+                },
+              ],
+            },
+          });
+        }
+      },
+
+      error: (err) => {
+        console.error(err);
+
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Error',
+            mensaje: err?.error?.mensaje || 'Error al guardar transacción',
+            tipo: 'error',
+            icon: 'error',
+          },
+        });
+      },
     });
-
-    // RESET
-    this.cantidad = 1;
-
-    this.detalleProducto = '';
-
-    this.productoBuscado = '';
-
-    this.productoEncontrado = null;
-
-    this.viewDetailTransaccion = false;
-
-    this.productosFiltrados = [];
   }
 
   // ==========================================================
   // ELIMINAR PRODUCTO
   // ==========================================================
   eliminarProducto(index: number) {
-
     this.transacciones.splice(index, 1);
   }
 
@@ -221,7 +307,6 @@ export class TransaccionScreenComponent {
   // AUMENTAR
   // ==========================================================
   aumentarCantidad() {
-
     this.cantidad++;
   }
 
@@ -229,9 +314,7 @@ export class TransaccionScreenComponent {
   // DISMINUIR
   // ==========================================================
   disminuirCantidad() {
-
     if (this.cantidad > 1) {
-
       this.cantidad--;
     }
   }
@@ -240,10 +323,9 @@ export class TransaccionScreenComponent {
   // TOTAL GENERAL
   // ==========================================================
   get totalGeneral(): number {
-
     return this.transacciones.reduce(
-      (acc, item) => acc + item.subtotal,
-      0
+      (acc, item) => acc + Number(item.subtotal),
+      0,
     );
   }
 
@@ -251,10 +333,9 @@ export class TransaccionScreenComponent {
   // TOTAL UNIDADES
   // ==========================================================
   get totalUnidades(): number {
-
     return this.transacciones.reduce(
-      (acc, item) => acc + item.cantidad,
-      0
+      (acc, item) => acc + Number(item.cantidad),
+      0,
     );
   }
 }

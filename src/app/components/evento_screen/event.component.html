@@ -1,6 +1,11 @@
 <div class="event-form-container">
-  <!-- Pestañas -->
+
+  <!-- ===================================================== -->
+  <!-- PESTAÑAS -->
+  <!-- ===================================================== -->
   <ul class="nav custom-tabs mb-3">
+
+    <!-- DOCUMENTO -->
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
@@ -11,6 +16,7 @@
       </button>
     </li>
 
+    <!-- TRANSACCIONES -->
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
@@ -21,6 +27,7 @@
       </button>
     </li>
 
+    <!-- PAGO -->
     <li class="nav-item">
       <button
         class="nav-link pestañaPersonalizada"
@@ -30,23 +37,48 @@
         Pago
       </button>
     </li>
+
   </ul>
 
-  <!-- Contenido de las pestañas -->
+  <!-- ===================================================== -->
+  <!-- DOCUMENTO -->
+  <!-- ===================================================== -->
+  <div [hidden]="selectedTab !== 'documento'">
 
-  <!-- Doumento -->
-  <div *ngIf="selectedTab === 'documento'">
-    <app-documento-screen></app-documento-screen>
+    <app-documento-screen
+
+      (eventoCreado)="idEventoCreado = $event"
+
+      (clienteCompletoChange)="clienteSeleccionadoData = $event">
+
+    </app-documento-screen>
+
   </div>
 
-  <!-- Transacciones -->
-  <div *ngIf="selectedTab === 'transacciones'">
-    <app-transaccion-screen></app-transaccion-screen>
+  <!-- ===================================================== -->
+  <!-- TRANSACCIONES -->
+  <!-- ===================================================== -->
+  <div [hidden]="selectedTab !== 'transacciones'">
+
+    <app-transaccion-screen
+
+      [idEvento]="idEventoCreado"
+
+      [cliente]="clienteSeleccionadoData">
+
+    </app-transaccion-screen>
+
   </div>
 
-  <!-- Pago -->
-  <div *ngIf="selectedTab === 'pago'">
+  <!-- ===================================================== -->
+  <!-- PAGO -->
+  <!-- ===================================================== -->
+  <div [hidden]="selectedTab !== 'pago'">
+
     <h4>Pago</h4>
+
     <p>Contenido de Pago...</p>
+
   </div>
+
 </div>

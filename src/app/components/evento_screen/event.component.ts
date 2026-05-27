@@ -15,10 +15,14 @@ export class EventComponent {
 
   constructor(
     public theme: ThemeService,
-  ) {}
+  ) { }
 
   // Variable para cambiar la pestaña seleccionada entre documento, transacciones y pago
   selectedTab: string = 'documento';
-
+ 
   
+idEventoCreado: number | null = null;
+
+clienteSeleccionadoData: any = null;
+
 }

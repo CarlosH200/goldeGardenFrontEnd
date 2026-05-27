@@ -1,4 +1,3 @@
-import { Component } from '@angular/core';
 import { UbicacionesModel } from '../../models/ubicaciones.model';
 import { UbicacionesService } from '../../services/ubicaciones.service';
 import { CommonModule } from '@angular/common';
@@ -20,16 +19,28 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
+import { Component, Output, EventEmitter } from '@angular/core';
 
-// ✅ NUEVO IMPORT
+
+
 
 @Component({
   selector: 'app-documento-screen',
-  imports: [FormsModule, CommonModule, MatIconModule,],
+  imports: [FormsModule, CommonModule, MatIconModule],
   templateUrl: './documento-screen.component.html',
-  styleUrl: './documento-screen.component.css'
+  styleUrl: './documento-screen.component.css',
 })
 export class DocumentoScreenComponent {
+  // Evento para recibir el id de el evento creado
+  @Output()
+  eventoCreado = new EventEmitter<number>();
+
+  // Evento para recibir el id del cliente seleccionado
+  @Output()
+  clienteCompletoChange = new EventEmitter<any>();
+
+ 
+
 
   // Modelo para datos del cliente
   clienteForm: Partial<ClienteModel> = {
@@ -45,9 +56,8 @@ export class DocumentoScreenComponent {
     observacion01: '',
     observacion02: '',
     estado: 1, // Agregado para mostrar en el modal, aunque tu API lo maneje internamente
-    fecha_Registro: new Date().toLocaleDateString() // Solo para mostrar en el modal, tu API debería manejar la fecha real
+    fecha_Registro: new Date().toLocaleDateString(), // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
-
 
   // VARIABLES PARA EL MODO DE EDICION DE ESTADOS Y ESTADO POR DEFECTO AL CRER UN EVENTO
   pEstadoEvento: number = 1;
@@ -109,19 +119,17 @@ export class DocumentoScreenComponent {
 
     //NUEVO SERVICE
     private clientesService: ClientesService,
-  ) { }
+  ) {}
 
- ngOnInit(): void {
+  ngOnInit(): void {
+    this.limpiarPantalla();
 
-  this.limpiarPantalla();
-
-  this.getUbicaciones();
-  this.getTipoEvento();
-  this.getOrganizador();
-  this.getCapacidades();
-  this.getEstados();
-}
-
+    this.getUbicaciones();
+    this.getTipoEvento();
+    this.getOrganizador();
+    this.getCapacidades();
+    this.getEstados();
+  }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
   getFechaConHora(hora: number, minutos: number): string {
@@ -135,116 +143,117 @@ export class DocumentoScreenComponent {
     return local.toISOString().slice(0, 16);
   }
 
+  // INICIO FUNCION PARA GUARDAR EVENTO
+  guardarEvento(): void {
+    if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Datos incompletos',
+          mensaje: 'El título del evento es obligatorio.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+      return;
+    }
 
- // INICIO FUNCION PARA GUARDAR EVENTO
-guardarEvento(): void {
+    if (!this.clienteSeleccionado) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Cliente requerido',
+          mensaje: 'Debes seleccionar un cliente.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+      return;
+    }
 
-  if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
-    this.dialog.open(AlertGenericComponent, {
-      width: '450px',
-      data: {
-        titulo: 'Datos incompletos',
-        mensaje: 'El título del evento es obligatorio.',
-        tipo: 'warning',
-        icon: 'warning'
-      }
-    });
-    return;
-  }
+    const body = {
+      titulo: this.pTituloEvento,
+      descripcion: this.pDescripcionEvento,
 
-  if (!this.clienteSeleccionado) {
-    this.dialog.open(AlertGenericComponent, {
-      width: '450px',
-      data: {
-        titulo: 'Cliente requerido',
-        mensaje: 'Debes seleccionar un cliente.',
-        tipo: 'warning',
-        icon: 'warning'
-      }
-    });
-    return;
-  }
+      fecha_Ini: this.pFechaInicioEvento,
+      fecha_Fin: this.pFechaFinEvento,
+      fecha_Entrega: this.pFechaEntregaEvento,
+      fecha_Recepcion: this.pFechaRecogerEvento,
 
-  const body = {
-    titulo: this.pTituloEvento,
-    descripcion: this.pDescripcionEvento,
+      ubicacion: this.pUbicacionEvento,
+      organizador: this.pOrganizadorEvento,
+      tipo_Evento: this.pTipoEvento,
+      capacidad_Evento: this.pCapacidadEvento,
 
-    fecha_Ini: this.pFechaInicioEvento,
-    fecha_Fin: this.pFechaFinEvento,
-    fecha_Entrega: this.pFechaEntregaEvento,
-    fecha_Recepcion: this.pFechaRecogerEvento,
+      observacion: this.pDetallesEvento,
 
-    ubicacion: this.pUbicacionEvento,
-    organizador: this.pOrganizadorEvento,
-    tipo_Evento: this.pTipoEvento,
-    capacidad_Evento: this.pCapacidadEvento,
+      // ESTADO
+      estado: this.pEstadoEvento,
 
-    observacion: this.pDetallesEvento,
+      url_Evento:
+        this.pTituloEvento.toLowerCase().replace(/\s+/g, '-') +
+        '-' +
+        Date.now(),
 
-    // ESTADO
-    estado: this.pEstadoEvento,
+      username: this.authService.getUsername(),
 
-    url_Evento: this.pTituloEvento.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
+      id_cliente: this.clienteSeleccionado.id,
+    };
 
-    username: this.authService.getUsername(),
+    console.log('BODY EVENTO:', body);
 
-    id_cliente: this.clienteSeleccionado.id
-  };
+    this.eventosService.insertarEvento(body).subscribe({
+      next: (res) => {
+        if (res.success) {
+          const idEvento = res.id;
 
-  console.log('BODY EVENTO:', body);
+          // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
+          this.idEventoCreado = idEvento;
 
-  this.eventosService.insertarEvento(body).subscribe({
-    next: (res) => {
-      if (res.success) {
+          // EMITIR EL ID DEL EVENTO CREADO PARA QUE LOS COMPONENTES DE TRANSACCIONES Y DOCUMENTOS LO RECIBAN
+          this.eventoCreado.emit(idEvento);
 
-        const idEvento = res.id;
+          // NUEVO
+          this.cargarEventoPorId(idEvento);
 
-        // AQUÍ GUARDAS EL ID PARA MOSTRARLO EN PANTALLA
-        this.idEventoCreado = idEvento;
+          console.log('ID EVENTO:', idEvento);
 
-        // NUEVO
-        this.cargarEventoPorId(idEvento);
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Evento creado',
+              mensaje: res.mensaje,
+              tipo: 'success',
+              icon: 'check_circle',
+              detalles: [
+                { etiqueta: 'ID Evento', valor: idEvento },
+                { etiqueta: 'Título', valor: this.pTituloEvento },
+              ],
+            },
+          });
 
-        console.log('ID EVENTO:', idEvento);
+          // 🔥 FUTURO: documentos
+          // this.subirDocumento(idEvento);
+        } else {
+          console.error(res);
+        }
+      },
+      error: (err) => {
+        console.error(err);
 
         this.dialog.open(AlertGenericComponent, {
           width: '450px',
           data: {
-            titulo: 'Evento creado',
-            mensaje: res.mensaje,
-            tipo: 'success',
-            icon: 'check_circle',
-            detalles: [
-              { etiqueta: 'ID Evento', valor: idEvento },
-              { etiqueta: 'Título', valor: this.pTituloEvento }
-            ]
-          }
+            titulo: 'Error',
+            mensaje: err?.error?.mensaje || 'Error al guardar evento',
+            tipo: 'error',
+            icon: 'error',
+          },
         });
-
-        // 🔥 FUTURO: documentos
-        // this.subirDocumento(idEvento);
-
-      } else {
-        console.error(res);
-      }
-    },
-    error: (err) => {
-      console.error(err);
-
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Error',
-          mensaje: err?.error?.mensaje || 'Error al guardar evento',
-          tipo: 'error',
-          icon: 'error'
-        }
-      });
-    }
-  });
-}
-// FIN FUNCION PARA GUARDAR EVENTO
-
+      },
+    });
+  }
+  // FIN FUNCION PARA GUARDAR EVENTO
 
   // FUNCION PARA LLAMMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
   buscarEvento(): void {
@@ -257,99 +266,96 @@ guardarEvento(): void {
   }
 
   // ==========================================================
-// CARGAR EVENTO POR ID (CON CLIENTE)
-// ==========================================================
-cargarEventoPorId(id: number | null): void {
+  // CARGAR EVENTO POR ID (CON CLIENTE)
+  // ==========================================================
+  cargarEventoPorId(id: number | null): void {
+    if (!id) return;
 
-  if (!id) return;
+    this.eventosService.obtenerEvento(id).subscribe({
+      next: (res: any) => {
+        if (res?.success && res?.data) {
+          const evento = res.data;
 
-  this.eventosService.obtenerEvento(id).subscribe({
-    next: (res: any) => {
+          console.log('EVENTO CARGADO:', evento);
 
-      if (res?.success && res?.data) {
+          // =========================
+          // EVENTO
+          // =========================
+          this.pTituloEvento = evento.titulo;
+          this.pDescripcionEvento = evento.descripcion;
 
-        const evento = res.data;
+          this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
+          this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
+          this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
+          this.pFechaRecogerEvento = this.formatearFecha(
+            evento.fecha_Recepcion,
+          );
 
-        console.log('EVENTO CARGADO:', evento);
+          this.pUbicacionEvento = evento.ubicacion;
+          this.pOrganizadorEvento = evento.organizador;
+          this.pTipoEvento = evento.tipo_Evento;
+          this.pCapacidadEvento = evento.capacidad_Evento;
 
-        // =========================
-        // EVENTO
-        // =========================
-        this.pTituloEvento = evento.titulo;
-        this.pDescripcionEvento = evento.descripcion;
+          this.pDetallesEvento = evento.observacion || '';
 
-        this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
-        this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
-        this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
-        this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
+          // =========================
+          // ESTADO DOCUMENTO
+          // =========================
+          this.pEstadoEvento = evento.estado;
 
-        this.pUbicacionEvento = evento.ubicacion;
-        this.pOrganizadorEvento = evento.organizador;
-        this.pTipoEvento = evento.tipo_Evento;
-        this.pCapacidadEvento = evento.capacidad_Evento;
+          // HABILITAR CAMBIO DE ESTADO
+          this.modoEdicion = true;
 
-        this.pDetallesEvento = evento.observacion || '';
+          // =========================
+          // CLIENTE (DESDE EVENTO - JOIN SQL)
+          // =========================
+          this.clienteSeleccionado = null;
 
-        // =========================
-        // ESTADO DOCUMENTO
-        // =========================
-        this.pEstadoEvento = evento.estado;
+          if (evento.id_cliente) {
+            this.clienteSeleccionado = {
+              id: evento.id_cliente,
 
-        // HABILITAR CAMBIO DE ESTADO
-        this.modoEdicion = true;
+              nit: evento.cliente_NIT || '',
+              nombre: evento.cliente_Nombre || '',
+              apellido: evento.cliente_Apellido || '',
+              email: evento.cliente_Email || '',
+              telefono: evento.cliente_Telefono || '',
+              direccion: evento.cliente_Direccion || '',
 
-        // =========================
-        // CLIENTE (DESDE EVENTO - JOIN SQL)
-        // =========================
-        this.clienteSeleccionado = null;
+              dpi: '',
+              celular: '',
+              tipoCliente: 0,
 
-        if (evento.id_cliente) {
+              fecha_Registro: '',
+              observacion01: '',
+              observacion02: '',
 
-          this.clienteSeleccionado = {
-            id: evento.id_cliente,
+              estado: 1,
+              username: '',
+              m_Username: '',
+              fecha_Hora: '',
+              m_Fecha_Hora: null,
+              consecutivo_Interno: 0,
+            } as ClienteModel;
 
-            nit: evento.cliente_NIT || '',
-            nombre: evento.cliente_Nombre || '',
-            apellido: evento.cliente_Apellido || '',
-            email: evento.cliente_Email || '',
-            telefono: evento.cliente_Telefono || '',
-            direccion: evento.cliente_Direccion || '',
-
-            dpi: '',
-            celular: '',
-            tipoCliente: 0,
-
-            fecha_Registro: '',
-            observacion01: '',
-            observacion02: '',
-
-            estado: 1,
-            username: '',
-            m_Username: '',
-            fecha_Hora: '',
-            m_Fecha_Hora: null,
-            consecutivo_Interno: 0
-
-          } as ClienteModel;
-
-          console.log('CLIENTE CARGADO DESDE EVENTO:', this.clienteSeleccionado);
+            console.log(
+              'CLIENTE CARGADO DESDE EVENTO:',
+              this.clienteSeleccionado,
+            );
+          }
+        } else {
+          console.warn('Evento no encontrado');
+          this.clienteSeleccionado = null;
         }
-
-      } else {
-        console.warn('Evento no encontrado');
+      },
+      error: (err: any) => {
+        console.error('Error al cargar evento', err);
         this.clienteSeleccionado = null;
-      }
-
-    },
-    error: (err: any) => {
-      console.error('Error al cargar evento', err);
-      this.clienteSeleccionado = null;
-    }
-  });
-}
+      },
+    });
+  }
   // FUNCION PARA LIMPIAR LA PANTALLA
   limpiarPantalla(): void {
-
     // =========================
     // EVENTO
     // =========================
@@ -393,24 +399,19 @@ cargarEventoPorId(id: number | null): void {
       celular: '',
       tipoCliente: 1,
       observacion01: '',
-      observacion02: ''
+      observacion02: '',
     };
 
-// SEGMENTO PARA CONTROLAR ESTADOS Y MODO EDICION
-  this.idEventoCreado = null;
+    // SEGMENTO PARA CONTROLAR ESTADOS Y MODO EDICION
+    this.idEventoCreado = null;
 
-  // estado por defecto ACTIVO
-  this.pEstadoEvento = 1;
+    // estado por defecto ACTIVO
+    this.pEstadoEvento = 1;
 
-  // bloquear cambio de estado en nuevos
-  this.modoEdicion = false;
-
+    // bloquear cambio de estado en nuevos
+    this.modoEdicion = false;
   }
   // FIN FUNCION PARA LIMPIAR LA PANTALLA
-
-
-
-
 
   // FUNCION QUE FORMATEA LAS FECHAS QUE VIENEN DE LA API PARA MOSTRARLAS EN LOS INPUTS DE FECHA}
   formatearFecha(fecha: string): string {
@@ -426,7 +427,6 @@ cargarEventoPorId(id: number | null): void {
 
   // FUNCION PARA BUSCAR CLIENTES CON EL NUEVO METODO EN EL SERVICE
   buscarClientes(): void {
-
     // limpia el cliente seleccionado cada vez que se hace una nueva búsqueda para evitar confusiones si el usuario cambia de opinión o busca otro cliente
     this.clienteSeleccionado = null;
 
@@ -446,25 +446,28 @@ cargarEventoPorId(id: number | null): void {
       error: (err) => {
         console.error('Error al buscar clientes', err);
         this.clientesEncontrados = [];
-      }
+      },
     });
   }
 
-  seleccionarCliente(cliente: ClienteModel): void {
-    this.clienteSeleccionado = cliente;
+seleccionarCliente(cliente: ClienteModel): void {
 
-    // Limpia resultados (oculta lista)
-    this.clientesEncontrados = [];
+  this.clienteSeleccionado = cliente;
 
-    // Limpia input si quieres
-    this.busquedaCliente = '';
-  }
+  // OCULTA RESULTADOS
+  this.clientesEncontrados = [];
+
+  // LIMPIA BUSQUEDA
+  this.busquedaCliente = '';
+
+  // ENVIA CLIENTE COMPLETO
+  this.clienteCompletoChange.emit(cliente);
+}
 
   // ==========================================================
   // BLOQUE GUARDAR CLIENTE
   // ==========================================================
   guardarCliente(): void {
-
     //Validaciones mínimas (para evitar error @Tipo_Cliente)
     //
 
@@ -477,10 +480,8 @@ cargarEventoPorId(id: number | null): void {
           mensaje: 'El NIT es obligatorio y debe contener caracteres válidos.',
           tipo: 'warning',
           icon: 'warning',
-          detalles: [
-            { etiqueta: 'NIT Actual', valor: this.clienteForm.nit },
-          ]
-        }
+          detalles: [{ etiqueta: 'NIT Actual', valor: this.clienteForm.nit }],
+        },
       });
 
       return;
@@ -495,14 +496,15 @@ cargarEventoPorId(id: number | null): void {
         width: '450px',
         data: {
           titulo: 'Datos incompletos',
-          mensaje: 'El Teléfono o Celular es obligatorio y debe contener caracteres válidos.',
+          mensaje:
+            'El Teléfono o Celular es obligatorio y debe contener caracteres válidos.',
           tipo: 'warning',
           icon: 'warning',
           detalles: [
             { etiqueta: 'Teléfono Actual', valor: this.clienteForm.telefono },
             { etiqueta: 'Celular Actual', valor: this.clienteForm.celular },
-          ]
-        }
+          ],
+        },
       });
 
       return;
@@ -514,13 +516,14 @@ cargarEventoPorId(id: number | null): void {
         width: '450px',
         data: {
           titulo: 'Datos incompletos',
-          mensaje: 'El Nombre es obligatorio y debe contener caracteres válidos.',
+          mensaje:
+            'El Nombre es obligatorio y debe contener caracteres válidos.',
           tipo: 'warning',
           icon: 'warning',
           detalles: [
             { etiqueta: 'Nombre Actual', valor: this.clienteForm.nombre },
-          ]
-        }
+          ],
+        },
       });
       return;
     }
@@ -531,34 +534,38 @@ cargarEventoPorId(id: number | null): void {
         width: '450px',
         data: {
           titulo: 'Datos incompletos',
-          mensaje: 'El Apellido es obligatorio y debe contener caracteres válidos.',
+          mensaje:
+            'El Apellido es obligatorio y debe contener caracteres válidos.',
           tipo: 'warning',
           icon: 'warning',
           detalles: [
             { etiqueta: 'Apellido Actual', valor: this.clienteForm.apellido },
-          ]
-        }
+          ],
+        },
       });
       return;
     }
 
     // Valida que la Direccion se ingrese y sea valido (no solo espacios) con la nueva alerta generica integrada
-    if (!this.clienteForm.direccion || this.clienteForm.direccion.trim() === '') {
+    if (
+      !this.clienteForm.direccion ||
+      this.clienteForm.direccion.trim() === ''
+    ) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
           titulo: 'Datos incompletos',
-          mensaje: 'La Dirección es obligatoria y debe contener caracteres válidos.',
+          mensaje:
+            'La Dirección es obligatoria y debe contener caracteres válidos.',
           tipo: 'warning',
           icon: 'warning',
           detalles: [
             { etiqueta: 'Dirección Actual', valor: this.clienteForm.direccion },
-          ]
-        }
+          ],
+        },
       });
       return;
     }
-
 
     // VALIDACION DEL TIPO CLIENTE: Asegura que se haya seleccionado un tipo cliente válido (no nulo, no vacío, no cero)
     if (!this.clienteForm.tipoCliente || this.clienteForm.tipoCliente <= 0) {
@@ -570,9 +577,12 @@ cargarEventoPorId(id: number | null): void {
           tipo: 'warning',
           icon: 'warning',
           detalles: [
-            { etiqueta: 'Tipo Cliente Actual', valor: this.clienteForm.tipoCliente },
-          ]
-        }
+            {
+              etiqueta: 'Tipo Cliente Actual',
+              valor: this.clienteForm.tipoCliente,
+            },
+          ],
+        },
       });
       return;
     }
@@ -595,10 +605,8 @@ cargarEventoPorId(id: number | null): void {
           mensaje: 'NIT Actual: ' + this.clienteForm.nit,
           tipo: 'warning',
           icon: 'warning',
-          detalles: [
-            { etiqueta: 'NIT Actual', valor: this.clienteForm.nit },
-          ]
-        }
+          detalles: [{ etiqueta: 'NIT Actual', valor: this.clienteForm.nit }],
+        },
       });
       return;
     }
@@ -637,19 +645,28 @@ cargarEventoPorId(id: number | null): void {
             width: '450px',
             data: {
               titulo: 'Cliente Creado Correctamente',
-              mensaje: res.mensaje || 'Los datos del cliente han sido almacenados.',
+              mensaje:
+                res.mensaje || 'Los datos del cliente han sido almacenados.',
               tipo: 'success', // Controla el tipo de mensaje (puedes usar esto para cambiar colores o íconos en el modal)
               icon: 'check_circle', // Icono de éxito
               detalles: [
                 { etiqueta: 'NIT', valor: this.clienteForm.nit },
-                { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+                {
+                  etiqueta: 'Nombre',
+                  valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}`,
+                },
                 { etiqueta: 'Correo', valor: this.clienteForm.email },
-                { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
+                {
+                  etiqueta: 'Telefono',
+                  valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}`,
+                },
                 { etiqueta: 'Estado', valor: this.clienteForm.estado },
-                { etiqueta: 'Fecha Creación', valor: this.clienteForm.fecha_Registro },
-
-              ]
-            }
+                {
+                  etiqueta: 'Fecha Creación',
+                  valor: this.clienteForm.fecha_Registro,
+                },
+              ],
+            },
           });
 
           //Limpia el formulario de cliente al guardar
@@ -664,12 +681,11 @@ cargarEventoPorId(id: number | null): void {
             celular: '',
             tipoCliente: 1,
             observacion01: '',
-            observacion02: ''
+            observacion02: '',
           };
 
           // OCULTA LOS INPUTS LUEGO DE QUE SE GUARDO EL NUEVO CLIENTE
           this.dataCreateClient = 0;
-
         } else {
           alert(res?.mensaje || 'No se pudo guardar el cliente');
           console.error('Respuesta API:', res);
@@ -690,16 +706,24 @@ cargarEventoPorId(id: number | null): void {
             icon: 'error', // Icono de error
             detalles: [
               { etiqueta: 'NIT', valor: this.clienteForm.nit },
-              { etiqueta: 'Nombre', valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}` },
+              {
+                etiqueta: 'Nombre',
+                valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}`,
+              },
               { etiqueta: 'Correo', valor: this.clienteForm.email },
-              { etiqueta: 'Telefono', valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}` },
+              {
+                etiqueta: 'Telefono',
+                valor: `${this.clienteForm.telefono}  /  ${this.clienteForm.celular}`,
+              },
               { etiqueta: 'Estado', valor: this.clienteForm.estado },
-              { etiqueta: 'Fecha Creación', valor: this.clienteForm.fecha_Registro },
-
-            ]
-          }
+              {
+                etiqueta: 'Fecha Creación',
+                valor: this.clienteForm.fecha_Registro,
+              },
+            ],
+          },
         });
-      }
+      },
     });
   }
 
@@ -719,40 +743,40 @@ cargarEventoPorId(id: number | null): void {
   // Funcion para consumir el servicio de ubicaciones disponibles
   getUbicaciones(): void {
     this.ubicacionesService.getUbicaciones().subscribe({
-      next: (data) => this.ubicaciones = data,
-      error: (err) => console.error('Error al cargar ubicaciones', err)
+      next: (data) => (this.ubicaciones = data),
+      error: (err) => console.error('Error al cargar ubicaciones', err),
     });
   }
 
   // Funcion para consumir el servicio de Tipos Evento disponibles
   getTipoEvento(): void {
     this.TipoEventoService.getTipoEvento().subscribe({
-      next: (data) => this.tipoEvento = data,
-      error: (err) => console.error('Error al cargar ubicaciones', err)
+      next: (data) => (this.tipoEvento = data),
+      error: (err) => console.error('Error al cargar ubicaciones', err),
     });
   }
 
   // Funcion para consumir el servicio de Tipos Evento disponibles
   getOrganizador(): void {
     this.OrganizadorService.getOrganizador().subscribe({
-      next: (data) => this.Organizadores = data,
-      error: (err) => console.error('Error al cargar ubicaciones', err)
+      next: (data) => (this.Organizadores = data),
+      error: (err) => console.error('Error al cargar ubicaciones', err),
     });
   }
 
   // Funcion para consumir el servicio de capacidades disponibles
   getCapacidades(): void {
     this.CapacidadesService.getCapacidades().subscribe({
-      next: (data) => this.Capacidades = data,
-      error: (err) => console.error('Error al cargar Capacidades', err)
+      next: (data) => (this.Capacidades = data),
+      error: (err) => console.error('Error al cargar Capacidades', err),
     });
   }
 
   // Funcion para consumir el servicio de capacidades disponibles
   getEstados(): void {
     this.EstadosService.getEstados().subscribe({
-      next: (data) => this.Estados = data,
-      error: (err) => console.error('Error al cargar Estados', err)
+      next: (data) => (this.Estados = data),
+      error: (err) => console.error('Error al cargar Estados', err),
     });
   }
 }

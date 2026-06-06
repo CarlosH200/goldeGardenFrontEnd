@@ -1,67 +1,52 @@
 <div>
   <form class="event-form">
-<div class="row mb-4">
-  <div class="col-12">
+    <div class="row mb-4">
+      <div class="col-12">
 
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-      <!--IZQUIERDA: BUSCADOR -->
-      <div class="d-flex align-items-center gap-2">
-        <input 
-          type="text" 
-          [(ngModel)]="idEventoCreado" 
-          name="idEventoCreado"
-          class="input-btn-group form-control"
-          placeholder="ID Evento"
-          style="width: 140px;"
-        >
+          <!--IZQUIERDA: BUSCADOR -->
+          <div class="d-flex align-items-center gap-2">
+            <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado" class="input-btn-group form-control"
+              placeholder="ID Evento" style="width: 140px;">
 
-        <button 
-          type="button" 
-          class="buttonCircle btn btn-outline-dark"
-          (click)="buscarEvento()">
-          <span class="material-icons">search</span>
-        </button>
-      </div>
+            <button type="button" class="buttonCircle btn btn-outline-dark" (click)="buscarEvento()">
+              <span class="material-icons">search</span>
+            </button>
+          </div>
 
-      <!--CENTRO: TÍTULO -->
-      <div class="text-center flex-grow-1">
-        <h2 class="mb-0" *ngIf="idEventoCreado">
-          Evento No. {{ idEventoCreado }}
-        </h2>
-      </div>
+          <!--CENTRO: TÍTULO -->
+          <div class="text-center flex-grow-1">
+            <h2 class="mb-0" *ngIf="idEventoCreado">
+              Evento No. {{ idEventoCreado }}
+            </h2>
+          </div>
 
-      <!--DERECHA: ACCIONES -->
-      <div class="d-flex align-items-center gap-2">
+          <!--DERECHA: ACCIONES -->
+          <div class="d-flex align-items-center gap-2">
 
-       <select 
-  class="form-select"
-  style="min-width: 180px;"
-  [(ngModel)]="pEstadoEvento"
-  name="pEstadoEvento"
-  [disabled]="!modoEdicion">
+            <select class="form-select" style="min-width: 180px;" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
+              [disabled]="!modoEdicion">
 
-  <option *ngFor="let estado of Estados" [value]="estado.id">
-    {{ estado.descripcion }} ({{ estado.id }})
-  </option>
+              <option *ngFor="let estado of Estados" [value]="estado.id">
+                {{ estado.descripcion }} ({{ estado.id }})
+              </option>
 
-</select>
+            </select>
 
-        <button 
-          type="button" 
-          class="buttonCircle btn btn-outline-dark"
-          (click)="limpiarPantalla()" 
-          title="Nuevo evento">
+            <button type="button" class="NewEventButton btn btn-outline-dark" (click)="habilitarModoCreacionEvento()">
 
-          <span class="material-icons">add</span>
-        </button>
+              <span class="material-icons align-middle textColor">add</span>
+              <span class="textColor">NUEVO EVENTO</span>
+
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
-
     </div>
-
-  </div>
-</div>
 
 
     <!-- Buscador de clientes -->
@@ -193,7 +178,7 @@
           <div class="col-md-6">
             <label>Observación 01</label>
             <textarea [(ngModel)]="clienteForm.observacion01" name="observacion01" class="form-control"
-              rows="2"></textarea>
+              rows="2" [readonly]="modoConsulta"></textarea>
           </div>
 
           <div class="col-md-6">
@@ -210,33 +195,34 @@
     <!-- Información del evento -->
     <div class="form-group mb-3">
       <label for="tituloEvento">Título Evento</label>
-      <input type="text" [(ngModel)]="pTituloEvento" name="pTituloEvento" class="form-control" required />
+      <input type="text" [(ngModel)]="pTituloEvento" name="pTituloEvento" class="form-control" required
+        [readonly]="modoConsulta" />
     </div>
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Descripcion</label>
-      <textarea name="pDescripcionEvento" [(ngModel)]="pDescripcionEvento" rows="5" class="form-control"></textarea>
+      <textarea name="pDescripcionEvento" [(ngModel)]="pDescripcionEvento" rows="5" class="form-control" [readonly]="modoConsulta"></textarea>
     </div>
     <div class="containerDates">
       <div class="row g-3">
         <div class="col-md-6">
           <label for="fechaEntrega">Fecha Entrega</label>
           <input type="datetime-local" name="pFechaEntregaEvento" class="form-control" [(ngModel)]="pFechaEntregaEvento"
-            required />
+          [readonly]="modoConsulta"  required />
         </div>
         <div class="col-md-6">
           <label for="fechaRecoger">Fecha Recoger</label>
           <input type="datetime-local" name="pFechaRecogerEvento" class="form-control" [(ngModel)]="pFechaRecogerEvento"
-            required />
+            [readonly]="modoConsulta" required />
         </div>
         <div class="col-md-6">
           <label for="fechaInicio">Fecha Inicio</label>
           <input type="datetime-local" name="pFechaInicioEvento" class="form-control" [(ngModel)]="pFechaInicioEvento"
-            required />
+            [readonly]="modoConsulta"  required />
         </div>
         <div class="col-md-6">
           <label for="fechaFin">Fecha Fin</label>
           <input type="datetime-local" name="pFechaFinEvento" class="form-control" [(ngModel)]="pFechaFinEvento"
-            required />
+            [readonly]="modoConsulta" required />
         </div>
       </div>
     </div>
@@ -244,7 +230,7 @@
     <div class="row mt-3">
       <div class="col-md-6 mb-3">
         <label for="ubicacion">Ubicación</label>
-        <select class="form-select" [(ngModel)]="pUbicacionEvento" name="tipoEvento" required>
+        <select class="form-select" [(ngModel)]="pUbicacionEvento" name="tipoEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let ubicacion of ubicaciones" [value]="ubicacion.id">
             ({{ ubicacion.id }}) {{ ubicacion.descripcion }}
@@ -253,7 +239,7 @@
       </div>
       <div class="col-md-6 mb-3">
         <label for="organizador">Organizador</label>
-        <select class="form-select" [(ngModel)]="pOrganizadorEvento" name="pOrganizadorEvento" required>
+        <select class="form-select" [(ngModel)]="pOrganizadorEvento" name="pOrganizadorEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let organizador of Organizadores" [value]="organizador.id">
             ({{ organizador.id }}) {{ organizador.descripcion }}
@@ -263,7 +249,7 @@
 
       <div class="col-md-6 mb-3">
         <label for="tipoEvento">Tipo Evento</label>
-        <select class="form-select" [(ngModel)]="pTipoEvento" name="pTipoEvento" required>
+        <select class="form-select" [(ngModel)]="pTipoEvento" name="pTipoEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let tEvento of tipoEvento" [value]="tEvento.id">
             ({{ tEvento.id }}) {{ tEvento.descripcion }}
@@ -273,7 +259,7 @@
 
       <div class="col-md-6 mb-3">
         <label for="capacidadEvento">Capacidad Evento</label>
-        <select class="form-select" [(ngModel)]="pCapacidadEvento" name="pCapacidadEvento" required>
+        <select class="form-select" [(ngModel)]="pCapacidadEvento" name="pCapacidadEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let capacidad of Capacidades" [value]="capacidad.id">
             <!-- ({{ capacidad.id }})  -->
@@ -285,10 +271,10 @@
 
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Detalles Adicionales</label>
-      <textarea name="pDetallesEvento" [(ngModel)]="pDetallesEvento" rows="5" class="form-control"></textarea>
+      <textarea name="pDetallesEvento" [(ngModel)]="pDetallesEvento" rows="5" class="form-control" [readonly]="modoConsulta"></textarea>
     </div>
 
-    <button class="btn btn-dark w-100 fw-bold" (click)="guardarEvento()" type="submit">
+    <button class="btn btn-dark w-100 fw-bold" *ngIf="!modoConsulta" (click)="guardarEvento()" type="submit">
       GUARDAR EVENTO
     </button>
   </form>

@@ -53,6 +53,8 @@ export class DocumentoScreenComponent {
     fecha_Registro: new Date().toLocaleDateString(), // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
+  // Variable para controlar el modo consulta de documento hasta hacer clic en nuevo evento
+  modoConsulta: boolean = true;
   // VARIABLES PARA EL MODO DE EDICION DE ESTADOS Y ESTADO POR DEFECTO AL CRER UN EVENTO
   pEstadoEvento: number = 1;
   modoEdicion: boolean = false;
@@ -114,7 +116,7 @@ export class DocumentoScreenComponent {
 
     //NUEVO SERVICE
     private clientesService: ClientesService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.limpiarPantalla();
@@ -124,6 +126,16 @@ export class DocumentoScreenComponent {
     this.getOrganizador();
     this.getCapacidades();
     this.getEstados();
+  }
+
+
+  // FUNCION PARA HABILITAR MODO CREACION DE EVENTO O MODO CONSULTA DE EVENTO
+  habilitarModoCreacionEvento(): void {
+
+    this.limpiarPantalla();
+
+    this.modoConsulta = false;
+
   }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
@@ -411,6 +423,7 @@ export class DocumentoScreenComponent {
 
     // bloquear cambio de estado en nuevos
     this.modoEdicion = false;
+
   }
   // FIN FUNCION PARA LIMPIAR LA PANTALLA
 

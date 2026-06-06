@@ -5,6 +5,10 @@
   color: var(--color-texto);
 }
 
+.textColor{
+  color: var(--color-texto-invertido) !important;
+}
+
 .event-form h4 {
   font-weight: 600;
   color: var(--color-texto);
@@ -98,7 +102,7 @@
 
 .client-card-header .material-icons {
   font-size: 22px;
-  color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
 }
 
 /* APARTADO DE ESTILOS CONTAINER PARA CREAR CLIENTE */
@@ -274,6 +278,19 @@ label {
   justify-content: center;
 }
 
+
+.NewEventButton {
+  width: 250px;
+  font-size: 14px;
+  height: 50px;
+  border-radius: 14px;
+  border: none;
+  background-color: var(--color-principal);
+  color: var(--color-texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .buttonCancel {
   background-color: red;

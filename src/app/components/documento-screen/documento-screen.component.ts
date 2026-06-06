@@ -265,7 +265,7 @@ export class DocumentoScreenComponent {
   }
   // FIN FUNCION PARA GUARDAR EVENTO
 
-  // FUNCION PARA LLAMMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
+  // FUNCION PARA LLAMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
   buscarEvento(): void {
     if (!this.idEventoCreado) {
       console.warn('Debes ingresar un ID');
@@ -273,6 +273,8 @@ export class DocumentoScreenComponent {
     }
 
     this.cargarEventoPorId(this.idEventoCreado);
+    // ACTIVA EL MODO CONSULTA PARA NO PODER HACER CAMBIOS AL DOCUMENTO MIENTRAS NO SE HAGA CLIC EN EDITAR
+    this.modoConsulta = true;
   }
 
   // ==========================================================

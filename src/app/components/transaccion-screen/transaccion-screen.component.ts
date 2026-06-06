@@ -6,7 +6,7 @@ import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-transaccion-screen',
@@ -38,10 +38,15 @@ ngOnChanges(changes: SimpleChanges): void {
   }
 }
 
+@Output() totalGeneralChange =
+  new EventEmitter<number>();
   // input para recibir el id del evento o cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
   @Input() idEvento: number | null = null;
   // input para recibir el id del cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
   @Input() cliente: any = null;
+
+
+  totalTransaccion = 0;
 
   productoBuscado = '';
 
@@ -61,6 +66,16 @@ ngOnChanges(changes: SimpleChanges): void {
 
   loadingProductos = false;
 
+
+
+
+   actualizarTotal(): void {
+
+  console.log('EMITIENDO TOTAL:', this.totalGeneral);
+
+  this.totalGeneralChange.emit(this.totalGeneral);
+
+}
   // ==========================================================
   // FILTRAR PRODUCTOS DESDE API
   // ==========================================================
@@ -250,6 +265,7 @@ ngOnChanges(changes: SimpleChanges): void {
             existe.subtotal = existe.cantidad * existe.precio;
           } else {
             this.transacciones.push({
+              
               ...this.productoEncontrado,
 
               cantidad: this.cantidad,
@@ -257,8 +273,12 @@ ngOnChanges(changes: SimpleChanges): void {
               detalle: this.detalleProducto,
 
               subtotal,
+
+              
             });
           }
+
+          this.actualizarTotal();
 
           // RESET
           this.cantidad = 1;
@@ -353,6 +373,8 @@ cargarTransacciones(): void {
             'TRANSACCIONES CARGADAS:',
             this.transacciones
           );
+
+          this.actualizarTotal();
         }
       },
 
@@ -372,8 +394,12 @@ cargarTransacciones(): void {
   // ELIMINAR PRODUCTO
   // ==========================================================
   eliminarProducto(index: number) {
-    this.transacciones.splice(index, 1);
-  }
+
+  this.transacciones.splice(index, 1);
+
+  this.actualizarTotal();
+
+}
 
   // ==========================================================
   // AUMENTAR

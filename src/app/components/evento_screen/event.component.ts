@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TransaccionScreenComponent } from '../transaccion-screen/transaccion-screen.component';
 import { DocumentoScreenComponent } from "../documento-screen/documento-screen.component";
 import { ThemeService } from '../../services/theme.service';
+import { FormaPagoScreenComponent } from '../forma-pago-screen/forma-pago-screen.component';
 
 @Component({
   selector: 'app-event',
-  imports: [CommonModule, FormsModule, TransaccionScreenComponent, DocumentoScreenComponent],
+  imports: [CommonModule, FormsModule, TransaccionScreenComponent, DocumentoScreenComponent, FormaPagoScreenComponent],
   templateUrl: './event.component.html',
   styleUrl: './evento.component.css',
 })
@@ -24,5 +25,5 @@ export class EventComponent {
 idEventoCreado: number | null = null;
 
 clienteSeleccionadoData: any = null;
-
+totalTransaccion: number = 0;
 }

@@ -1,1 +1,288 @@
-<p>forma-pago-screen works!</p>
+<div class="pagos-container">
+
+  <!-- ENCABEZADO -->
+  <div class="encabezado">
+
+    <div>
+      <p>
+        <strong class="textoInvertido">
+          Gestión de Pagos
+        </strong>
+      </p>
+
+      <p class="textoInvertido">
+        <strong>Total Transacción:</strong>
+        Q{{ totalTransaccion.toFixed(2) }}
+      </p>
+    </div>
+
+    <div class="badge-items textoInvertido">
+      {{ pagos.length }} Pagos
+    </div>
+
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="contenido-principal">
+
+    <!-- FORMULARIO -->
+    <div class="pago-card">
+
+      <h3>Agregar Forma de Pago</h3>
+
+      <div class="form-group">
+
+        <label>Forma de Pago</label>
+
+        <select
+          [(ngModel)]="formaPagoSeleccionada"
+          class="inputControl">
+
+          <option value="">Seleccione</option>
+
+          <option
+            *ngFor="let forma of formasPago"
+            [value]="forma.id">
+
+            {{ forma.descripcion }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Monto</label>
+
+        <input
+          type="number"
+          [(ngModel)]="montoPago"
+          class="inputControl">
+
+      </div>
+
+      <!-- TRANSFERENCIA -->
+      <div *ngIf="esTransferencia">
+
+        <div class="form-group">
+          <label>Banco Origen</label>
+
+          <select
+            [(ngModel)]="bancoOrigen"
+            class="inputControl">
+
+            <option value="">Seleccione</option>
+
+            <option
+              *ngFor="let banco of bancos">
+              {{ banco.nombre }}
+            </option>
+
+          </select>
+        </div>
+
+        <div class="form-group">
+
+          <label>Cuenta Destino</label>
+
+          <select
+            [(ngModel)]="cuentaDestino"
+            class="inputControl">
+
+            <option value="">Seleccione</option>
+
+            <option
+              *ngFor="let cuenta of cuentasEmpresa">
+              {{ cuenta.descripcion }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Referencia</label>
+
+          <input
+            type="text"
+            [(ngModel)]="referencia"
+            class="inputControl">
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Autorización</label>
+
+          <input
+            type="text"
+            [(ngModel)]="autorizacion"
+            class="inputControl">
+
+        </div>
+
+      </div>
+
+      <!-- TARJETA -->
+      <div *ngIf="esTarjeta">
+
+        <div class="form-group">
+
+          <label>Autorización</label>
+
+          <input
+            type="text"
+            [(ngModel)]="autorizacion"
+            class="inputControl">
+
+        </div>
+
+      </div>
+
+      <button
+        class="btn-agregar"
+        (click)="agregarPago()">
+
+        <i class="material-icons">add_card</i>
+
+        Agregar Pago
+
+      </button>
+
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="resumen-box">
+
+      <h3 class="tituloResumen">
+        Resumen
+      </h3>
+
+      <div class="resumen-item">
+
+        <span class="textoNoInvertido">
+          Total:
+        </span>
+
+        <strong>
+          Q{{ totalTransaccion.toFixed(2) }}
+        </strong>
+
+      </div>
+
+      <div class="resumen-item">
+
+        <span class="textoNoInvertido">
+          Pagado:
+        </span>
+
+        <strong>
+          Q{{ totalPagado.toFixed(2) }}
+        </strong>
+
+      </div>
+
+      <div class="resumen-item">
+
+        <span class="textoNoInvertido">
+          Pendiente:
+        </span>
+
+        <strong>
+          Q{{ saldoPendiente.toFixed(2) }}
+        </strong>
+
+      </div>
+
+      <hr>
+
+      <div class="total-general">
+
+        <span class="textoNoInvertido">
+          Cambio
+        </span>
+
+        <strong>
+          Q{{ cambio.toFixed(2) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TABLA -->
+  <div
+    class="tabla-container"
+    *ngIf="pagos.length > 0">
+
+    <div class="tabla-header">
+      <h3>Pagos Agregados</h3>
+    </div>
+
+    <div class="tabla-scroll">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Forma Pago</th>
+            <th>Monto</th>
+            <th>Referencia</th>
+            <th>Autorización</th>
+            <th></th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="let pago of pagos; let i=index">
+
+            <td>{{ pago.formaPago }}</td>
+
+            <td>
+              Q{{ pago.monto.toFixed(2) }}
+            </td>
+
+            <td>
+              {{ pago.referencia }}
+            </td>
+
+            <td>
+              {{ pago.autorizacion }}
+            </td>
+
+            <td>
+
+              <button
+                class="buttonDelete"
+                (click)="eliminarPago(i)">
+
+                <i class="material-icons">
+                  delete
+                </i>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

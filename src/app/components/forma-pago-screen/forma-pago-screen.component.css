@@ -1,0 +1,151 @@
+.pagos-container {
+  width: 100%;
+  margin: auto;
+  padding: 12px;
+  background: var(--color-fondo);
+  padding-bottom: 120px;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 18px;
+  background: var(--color-principal);
+  border-radius: 14px;
+  flex-wrap: wrap;
+}
+
+.textoInvertido {
+  color: var(--color-texto-invertido) !important;
+}
+
+.textoNoInvertido {
+  color: var(--color-texto) !important;
+}
+
+.badge-items {
+  background: rgba(255,255,255,.15);
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+}
+
+.contenido-principal {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pago-card {
+  flex: 2;
+  min-width: 350px;
+  background: var(--color-fondoSecundario);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.resumen-box {
+  flex: 1;
+  min-width: 280px;
+  background: var(--color-fondoSecundario);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  color: var(--color-texto);
+}
+
+.inputControl {
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+.btn-agregar {
+  width: 100%;
+  height: 55px;
+  border: none;
+  border-radius: 14px;
+  background: var(--color-principal);
+  color: var(--color-texto-invertido);
+  font-weight: bold;
+  cursor: pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.tabla-container {
+  margin-top: 25px;
+  background: var(--color-fondoSecundario);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.tabla-header {
+  padding: 18px;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 16px;
+  text-align: left;
+}
+
+td {
+  padding: 16px;
+}
+
+.buttonDelete {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #ff4d4f;
+  color: white;
+  cursor: pointer;
+}
+
+.resumen-item,
+.total-general {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+.total-general {
+  font-size:22px;
+  font-weight:bold;
+}
+
+@media (max-width:768px){
+
+  .contenido-principal{
+    flex-direction:column;
+  }
+
+}

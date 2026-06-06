@@ -53,8 +53,9 @@
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'transacciones'">
     <app-transaccion-screen
-      [idEvento]="idEventoCreado"
-      [cliente]="clienteSeleccionadoData"
+  [idEvento]="idEventoCreado"
+  [cliente]="clienteSeleccionadoData"
+  (totalGeneralChange)="totalTransaccion = $event">
     >
     </app-transaccion-screen>
   </div>
@@ -63,8 +64,10 @@
   <!-- PAGO -->
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'pago'">
-    <h4>Pago</h4>
-
-    <p>Contenido de Pago...</p>
+     <app-forma-pago-screen
+     [idEvento]="idEventoCreado"
+     [cliente]="clienteSeleccionadoData"
+     [totalTransaccion]="totalTransaccion">
+  </app-forma-pago-screen>
   </div>
 </div>

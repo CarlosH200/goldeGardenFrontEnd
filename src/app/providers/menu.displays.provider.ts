@@ -26,6 +26,13 @@ export class MenuDisplayProvider {
       enabled: false,
       icon: 'calendar_month'
     },
+    {
+      id: 3,
+      nombre: 'Clientes',
+      component: EventCalendarComponent,
+      enabled: false,
+      icon: 'group_add'
+    },
  
   ];
 

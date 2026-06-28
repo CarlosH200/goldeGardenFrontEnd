@@ -6,10 +6,10 @@
   /* Tema claro por defecto */
   --color-fondo: #ffffff;
   --color-fondoSecundario: #dfdede;
-  --color-principal: #004e24;
-  --color-texto: #1b1b1b;
+  --color-principal: #065b32;
+  --color-texto: #000000;
   --color-texto-invertido: #ffffff;
-  --color-secundario: #f2c94c;
+  --color-secundario: #e1b244;
   --color-Shadow: #b3b3b3;
   --theme-image-url: url("assets/GoldenGardenLigthTheme.png");
   /* APARTADO COLORES ALERTAS */
@@ -20,12 +20,12 @@
 
 /* tema obscuro */
 body.dark-theme {
-  --color-fondo: #535353;
-  --color-fondoSecundario: #2c2b2b;
-  --color-principal: #e5b040;
+  --color-fondo: #202125;
+  --color-fondoSecundario: #2b2c2e;
+  --color-principal: #e1b244;
   --color-texto: #ffffff;
   --color-texto-invertido: #000000;
-  --color-secundario: #004e24;
+  --color-secundario: #065b32;
   --color-Shadow: #535353;
   --theme-image-url: url("assets/GoldenGardenDarckTheme.png"); 
   /* APARTADO COLORES ALERTAS */
@@ -33,8 +33,6 @@ body.dark-theme {
   --color-error: #dc2626;
   --color-warning: #d97706;
 }
-
-
 
 /* fin segmento colores para el proyecto  */
 

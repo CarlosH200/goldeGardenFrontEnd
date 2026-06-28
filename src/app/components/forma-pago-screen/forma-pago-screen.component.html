@@ -38,7 +38,9 @@
           [(ngModel)]="formaPagoSeleccionada"
           class="inputControl">
 
-          <option value="">Seleccione</option>
+          <option value="">
+            Seleccione
+          </option>
 
           <option
             *ngFor="let forma of formasPago"
@@ -57,88 +59,91 @@
         <label>Monto</label>
 
         <input
-          type="number"
+          type="text"
           [(ngModel)]="montoPago"
           class="inputControl">
 
       </div>
 
-      <!-- TRANSFERENCIA -->
-      <div *ngIf="esTransferencia">
+      <!-- BANCO -->
+      <div
+        class="form-group"
+        *ngIf="mostrarBanco">
 
-        <div class="form-group">
-          <label>Banco Origen</label>
+        <label>Banco Origen</label>
 
-          <select
-            [(ngModel)]="bancoOrigen"
-            class="inputControl">
+        <select
+          [(ngModel)]="bancoOrigen"
+          class="inputControl">
 
-            <option value="">Seleccione</option>
+          <option value="">
+            Seleccione
+          </option>
 
-            <option
-              *ngFor="let banco of bancos">
-              {{ banco.nombre }}
-            </option>
+          <option
+            *ngFor="let banco of bancos"
+            [value]="banco.nombre">
 
-          </select>
-        </div>
+            {{ banco.nombre }}
 
-        <div class="form-group">
+          </option>
 
-          <label>Cuenta Destino</label>
-
-          <select
-            [(ngModel)]="cuentaDestino"
-            class="inputControl">
-
-            <option value="">Seleccione</option>
-
-            <option
-              *ngFor="let cuenta of cuentasEmpresa">
-              {{ cuenta.descripcion }}
-            </option>
-
-          </select>
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Referencia</label>
-
-          <input
-            type="text"
-            [(ngModel)]="referencia"
-            class="inputControl">
-
-        </div>
-
-        <div class="form-group">
-
-          <label>Autorización</label>
-
-          <input
-            type="text"
-            [(ngModel)]="autorizacion"
-            class="inputControl">
-
-        </div>
+        </select>
 
       </div>
 
-      <!-- TARJETA -->
-      <div *ngIf="esTarjeta">
+      <!-- CUENTA BANCARIA -->
+      <div
+        class="form-group"
+        *ngIf="mostrarCuentaBancaria">
 
-        <div class="form-group">
+        <label>Cuenta Destino</label>
 
-          <label>Autorización</label>
+        <select
+          [(ngModel)]="cuentaDestino"
+          class="inputControl">
 
-          <input
-            type="text"
-            [(ngModel)]="autorizacion"
-            class="inputControl">
+          <option value="">
+            Seleccione
+          </option>
 
-        </div>
+          <option
+            *ngFor="let cuenta of cuentasEmpresa"
+            [value]="cuenta.descripcion">
+
+            {{ cuenta.descripcion }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- REFERENCIA -->
+      <div
+        class="form-group"
+        *ngIf="mostrarReferencia">
+
+        <label>Referencia</label>
+
+        <input
+          type="text"
+          [(ngModel)]="referencia"
+          class="inputControl">
+
+      </div>
+
+      <!-- AUTORIZACIÓN -->
+      <div
+        class="form-group"
+        *ngIf="mostrarAutorizacion">
+
+        <label>Autorización</label>
+
+        <input
+          type="text"
+          [(ngModel)]="autorizacion"
+          class="inputControl">
 
       </div>
 
@@ -245,9 +250,11 @@
         <tbody>
 
           <tr
-            *ngFor="let pago of pagos; let i=index">
+            *ngFor="let pago of pagos; let i = index">
 
-            <td>{{ pago.formaPago }}</td>
+            <td>
+              {{ pago.formaPago }}
+            </td>
 
             <td>
               Q{{ pago.monto.toFixed(2) }}

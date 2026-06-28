@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+import { FormaPagoModel } from '../../models/formaPagoModel';
+import { FormaPagoService } from '../../services/formaPagoService';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -8,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './forma-pago-screen.component.html',
   styleUrl: './forma-pago-screen.component.css'
 })
-export class FormaPagoScreenComponent {
+export class FormaPagoScreenComponent implements OnInit {
 
   @Input() idEvento: number | null = null;
 
@@ -17,42 +20,103 @@ export class FormaPagoScreenComponent {
   @Input() totalTransaccion = 0;
 
   formaPagoSeleccionada = '';
+
   montoPago = 0;
 
   referencia = '';
+
   autorizacion = '';
 
   bancoOrigen = '';
+
   cuentaDestino = '';
 
   pagos: any[] = [];
 
-  formasPago = [
-    { id: 'EFE', descripcion: 'Efectivo' },
-    { id: 'TAR', descripcion: 'Tarjeta' },
-    { id: 'TRA', descripcion: 'Transferencia' },
-    { id: 'CHE', descripcion: 'Cheque' }
-  ];
+  formasPago: FormaPagoModel[] = [];
 
   bancos: any[] = [];
 
   cuentasEmpresa: any[] = [];
 
-  get esTransferencia() {
-    return this.formaPagoSeleccionada === 'TRA';
+  constructor(
+    private formaPagoService: FormaPagoService
+  ) { }
+
+  ngOnInit(): void {
+
+    this.cargarFormasPago();
+
   }
 
-  get esTarjeta() {
-    return this.formaPagoSeleccionada === 'TAR';
+  cargarFormasPago(): void {
+
+    this.formaPagoService
+      .getFormasPago()
+      .subscribe({
+
+        next: (response) => {
+
+          this.formasPago = response;
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error cargando formas de pago',
+            error
+          );
+
+        }
+
+      });
+
+  }
+
+  get formaPagoActual(): FormaPagoModel | undefined {
+
+    return this.formasPago.find(
+      x => x.id === Number(this.formaPagoSeleccionada)
+    );
+
+  }
+
+  get mostrarBanco(): boolean {
+
+    return this.formaPagoActual?.posee_Banco ?? false;
+
+  }
+
+  get mostrarCuentaBancaria(): boolean {
+
+    return this.formaPagoActual?.posee_Cuenta_Bancaria ?? false;
+
+  }
+
+  get mostrarReferencia(): boolean {
+
+    return this.formaPagoActual?.posee_Referencia ?? false;
+
+  }
+
+  get mostrarAutorizacion(): boolean {
+
+    return this.formaPagoActual?.posee_Autorizarion ?? false;
+
   }
 
   agregarPago() {
 
+    if (!this.formaPagoSeleccionada) {
+      return;
+    }
+
     this.pagos.push({
 
-      formaPago: this.formasPago.find(
-        x => x.id === this.formaPagoSeleccionada
-      )?.descripcion,
+      idFormaPago: Number(this.formaPagoSeleccionada),
+
+      formaPago: this.formaPagoActual?.descripcion,
 
       monto: Number(this.montoPago),
 
@@ -63,9 +127,11 @@ export class FormaPagoScreenComponent {
       bancoOrigen: this.bancoOrigen,
 
       cuentaDestino: this.cuentaDestino
+
     });
 
     this.limpiar();
+
   }
 
   eliminarPago(index: number) {
@@ -116,4 +182,5 @@ export class FormaPagoScreenComponent {
     );
 
   }
+
 }

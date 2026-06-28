@@ -32,19 +32,35 @@
 
       <div class="form-group">
 
-        <label>Forma de Pago</label>
+        <label>Tipo de Movimiento</label>
 
-        <select
-          [(ngModel)]="formaPagoSeleccionada"
-          class="inputControl">
+        <select [(ngModel)]="tipoMovimientoSeleccionado" class="inputControl">
 
-          <option value="">
+          <!-- <option value="">
             Seleccione
+          </option> -->
+
+          <option *ngFor="let tipo of tiposMovimiento" [value]="tipo.id">
+
+            {{ tipo.descripcion }}
+
           </option>
 
-          <option
-            *ngFor="let forma of formasPago"
-            [value]="forma.id">
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Forma de Pago</label>
+
+        <select [(ngModel)]="formaPagoSeleccionada" class="inputControl">
+
+          <!-- <option value="">
+            Seleccione
+          </option> -->
+
+          <option *ngFor="let forma of formasPago" [value]="forma.id">
 
             {{ forma.descripcion }}
 
@@ -58,31 +74,22 @@
 
         <label>Monto</label>
 
-        <input
-          type="text"
-          [(ngModel)]="montoPago"
-          class="inputControl">
+        <input type="text" [(ngModel)]="montoPago" class="inputControl">
 
       </div>
 
       <!-- BANCO -->
-      <div
-        class="form-group"
-        *ngIf="mostrarBanco">
+      <div class="form-group" *ngIf="mostrarBanco">
 
         <label>Banco Origen</label>
 
-        <select
-          [(ngModel)]="bancoOrigen"
-          class="inputControl">
-
+        <select [(ngModel)]="bancoOrigen" class="inputControl">
+<!-- 
           <option value="">
             Seleccione
-          </option>
+          </option> -->
 
-          <option
-            *ngFor="let banco of bancos"
-            [value]="banco.nombre">
+          <option *ngFor="let banco of bancos" [value]="banco.nombre">
 
             {{ banco.nombre }}
 
@@ -93,23 +100,17 @@
       </div>
 
       <!-- CUENTA BANCARIA -->
-      <div
-        class="form-group"
-        *ngIf="mostrarCuentaBancaria">
+      <div class="form-group" *ngIf="mostrarCuentaBancaria">
 
         <label>Cuenta Destino</label>
 
-        <select
-          [(ngModel)]="cuentaDestino"
-          class="inputControl">
+        <select [(ngModel)]="cuentaDestino" class="inputControl">
 
           <option value="">
             Seleccione
           </option>
 
-          <option
-            *ngFor="let cuenta of cuentasEmpresa"
-            [value]="cuenta.descripcion">
+          <option *ngFor="let cuenta of cuentasEmpresa" [value]="cuenta.descripcion">
 
             {{ cuenta.descripcion }}
 
@@ -120,36 +121,24 @@
       </div>
 
       <!-- REFERENCIA -->
-      <div
-        class="form-group"
-        *ngIf="mostrarReferencia">
+      <div class="form-group" *ngIf="mostrarReferencia">
 
         <label>Referencia</label>
 
-        <input
-          type="text"
-          [(ngModel)]="referencia"
-          class="inputControl">
+        <input type="text" [(ngModel)]="referencia" class="inputControl">
 
       </div>
 
       <!-- AUTORIZACIÓN -->
-      <div
-        class="form-group"
-        *ngIf="mostrarAutorizacion">
+      <div class="form-group" *ngIf="mostrarAutorizacion">
 
         <label>Autorización</label>
 
-        <input
-          type="text"
-          [(ngModel)]="autorizacion"
-          class="inputControl">
+        <input type="text" [(ngModel)]="autorizacion" class="inputControl">
 
       </div>
 
-      <button
-        class="btn-agregar"
-        (click)="agregarPago()">
+      <button class="btn-agregar" (click)="agregarPago()">
 
         <i class="material-icons">add_card</i>
 
@@ -221,9 +210,7 @@
   </div>
 
   <!-- TABLA -->
-  <div
-    class="tabla-container"
-    *ngIf="pagos.length > 0">
+  <div class="tabla-container" *ngIf="pagos.length > 0">
 
     <div class="tabla-header">
       <h3>Pagos Agregados</h3>
@@ -238,6 +225,7 @@
           <tr>
 
             <th>Forma Pago</th>
+            <th>Tipo Movimiento</th>
             <th>Monto</th>
             <th>Referencia</th>
             <th>Autorización</th>
@@ -249,11 +237,14 @@
 
         <tbody>
 
-          <tr
-            *ngFor="let pago of pagos; let i = index">
+          <tr *ngFor="let pago of pagos; let i = index">
 
             <td>
               {{ pago.formaPago }}
+            </td>
+
+            <td>
+              {{ pago.tipoMovimiento }}
             </td>
 
             <td>
@@ -270,9 +261,7 @@
 
             <td>
 
-              <button
-                class="buttonDelete"
-                (click)="eliminarPago(i)">
+              <button class="buttonDelete" (click)="eliminarPago(i)">
 
                 <i class="material-icons">
                   delete

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 
 import { FormaPagoModel } from '../../models/formaPagoModel';
 import { FormaPagoService } from '../../services/formaPagoService';
+import { TipoMovimientoModel } from '../../models/tipoMovimientoModel';
+import { TipoMovimientoService } from '../../services/tipoMovimientoService';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -35,44 +37,90 @@ export class FormaPagoScreenComponent implements OnInit {
 
   formasPago: FormaPagoModel[] = [];
 
+  tiposMovimiento: TipoMovimientoModel[] = [];
+
+  tipoMovimientoSeleccionado = '';
+
   bancos: any[] = [];
 
   cuentasEmpresa: any[] = [];
 
   constructor(
-    private formaPagoService: FormaPagoService
+    private formaPagoService: FormaPagoService,
+    private tipoMovimientoService: TipoMovimientoService
   ) { }
 
   ngOnInit(): void {
 
     this.cargarFormasPago();
+    this.cargarTiposMovimiento();
 
   }
 
-  cargarFormasPago(): void {
 
-    this.formaPagoService
-      .getFormasPago()
-      .subscribe({
+ cargarTiposMovimiento(): void {
 
-        next: (response) => {
+  this.tipoMovimientoService
+    .getTiposMovimiento()
+    .subscribe({
 
-          this.formasPago = response;
+      next: (response) => {
 
-        },
+        this.tiposMovimiento = response;
 
-        error: (error) => {
+        // DEFAULT: ANTICIPO (recomendado negocio)
+        const anticipo = this.tiposMovimiento.find(
+          x => x.descripcion === 'ANTICIPO'
+        );
 
-          console.error(
-            'Error cargando formas de pago',
-            error
-          );
+        this.tipoMovimientoSeleccionado =
+          (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
+            .toString();
 
-        }
+      },
 
-      });
+      error: (error) => {
 
-  }
+        console.error(
+          'Error cargando tipos de movimiento',
+          error
+        );
+
+      }
+
+    });
+
+}
+
+cargarFormasPago(): void {
+
+  this.formaPagoService
+    .getFormasPago()
+    .subscribe({
+
+      next: (response) => {
+
+        this.formasPago = response;
+
+        // DEFAULT: primera forma activa
+        this.formaPagoSeleccionada =
+          (this.formasPago[0]?.id ?? '')
+            .toString();
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Error cargando formas de pago',
+          error
+        );
+
+      }
+
+    });
+
+}
 
   get formaPagoActual(): FormaPagoModel | undefined {
 
@@ -114,19 +162,34 @@ export class FormaPagoScreenComponent implements OnInit {
 
     this.pagos.push({
 
-      idFormaPago: Number(this.formaPagoSeleccionada),
+      idTipoMovimiento:
+        Number(this.tipoMovimientoSeleccionado),
 
-      formaPago: this.formaPagoActual?.descripcion,
+      tipoMovimiento:
+        this.tiposMovimiento.find(
+          x => x.id === Number(this.tipoMovimientoSeleccionado)
+        )?.descripcion,
 
-      monto: Number(this.montoPago),
+      idFormaPago:
+        Number(this.formaPagoSeleccionada),
 
-      referencia: this.referencia,
+      formaPago:
+        this.formaPagoActual?.descripcion,
 
-      autorizacion: this.autorizacion,
+      monto:
+        Number(this.montoPago),
 
-      bancoOrigen: this.bancoOrigen,
+      referencia:
+        this.referencia,
 
-      cuentaDestino: this.cuentaDestino
+      autorizacion:
+        this.autorizacion,
+
+      bancoOrigen:
+        this.bancoOrigen,
+
+      cuentaDestino:
+        this.cuentaDestino
 
     });
 

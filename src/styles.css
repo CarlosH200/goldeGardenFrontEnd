@@ -20,8 +20,8 @@
 
 /* tema obscuro */
 body.dark-theme {
-  --color-fondo: #202125;
-  --color-fondoSecundario: #2b2c2e;
+  --color-fondo: #2b2c2e;
+  --color-fondoSecundario: #202125;
   --color-principal: #e1b244;
   --color-texto: #ffffff;
   --color-texto-invertido: #000000;

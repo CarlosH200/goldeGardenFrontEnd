@@ -6,6 +6,8 @@ import { FormaPagoModel } from '../../models/formaPagoModel';
 import { FormaPagoService } from '../../services/formaPagoService';
 import { TipoMovimientoModel } from '../../models/tipoMovimientoModel';
 import { TipoMovimientoService } from '../../services/tipoMovimientoService';
+import { BancoModel } from '../../models/bancoModel';
+import { BancoService } from '../../services/bancoService';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -41,86 +43,153 @@ export class FormaPagoScreenComponent implements OnInit {
 
   tipoMovimientoSeleccionado = '';
 
-  bancos: any[] = [];
+  bancos: BancoModel[] = [];
+
+  bancoSeleccionado = '';
 
   cuentasEmpresa: any[] = [];
 
   constructor(
     private formaPagoService: FormaPagoService,
-    private tipoMovimientoService: TipoMovimientoService
+    private tipoMovimientoService: TipoMovimientoService,
+    private bancoService: BancoService,
   ) { }
 
   ngOnInit(): void {
 
     this.cargarFormasPago();
     this.cargarTiposMovimiento();
+    this.cargarBancos();
+  }
+
+
+  private establecerValoresPorDefecto(): void {
+
+    this.formaPagoSeleccionada =
+      (this.formasPago[0]?.id ?? '')
+        .toString();
+
+    const anticipo = this.tiposMovimiento.find(
+      x => x.descripcion === 'ANTICIPO'
+    );
+
+    this.tipoMovimientoSeleccionado =
+      (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
+        .toString();
+
+    this.bancoSeleccionado =
+      (this.bancos[0]?.id ?? '')
+        .toString();
+
+  }
+
+  cargarBancos(): void {
+
+  this.bancoService
+    .getBancos()
+    .subscribe({
+
+      next: (response) => {
+
+        this.bancos = response;
+
+        if (this.bancos.length > 0) {
+
+          this.bancoSeleccionado =
+            this.bancos[0].id.toString();
+
+          this.bancoOrigen =
+            this.bancos[0].descripcion;
+
+        }
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Error cargando bancos',
+          error
+        );
+
+      }
+
+    });
+
+}
+
+  get bancoActual(): BancoModel | undefined {
+
+    return this.bancos.find(
+      x => x.id === Number(this.bancoSeleccionado)
+    );
 
   }
 
 
- cargarTiposMovimiento(): void {
+  cargarTiposMovimiento(): void {
 
-  this.tipoMovimientoService
-    .getTiposMovimiento()
-    .subscribe({
+    this.tipoMovimientoService
+      .getTiposMovimiento()
+      .subscribe({
 
-      next: (response) => {
+        next: (response) => {
 
-        this.tiposMovimiento = response;
+          this.tiposMovimiento = response;
 
-        // DEFAULT: ANTICIPO (recomendado negocio)
-        const anticipo = this.tiposMovimiento.find(
-          x => x.descripcion === 'ANTICIPO'
-        );
+          // DEFAULT: ANTICIPO (recomendado negocio)
+          const anticipo = this.tiposMovimiento.find(
+            x => x.descripcion === 'ANTICIPO'
+          );
 
-        this.tipoMovimientoSeleccionado =
-          (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
-            .toString();
+          this.tipoMovimientoSeleccionado =
+            (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
+              .toString();
 
-      },
+        },
 
-      error: (error) => {
+        error: (error) => {
 
-        console.error(
-          'Error cargando tipos de movimiento',
-          error
-        );
+          console.error(
+            'Error cargando tipos de movimiento',
+            error
+          );
 
-      }
+        }
 
-    });
+      });
 
-}
+  }
 
-cargarFormasPago(): void {
+  cargarFormasPago(): void {
 
-  this.formaPagoService
-    .getFormasPago()
-    .subscribe({
+    this.formaPagoService
+      .getFormasPago()
+      .subscribe({
 
-      next: (response) => {
+        next: (response) => {
 
-        this.formasPago = response;
+          this.formasPago = response;
 
-        // DEFAULT: primera forma activa
-        this.formaPagoSeleccionada =
-          (this.formasPago[0]?.id ?? '')
-            .toString();
+          // DEFAULT: primera forma activa
+          this.formaPagoSeleccionada =
+            (this.formasPago[0]?.id ?? '')
+              .toString();
 
-      },
+        },
 
-      error: (error) => {
+        error: (error) => {
 
-        console.error(
-          'Error cargando formas de pago',
-          error
-        );
+          console.error(
+            'Error cargando formas de pago',
+            error
+          );
 
-      }
+        }
 
-    });
+      });
 
-}
+  }
 
   get formaPagoActual(): FormaPagoModel | undefined {
 
@@ -161,6 +230,13 @@ cargarFormasPago(): void {
     }
 
     this.pagos.push({
+
+
+      idBanco:
+        Number(this.bancoSeleccionado),
+
+      banco:
+        this.bancoActual?.descripcion,
 
       idTipoMovimiento:
         Number(this.tipoMovimientoSeleccionado),
@@ -205,18 +281,13 @@ cargarFormasPago(): void {
 
   limpiar() {
 
-    this.formaPagoSeleccionada = '';
-
+    this.establecerValoresPorDefecto();
     this.montoPago = 0;
-
     this.referencia = '';
-
     this.autorizacion = '';
-
-    this.bancoOrigen = '';
-
+    this.bancoOrigen =
+    this.bancos[0]?.descripcion ?? '';
     this.cuentaDestino = '';
-
   }
 
   get totalPagado(): number {

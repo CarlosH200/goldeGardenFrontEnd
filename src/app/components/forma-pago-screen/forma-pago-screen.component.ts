@@ -8,6 +8,8 @@ import { TipoMovimientoModel } from '../../models/tipoMovimientoModel';
 import { TipoMovimientoService } from '../../services/tipoMovimientoService';
 import { BancoModel } from '../../models/bancoModel';
 import { BancoService } from '../../services/bancoService';
+import { CuentaBancariaModel } from '../../models/cuentaBancariaModel';
+import { CuentaBancariaService } from '../../services/cuentaBancariaService';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -43,16 +45,20 @@ export class FormaPagoScreenComponent implements OnInit {
 
   tipoMovimientoSeleccionado = '';
 
+  cuentasEmpresa: CuentaBancariaModel[] = [];
+
+  cuentaSeleccionada = '';
+
   bancos: BancoModel[] = [];
 
   bancoSeleccionado = '';
 
-  cuentasEmpresa: any[] = [];
 
   constructor(
     private formaPagoService: FormaPagoService,
     private tipoMovimientoService: TipoMovimientoService,
     private bancoService: BancoService,
+    private cuentaBancariaService: CuentaBancariaService,
   ) { }
 
   ngOnInit(): void {
@@ -60,6 +66,7 @@ export class FormaPagoScreenComponent implements OnInit {
     this.cargarFormasPago();
     this.cargarTiposMovimiento();
     this.cargarBancos();
+    // cuenta bancaria no va porque lleva parametro el id banco
   }
 
 
@@ -81,40 +88,102 @@ export class FormaPagoScreenComponent implements OnInit {
       (this.bancos[0]?.id ?? '')
         .toString();
 
+    this.cuentaSeleccionada =
+      (this.cuentasEmpresa[0]?.id ?? '')
+        .toString();
+
+  }
+
+
+  cargarCuentasBancarias(
+    idBanco: number
+  ): void {
+
+    this.cuentaBancariaService
+      .getCuentasBancarias(idBanco)
+      .subscribe({
+
+        next: (response) => {
+
+          this.cuentasEmpresa = response;
+
+          if (this.cuentasEmpresa.length > 0) {
+
+            this.cuentaSeleccionada =
+              this.cuentasEmpresa[0].id.toString();
+
+          }
+          else {
+
+            this.cuentaSeleccionada = '';
+
+          }
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error cargando cuentas bancarias',
+            error
+          );
+
+        }
+
+      });
+
   }
 
   cargarBancos(): void {
 
-  this.bancoService
-    .getBancos()
-    .subscribe({
+    this.bancoService
+      .getBancos()
+      .subscribe({
 
-      next: (response) => {
+        next: (response) => {
 
-        this.bancos = response;
+          this.bancos = response;
 
-        if (this.bancos.length > 0) {
+          if (this.bancos.length > 0) {
 
-          this.bancoSeleccionado =
-            this.bancos[0].id.toString();
+            this.bancoSeleccionado =
+              this.bancos[0].id.toString();
 
-          this.bancoOrigen =
-            this.bancos[0].descripcion;
+            this.bancoOrigen =
+              this.bancos[0].descripcion;
+
+            this.cargarCuentasBancarias(
+              this.bancos[0].id
+            );
+
+          }
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error cargando bancos',
+            error
+          );
 
         }
 
-      },
+      });
 
-      error: (error) => {
+  }
 
-        console.error(
-          'Error cargando bancos',
-          error
-        );
+  onBancoChange(): void {
 
-      }
+    const banco = this.bancos.find(
+        x => x.id === Number(this.bancoSeleccionado)
+    );
 
-    });
+    this.bancoOrigen =
+        banco?.descripcion ?? '';
+
+    this.cargarCuentasBancarias(
+        Number(this.bancoSeleccionado)
+    );
 
 }
 
@@ -122,6 +191,14 @@ export class FormaPagoScreenComponent implements OnInit {
 
     return this.bancos.find(
       x => x.id === Number(this.bancoSeleccionado)
+    );
+
+  }
+
+  get cuentaActual(): CuentaBancariaModel | undefined {
+
+    return this.cuentasEmpresa.find(
+      x => x.id === Number(this.cuentaSeleccionada)
     );
 
   }
@@ -223,55 +300,57 @@ export class FormaPagoScreenComponent implements OnInit {
 
   }
 
-  agregarPago() {
+agregarPago() {
 
-    if (!this.formaPagoSeleccionada) {
-      return;
-    }
-
-    this.pagos.push({
-
-
-      idBanco:
-        Number(this.bancoSeleccionado),
-
-      banco:
-        this.bancoActual?.descripcion,
-
-      idTipoMovimiento:
-        Number(this.tipoMovimientoSeleccionado),
-
-      tipoMovimiento:
-        this.tiposMovimiento.find(
-          x => x.id === Number(this.tipoMovimientoSeleccionado)
-        )?.descripcion,
-
-      idFormaPago:
-        Number(this.formaPagoSeleccionada),
-
-      formaPago:
-        this.formaPagoActual?.descripcion,
-
-      monto:
-        Number(this.montoPago),
-
-      referencia:
-        this.referencia,
-
-      autorizacion:
-        this.autorizacion,
-
-      bancoOrigen:
-        this.bancoOrigen,
-
-      cuentaDestino:
-        this.cuentaDestino
-
-    });
-
-    this.limpiar();
-
+  if (!this.formaPagoSeleccionada) {
+    return;
   }
+
+  this.pagos.push({
+
+    idBanco:
+      Number(this.bancoSeleccionado),
+
+    banco:
+      this.bancoActual?.descripcion,
+
+    idCuentaBancaria:
+      Number(this.cuentaSeleccionada),
+
+    cuentaDestino:
+      this.cuentaActual?.numero_Cuenta,
+
+    idTipoMovimiento:
+      Number(this.tipoMovimientoSeleccionado),
+
+    tipoMovimiento:
+      this.tiposMovimiento.find(
+        x => x.id === Number(this.tipoMovimientoSeleccionado)
+      )?.descripcion,
+
+    idFormaPago:
+      Number(this.formaPagoSeleccionada),
+
+    formaPago:
+      this.formaPagoActual?.descripcion,
+
+    monto:
+      Number(this.montoPago),
+
+    referencia:
+      this.referencia,
+
+    autorizacion:
+      this.autorizacion,
+
+    bancoOrigen:
+      this.bancoOrigen
+
+  });
+
+  this.limpiar();
+
+}
 
   eliminarPago(index: number) {
 
@@ -286,8 +365,12 @@ export class FormaPagoScreenComponent implements OnInit {
     this.referencia = '';
     this.autorizacion = '';
     this.bancoOrigen =
-    this.bancos[0]?.descripcion ?? '';
-    this.cuentaDestino = '';
+      this.bancos[0]?.descripcion ?? '';
+    this.cuentaSeleccionada =
+      this.cuentasEmpresa[0]?.id.toString() ?? '';
+
+    this.cuentaDestino =
+      this.cuentasEmpresa[0]?.numero_Cuenta ?? '';
   }
 
   get totalPagado(): number {
@@ -305,6 +388,13 @@ export class FormaPagoScreenComponent implements OnInit {
       this.totalTransaccion - this.totalPagado,
       0
     );
+
+  }
+
+  onCuentaChange(): void {
+
+    this.cuentaDestino =
+      this.cuentaActual?.numero_Cuenta ?? '';
 
   }
 

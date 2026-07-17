@@ -83,13 +83,13 @@
 
         <label>Banco Origen</label>
 
-        <select [(ngModel)]="bancoOrigen" class="inputControl">
-<!-- 
+        <select [(ngModel)]="bancoSeleccionado" (change)="onBancoChange()" class="inputControl" class="inputControl">
+          <!-- 
           <option value="">
             Seleccione
           </option> -->
 
-          <option *ngFor="let banco of bancos" [value]="banco.descripcion">
+          <option *ngFor="let banco of bancos" [value]="banco.id">
 
             {{ banco.descripcion }}
 
@@ -99,26 +99,26 @@
 
       </div>
 
-      <!-- CUENTA BANCARIA -->
-      <div class="form-group" *ngIf="mostrarCuentaBancaria">
+   <!-- CUENTA BANCARIA -->
+<div class="form-group" *ngIf="mostrarCuentaBancaria">
 
-        <label>Cuenta Destino</label>
+  <label>Cuenta Destino</label>
 
-        <select [(ngModel)]="cuentaDestino" class="inputControl">
+  <select
+    [(ngModel)]="cuentaSeleccionada"
+    class="inputControl">
 
-          <option value="">
-            Seleccione
-          </option>
+    <option
+      *ngFor="let cuenta of cuentasEmpresa"
+      [value]="cuenta.id">
 
-          <option *ngFor="let cuenta of cuentasEmpresa" [value]="cuenta.descripcion">
+      {{ cuenta.numero_Cuenta }} - {{ cuenta.descripcion }} - {{ cuenta.titular }}
 
-            {{ cuenta.descripcion }}
+    </option>
 
-          </option>
+  </select>
 
-        </select>
-
-      </div>
+</div>
 
       <!-- REFERENCIA -->
       <div class="form-group" *ngIf="mostrarReferencia">

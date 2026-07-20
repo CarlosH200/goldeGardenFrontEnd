@@ -280,7 +280,9 @@ label {
 
 
 .NewEventButton {
-  width: 250px;
+  white-space: nowrap;
+  width: auto;
+  max-width: 300px;
   font-size: 14px;
   height: 50px;
   border-radius: 14px;

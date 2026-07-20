@@ -138,6 +138,13 @@ export class DocumentoScreenComponent {
 
   }
 
+
+
+  // FUNCION PARA EJETUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR
+  imprimirFormato(): void {
+  alert('Función de impresión no implementada aún.'); // Aquí puedes implementar la lógica de impresión según tus necesidades
+  }
+
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
   getFechaConHora(hora: number, minutos: number): string {
     const now = new Date();

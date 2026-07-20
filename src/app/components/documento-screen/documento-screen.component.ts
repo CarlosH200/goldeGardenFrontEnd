@@ -20,6 +20,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
 import { Component, Output, EventEmitter } from '@angular/core';
+import { PdfService } from '../../pdf/pdf.service';
+import { TipoDocumento } from '../../pdf/enums/tipo-documento.enum';
+import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
+
 
 @Component({
   selector: 'app-documento-screen',
@@ -113,6 +117,7 @@ export class DocumentoScreenComponent {
     public theme: ThemeService,
     public dialog: MatDialog,
     private authService: AuthService,
+    private pdfService:PdfService,
 
     //NUEVO SERVICE
     private clientesService: ClientesService,
@@ -139,10 +144,128 @@ export class DocumentoScreenComponent {
   }
 
 
+  // Método para obtener la descripción de la capacidad
+  obtenerDescripcionCapacidad(idCapacidad: number | string): string {
+    if (!idCapacidad) return 'N/A';
+
+    // Busca dentro del arreglo Capacidades que ya tienes cargado de tu API
+    const capacidadEncontrada = this.Capacidades.find(
+      (c) => c.id === Number(idCapacidad)
+    );
+
+    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre), 
+    // de lo contrario un fallback con el id o 'N/A'
+    return capacidadEncontrada 
+      ? (capacidadEncontrada.descripcion || capacidadEncontrada.descripcion || `${idCapacidad} Personas`)
+      : `${idCapacidad} Personas`;
+  }
+
+
+    // Método para obtener la descripción de la capacidad
+  obtenerDescripcionTipoEvento(idTipoEvento: number | string): string {
+    if (!idTipoEvento) return 'N/A';
+
+    // Busca dentro del arreglo TipoEvento que ya tienes cargado de tu API
+    const tipoEventoEncontrado = this.tipoEvento.find(
+      (t) => t.id === Number(idTipoEvento)
+    );
+
+    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre), 
+    // de lo contrario un fallback con el id o 'N/A'
+    return tipoEventoEncontrado  
+      ? (tipoEventoEncontrado.descripcion || tipoEventoEncontrado.descripcion || `${idTipoEvento} Personas`)
+      : `${idTipoEvento} Personas`;
+  }
+
 
   // FUNCION PARA EJETUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR
+// FUNCION PARA EJECUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR (DINÁMICO)
   imprimirFormato(): void {
-  alert('Función de impresión no implementada aún.'); // Aquí puedes implementar la lógica de impresión según tus necesidades
+
+    // 1. Validar que exista un cliente seleccionado o cargado
+    if (!this.clienteSeleccionado) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Atención',
+          mensaje: 'Debes seleccionar o buscar un evento/cliente antes de generar el contrato.',
+          tipo: 'warning',
+          icon: 'warning'
+        }
+      });
+      return;
+    }
+
+    // 2. Extraer y parsear fechas para el encabezado legal del contrato
+    const fechaInicio = this.pFechaInicioEvento ? new Date(this.pFechaInicioEvento) : new Date();
+    const diaStr = fechaInicio.getDate().toString().padStart(2, '0');
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const mesStr = meses[fechaInicio.getMonth()];
+    const anioStr = fechaInicio.getFullYear().toString().slice(-2); // "26"
+
+    // 3. Formatear la fecha del evento
+    const fechaEventoFormateada = fechaInicio.toLocaleDateString('es-GT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    // 4. Formatear rango de horario contratado
+    const horaInicioStr = this.pFechaInicioEvento ? this.pFechaInicioEvento.substring(11, 16) : '';
+    const horaFinStr = this.pFechaFinEvento ? this.pFechaFinEvento.substring(11, 16) : '';
+    const horarioContratado = `${horaInicioStr} hrs - ${horaFinStr} hrs`;
+
+    // 5. Construir objeto de datos mapeado para el Contrato
+    const documento: DocumentoPDF | any = {
+      // Encabezado legal
+      dia: diaStr,
+      mes: mesStr,
+      anio: anioStr,
+      representante: 'Administración Golden Garden',
+
+      // Sección I: Datos del Cliente
+      clienteNombre: `${this.clienteSeleccionado.nombre || ''} ${this.clienteSeleccionado.apellido || ''}`.trim(),
+      clienteDpi: this.clienteSeleccionado.dpi || 'N/A',
+      clienteEdadEstado: 'N/A', // Puedes mapearlo si agregas el campo en tu formulario
+      clienteTelefono: this.clienteSeleccionado.telefono || this.clienteSeleccionado.celular || 'N/A',
+      clienteCorreo: this.clienteSeleccionado.email || 'N/A',
+
+      // Datos Logísticos del Evento
+      eventoTipo: this.obtenerDescripcionTipoEvento(this.pTipoEvento),
+      eventoInvitados: this.obtenerDescripcionCapacidad(this.pCapacidadEvento),
+      eventoFecha: fechaEventoFormateada,
+      eventoHorario: horarioContratado,
+
+      // Montos (Si manejas valores dinámicos los sustituyes aquí)
+      montoTotal: '0.00',
+      montoAnticipo: '0.00',
+      montoSaldo: '0.00',
+
+      // Referencias directas de tu interfaz por compatibilidad
+      empresa: { nombre: 'Golden Garden' },
+      cliente: this.clienteSeleccionado,
+      evento: {
+        id: this.idEventoCreado,
+        titulo: this.pTituloEvento,
+        descripcion: this.pDescripcionEvento,
+        fechaInicio: this.pFechaInicioEvento,
+        fechaFin: this.pFechaFinEvento,
+        fechaEntrega: this.pFechaEntregaEvento,
+        fechaRecoger: this.pFechaRecogerEvento,
+        ubicacion: this.pUbicacionEvento,
+        tipo: this.pTipoEvento,
+        organizador: this.pOrganizadorEvento,
+        capacidad: this.pCapacidadEvento,
+        detalles: this.pDetallesEvento
+      },
+      observaciones: this.pDetallesEvento
+    };
+
+    // 6. Invocar al servicio seleccionando el tipo de documento Contrato
+    this.pdfService.imprimir(
+      TipoDocumento.Contrato,
+      documento
+    );
   }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA

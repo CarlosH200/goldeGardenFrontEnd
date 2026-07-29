@@ -18,6 +18,15 @@ export class EventComponent {
     public theme: ThemeService,
   ) { }
 
+  ngOnInit(){
+
+ console.log(
+   'CLIENTE INICIAL:',
+   this.clienteSeleccionadoData
+ );
+
+}
+
   // Variable para cambiar la pestaña seleccionada entre documento, transacciones y pago
   selectedTab: string = 'documento';
  

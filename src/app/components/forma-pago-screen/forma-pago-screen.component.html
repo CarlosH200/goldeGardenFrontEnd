@@ -99,26 +99,22 @@
 
       </div>
 
-   <!-- CUENTA BANCARIA -->
-<div class="form-group" *ngIf="mostrarCuentaBancaria">
+      <!-- CUENTA BANCARIA -->
+      <div class="form-group" *ngIf="mostrarCuentaBancaria">
 
-  <label>Cuenta Destino</label>
+        <label>Cuenta Destino</label>
 
-  <select
-    [(ngModel)]="cuentaSeleccionada"
-    class="inputControl">
+        <select [(ngModel)]="cuentaSeleccionada" class="inputControl">
 
-    <option
-      *ngFor="let cuenta of cuentasEmpresa"
-      [value]="cuenta.id">
+          <option *ngFor="let cuenta of cuentasEmpresa" [value]="cuenta.id">
 
-      {{ cuenta.numero_Cuenta }} - {{ cuenta.descripcion }} - {{ cuenta.titular }}
+            {{ cuenta.numero_Cuenta }} - {{ cuenta.descripcion }} - {{ cuenta.titular }}
 
-    </option>
+          </option>
 
-  </select>
+        </select>
 
-</div>
+      </div>
 
       <!-- REFERENCIA -->
       <div class="form-group" *ngIf="mostrarReferencia">
@@ -240,15 +236,15 @@
           <tr *ngFor="let pago of pagos; let i = index">
 
             <td>
-              {{ pago.formaPago }}
+              {{ pago.forma_Pago }}
             </td>
 
             <td>
-              {{ pago.tipoMovimiento }}
+              {{ pago.tipo_Movimiento }}
             </td>
 
             <td>
-              Q{{ pago.monto.toFixed(2) }}
+              Q{{ pago.monto_Pagado.toFixed(2) }}
             </td>
 
             <td>

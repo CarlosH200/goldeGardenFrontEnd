@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { FormaPagoModel } from '../../models/formaPagoModel';
@@ -10,6 +16,8 @@ import { BancoModel } from '../../models/bancoModel';
 import { BancoService } from '../../services/bancoService';
 import { CuentaBancariaModel } from '../../models/cuentaBancariaModel';
 import { CuentaBancariaService } from '../../services/cuentaBancariaService';
+import { PagoModel } from '../../models/pagoModel';
+import { PagosService } from '../../services/pagosService';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -17,7 +25,8 @@ import { CuentaBancariaService } from '../../services/cuentaBancariaService';
   templateUrl: './forma-pago-screen.component.html',
   styleUrl: './forma-pago-screen.component.css'
 })
-export class FormaPagoScreenComponent implements OnInit {
+export class FormaPagoScreenComponent
+implements OnInit, OnChanges {
 
   @Input() idEvento: number | null = null;
 
@@ -37,7 +46,7 @@ export class FormaPagoScreenComponent implements OnInit {
 
   cuentaDestino = '';
 
-  pagos: any[] = [];
+  pagos: PagoModel[] = [];
 
   formasPago: FormaPagoModel[] = [];
 
@@ -59,16 +68,73 @@ export class FormaPagoScreenComponent implements OnInit {
     private tipoMovimientoService: TipoMovimientoService,
     private bancoService: BancoService,
     private cuentaBancariaService: CuentaBancariaService,
+    private pagosService: PagosService,
   ) { }
+ 
 
-  ngOnInit(): void {
+  ngOnChanges(changes: SimpleChanges): void {
 
-    this.cargarFormasPago();
-    this.cargarTiposMovimiento();
-    this.cargarBancos();
-    // cuenta bancaria no va porque lleva parametro el id banco
+  if (changes['idEvento']) {
+
+    if (this.idEvento) {
+
+      this.cargarPagos();
+
+    }
+
   }
 
+  if (changes['cliente']) {
+
+    console.log(
+      'CLIENTE RECIBIDO EN FORMA PAGO:',
+      this.cliente
+    );
+
+  }
+
+}
+
+ngOnInit(): void {
+
+  this.cargarFormasPago();
+
+  this.cargarTiposMovimiento();
+
+  this.cargarBancos();
+
+}
+
+  
+
+  cargarPagos(): void {
+
+    if (!this.idEvento) {
+      return;
+    }
+
+    this.pagosService
+      .obtenerPagos(this.idEvento)
+      .subscribe({
+
+        next: (response) => {
+
+          this.pagos = response.data;
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Error cargando pagos',
+            error
+          );
+
+        }
+
+      });
+
+  }
 
   private establecerValoresPorDefecto(): void {
 
@@ -175,17 +241,17 @@ export class FormaPagoScreenComponent implements OnInit {
   onBancoChange(): void {
 
     const banco = this.bancos.find(
-        x => x.id === Number(this.bancoSeleccionado)
+      x => x.id === Number(this.bancoSeleccionado)
     );
 
     this.bancoOrigen =
-        banco?.descripcion ?? '';
+      banco?.descripcion ?? '';
 
     this.cargarCuentasBancarias(
-        Number(this.bancoSeleccionado)
+      Number(this.bancoSeleccionado)
     );
 
-}
+  }
 
   get bancoActual(): BancoModel | undefined {
 
@@ -300,58 +366,88 @@ export class FormaPagoScreenComponent implements OnInit {
 
   }
 
-agregarPago() {
+  agregarPago(): void {
 
-  if (!this.formaPagoSeleccionada) {
-    return;
+    if (!this.idEvento) {
+      console.error('No se recibió el id del evento.');
+      return;
+    }
+
+    if (!this.cliente) {
+      console.error('No se recibió el cliente.');
+      return;
+    }
+
+    if (!this.formaPagoSeleccionada) {
+      console.error('Debe seleccionar una forma de pago.');
+      return;
+    }
+
+    const body = {
+
+      id_evento: this.idEvento,
+
+      id_cliente: this.cliente.id,
+
+      id_forma_pago: Number(this.formaPagoSeleccionada),
+
+      monto_Pagado: Number(this.montoPago),
+
+      monto_Total: this.totalTransaccion,
+
+      saldo_Pendiente:
+        this.totalTransaccion - Number(this.montoPago),
+
+      descripcion: '',
+
+      fecha_Pago: new Date(),
+
+      estado: 1,
+
+      username: 'ADMIN',
+
+      m_Username: null,
+
+      id_Tipo_Movimiento:
+        Number(this.tipoMovimientoSeleccionado),
+
+      referencia: this.referencia,
+
+      autorizacion: this.autorizacion,
+
+      id_Banco:
+        Number(this.bancoSeleccionado),
+
+      id_Cuenta_Bancaria:
+        Number(this.cuentaSeleccionada)
+
+    };
+
+    console.log('BODY PAGO:', body);
+
+    this.pagosService
+      .insertarPago(body)
+      .subscribe({
+
+        next: (response) => {
+
+          console.log('Pago insertado', response);
+
+          this.cargarPagos();
+
+          this.limpiar();
+
+        },
+
+        error: (error) => {
+
+          console.error('Error insertando pago', error);
+
+        }
+
+      });
+
   }
-
-  this.pagos.push({
-
-    idBanco:
-      Number(this.bancoSeleccionado),
-
-    banco:
-      this.bancoActual?.descripcion,
-
-    idCuentaBancaria:
-      Number(this.cuentaSeleccionada),
-
-    cuentaDestino:
-      this.cuentaActual?.numero_Cuenta,
-
-    idTipoMovimiento:
-      Number(this.tipoMovimientoSeleccionado),
-
-    tipoMovimiento:
-      this.tiposMovimiento.find(
-        x => x.id === Number(this.tipoMovimientoSeleccionado)
-      )?.descripcion,
-
-    idFormaPago:
-      Number(this.formaPagoSeleccionada),
-
-    formaPago:
-      this.formaPagoActual?.descripcion,
-
-    monto:
-      Number(this.montoPago),
-
-    referencia:
-      this.referencia,
-
-    autorizacion:
-      this.autorizacion,
-
-    bancoOrigen:
-      this.bancoOrigen
-
-  });
-
-  this.limpiar();
-
-}
-
   eliminarPago(index: number) {
 
     this.pagos.splice(index, 1);
@@ -376,8 +472,13 @@ agregarPago() {
   get totalPagado(): number {
 
     return this.pagos.reduce(
-      (acc, p) => acc + Number(p.monto),
+
+      (acc, p) =>
+
+        acc + Number(p.monto_Pagado),
+
       0
+
     );
 
   }

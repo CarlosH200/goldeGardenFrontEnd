@@ -348,7 +348,7 @@ export class DocumentoScreenComponent {
           this.idEventoCreado = idEvento;
 
           // Emite el evento al componente padre para que lo reciba
-          this.eventoCreado.emit(idEvento);
+          // this.eventoCreado.emit(idEvento);
 
           // EMITIR EL ID DEL EVENTO CREADO PARA QUE LOS COMPONENTES DE TRANSACCIONES Y DOCUMENTOS LO RECIBAN
           this.eventoCreado.emit(idEvento);
@@ -457,37 +457,47 @@ export class DocumentoScreenComponent {
           this.clienteSeleccionado = null;
 
           if (evento.id_cliente) {
-            this.clienteSeleccionado = {
-              id: evento.id_cliente,
 
-              nit: evento.cliente_NIT || '',
-              nombre: evento.cliente_Nombre || '',
-              apellido: evento.cliente_Apellido || '',
-              email: evento.cliente_Email || '',
-              telefono: evento.cliente_Telefono || '',
-              direccion: evento.cliente_Direccion || '',
+  this.clienteSeleccionado = {
+    id: evento.id_cliente,
 
-              dpi: '',
-              celular: '',
-              tipoCliente: 0,
+    nit: evento.cliente_NIT || '',
+    nombre: evento.cliente_Nombre || '',
+    apellido: evento.cliente_Apellido || '',
+    email: evento.cliente_Email || '',
+    telefono: evento.cliente_Telefono || '',
+    direccion: evento.cliente_Direccion || '',
 
-              fecha_Registro: '',
-              observacion01: '',
-              observacion02: '',
+    dpi: evento.cliente_DPI || '',
+    celular: '',
+    tipoCliente: 0,
 
-              estado: 1,
-              username: '',
-              m_Username: '',
-              fecha_Hora: '',
-              m_Fecha_Hora: null,
-              consecutivo_Interno: 0,
-            } as ClienteModel;
+    fecha_Registro: '',
+    observacion01: '',
+    observacion02: '',
 
-            console.log(
-              'CLIENTE CARGADO DESDE EVENTO:',
-              this.clienteSeleccionado,
-            );
-          }
+    estado: 1,
+    username: '',
+    m_Username: '',
+    fecha_Hora: '',
+    m_Fecha_Hora: null,
+    consecutivo_Interno: 0,
+
+  } as ClienteModel;
+
+
+  console.log(
+    'CLIENTE CARGADO DESDE EVENTO:',
+    this.clienteSeleccionado
+  );
+
+
+  // 🔥 FALTABA ESTO
+  this.clienteCompletoChange.emit(
+    this.clienteSeleccionado
+  );
+
+}
         } else {
           console.warn('Evento no encontrado');
           this.clienteSeleccionado = null;

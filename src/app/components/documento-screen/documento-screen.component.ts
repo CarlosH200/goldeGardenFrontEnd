@@ -337,7 +337,6 @@ export class DocumentoScreenComponent {
       id_cliente: this.clienteSeleccionado.id,
     };
 
-    console.log('BODY EVENTO:', body);
 
     this.eventosService.insertarEvento(body).subscribe({
       next: (res) => {
@@ -356,7 +355,6 @@ export class DocumentoScreenComponent {
           // NUEVO
           this.cargarEventoPorId(idEvento);
 
-          console.log('ID EVENTO:', idEvento);
 
           this.dialog.open(AlertGenericComponent, {
             width: '450px',
@@ -398,7 +396,7 @@ export class DocumentoScreenComponent {
   // FUNCION PARA LLAMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
   buscarEvento(): void {
     if (!this.idEventoCreado) {
-      console.warn('Debes ingresar un ID');
+      alert('Debes ingresar un ID');
       return;
     }
 
@@ -418,7 +416,6 @@ export class DocumentoScreenComponent {
         if (res?.success && res?.data) {
           const evento = res.data;
 
-          console.log('EVENTO CARGADO:', evento);
 
           // EMITIR EVENTO AL PADRE
           this.eventoCreado.emit(evento.id);
@@ -486,25 +483,18 @@ export class DocumentoScreenComponent {
   } as ClienteModel;
 
 
-  console.log(
-    'CLIENTE CARGADO DESDE EVENTO:',
-    this.clienteSeleccionado
-  );
-
-
-  // 🔥 FALTABA ESTO
   this.clienteCompletoChange.emit(
     this.clienteSeleccionado
   );
 
 }
         } else {
-          console.warn('Evento no encontrado');
+          alert('Evento no encontrado');
           this.clienteSeleccionado = null;
         }
       },
       error: (err: any) => {
-        console.error('Error al cargar evento', err);
+        alert('Error al cargar evento');
         this.clienteSeleccionado = null;
       },
     });
@@ -594,7 +584,6 @@ export class DocumentoScreenComponent {
       next: (res) => {
         if (res?.success) {
           this.clientesEncontrados = res.data;
-          console.log('Clientes encontrados:', this.clientesEncontrados);
         } else {
           this.clientesEncontrados = [];
         }
@@ -787,7 +776,6 @@ export class DocumentoScreenComponent {
       username: this.authService.getUsername(),
     };
 
-    console.log('Body enviado a API:', body);
 
     // ==========================================================
     // CONSUMO DE SERVICIO CREAR CLIENTE (api crear cliente)
@@ -843,7 +831,6 @@ export class DocumentoScreenComponent {
           this.dataCreateClient = 0;
         } else {
           alert(res?.mensaje || 'No se pudo guardar el cliente');
-          console.error('Respuesta API:', res);
         }
       },
       error: (err) => {

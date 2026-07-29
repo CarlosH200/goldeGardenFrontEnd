@@ -24,7 +24,6 @@ import { PdfService } from '../../pdf/pdf.service';
 import { TipoDocumento } from '../../pdf/enums/tipo-documento.enum';
 import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
 
-
 @Component({
   selector: 'app-documento-screen',
   imports: [FormsModule, CommonModule, MatIconModule],
@@ -106,7 +105,6 @@ export class DocumentoScreenComponent {
   // Arreglo para almacenar lso estados del API getEstados
   Estados: EstadosModel[] = [];
 
-
   constructor(
     private eventosService: EventosService,
     private ubicacionesService: UbicacionesService,
@@ -117,11 +115,11 @@ export class DocumentoScreenComponent {
     public theme: ThemeService,
     public dialog: MatDialog,
     private authService: AuthService,
-    private pdfService:PdfService,
+    private pdfService: PdfService,
 
     //NUEVO SERVICE
     private clientesService: ClientesService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.limpiarPantalla();
@@ -133,16 +131,12 @@ export class DocumentoScreenComponent {
     this.getEstados();
   }
 
-
   // FUNCION PARA HABILITAR MODO CREACION DE EVENTO O MODO CONSULTA DE EVENTO
   habilitarModoCreacionEvento(): void {
-
     this.limpiarPantalla();
 
     this.modoConsulta = false;
-
   }
-
 
   // Método para obtener la descripción de la capacidad
   obtenerDescripcionCapacidad(idCapacidad: number | string): string {
@@ -150,56 +144,73 @@ export class DocumentoScreenComponent {
 
     // Busca dentro del arreglo Capacidades que ya tienes cargado de tu API
     const capacidadEncontrada = this.Capacidades.find(
-      (c) => c.id === Number(idCapacidad)
+      (c) => c.id === Number(idCapacidad),
     );
 
-    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre), 
+    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre),
     // de lo contrario un fallback con el id o 'N/A'
-    return capacidadEncontrada 
-      ? (capacidadEncontrada.descripcion || capacidadEncontrada.descripcion || `${idCapacidad} Personas`)
+    return capacidadEncontrada
+      ? capacidadEncontrada.descripcion ||
+          capacidadEncontrada.descripcion ||
+          `${idCapacidad} Personas`
       : `${idCapacidad} Personas`;
   }
 
-
-    // Método para obtener la descripción de la capacidad
+  // Método para obtener la descripción de la capacidad
   obtenerDescripcionTipoEvento(idTipoEvento: number | string): string {
     if (!idTipoEvento) return 'N/A';
 
     // Busca dentro del arreglo TipoEvento que ya tienes cargado de tu API
     const tipoEventoEncontrado = this.tipoEvento.find(
-      (t) => t.id === Number(idTipoEvento)
+      (t) => t.id === Number(idTipoEvento),
     );
 
-    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre), 
+    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre),
     // de lo contrario un fallback con el id o 'N/A'
-    return tipoEventoEncontrado  
-      ? (tipoEventoEncontrado.descripcion || tipoEventoEncontrado.descripcion || `${idTipoEvento} Personas`)
+    return tipoEventoEncontrado
+      ? tipoEventoEncontrado.descripcion ||
+          tipoEventoEncontrado.descripcion ||
+          `${idTipoEvento} Personas`
       : `${idTipoEvento} Personas`;
   }
 
-
   // FUNCION PARA EJETUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR
-// FUNCION PARA EJECUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR (DINÁMICO)
+  // FUNCION PARA EJECUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR (DINÁMICO)
   imprimirFormato(): void {
-
     // 1. Validar que exista un cliente seleccionado o cargado
     if (!this.clienteSeleccionado) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
           titulo: 'Atención',
-          mensaje: 'Debes seleccionar o buscar un evento/cliente antes de generar el contrato.',
+          mensaje:
+            'Debes seleccionar o buscar un evento/cliente antes de generar el contrato.',
           tipo: 'warning',
-          icon: 'warning'
-        }
+          icon: 'warning',
+        },
       });
       return;
     }
 
     // 2. Extraer y parsear fechas para el encabezado legal del contrato
-    const fechaInicio = this.pFechaInicioEvento ? new Date(this.pFechaInicioEvento) : new Date();
+    const fechaInicio = this.pFechaInicioEvento
+      ? new Date(this.pFechaInicioEvento)
+      : new Date();
     const diaStr = fechaInicio.getDate().toString().padStart(2, '0');
-    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const meses = [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ];
     const mesStr = meses[fechaInicio.getMonth()];
     const anioStr = fechaInicio.getFullYear().toString().slice(-2); // "26"
 
@@ -207,12 +218,16 @@ export class DocumentoScreenComponent {
     const fechaEventoFormateada = fechaInicio.toLocaleDateString('es-GT', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     });
 
     // 4. Formatear rango de horario contratado
-    const horaInicioStr = this.pFechaInicioEvento ? this.pFechaInicioEvento.substring(11, 16) : '';
-    const horaFinStr = this.pFechaFinEvento ? this.pFechaFinEvento.substring(11, 16) : '';
+    const horaInicioStr = this.pFechaInicioEvento
+      ? this.pFechaInicioEvento.substring(11, 16)
+      : '';
+    const horaFinStr = this.pFechaFinEvento
+      ? this.pFechaFinEvento.substring(11, 16)
+      : '';
     const horarioContratado = `${horaInicioStr} hrs - ${horaFinStr} hrs`;
 
     // 5. Construir objeto de datos mapeado para el Contrato
@@ -224,10 +239,14 @@ export class DocumentoScreenComponent {
       representante: 'Administración Golden Garden',
 
       // Sección I: Datos del Cliente
-      clienteNombre: `${this.clienteSeleccionado.nombre || ''} ${this.clienteSeleccionado.apellido || ''}`.trim(),
+      clienteNombre:
+        `${this.clienteSeleccionado.nombre || ''} ${this.clienteSeleccionado.apellido || ''}`.trim(),
       clienteDpi: this.clienteSeleccionado.dpi || 'N/A',
       clienteEdadEstado: 'N/A', // Puedes mapearlo si agregas el campo en tu formulario
-      clienteTelefono: this.clienteSeleccionado.telefono || this.clienteSeleccionado.celular || 'N/A',
+      clienteTelefono:
+        this.clienteSeleccionado.telefono ||
+        this.clienteSeleccionado.celular ||
+        'N/A',
       clienteCorreo: this.clienteSeleccionado.email || 'N/A',
 
       // Datos Logísticos del Evento
@@ -256,16 +275,13 @@ export class DocumentoScreenComponent {
         tipo: this.pTipoEvento,
         organizador: this.pOrganizadorEvento,
         capacidad: this.pCapacidadEvento,
-        detalles: this.pDetallesEvento
+        detalles: this.pDetallesEvento,
       },
-      observaciones: this.pDetallesEvento
+      observaciones: this.pDetallesEvento,
     };
 
     // 6. Invocar al servicio seleccionando el tipo de documento Contrato
-    this.pdfService.imprimir(
-      TipoDocumento.Contrato,
-      documento
-    );
+    this.pdfService.imprimir(TipoDocumento.Contrato, documento);
   }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
@@ -337,7 +353,6 @@ export class DocumentoScreenComponent {
       id_cliente: this.clienteSeleccionado.id,
     };
 
-
     this.eventosService.insertarEvento(body).subscribe({
       next: (res) => {
         if (res.success) {
@@ -355,7 +370,6 @@ export class DocumentoScreenComponent {
           // NUEVO
           this.cargarEventoPorId(idEvento);
 
-
           this.dialog.open(AlertGenericComponent, {
             width: '450px',
             data: {
@@ -370,7 +384,6 @@ export class DocumentoScreenComponent {
             },
           });
 
-          // 🔥 FUTURO: documentos
           // this.subirDocumento(idEvento);
         } else {
           console.error(res);
@@ -416,7 +429,6 @@ export class DocumentoScreenComponent {
         if (res?.success && res?.data) {
           const evento = res.data;
 
-
           // EMITIR EVENTO AL PADRE
           this.eventoCreado.emit(evento.id);
 
@@ -454,40 +466,34 @@ export class DocumentoScreenComponent {
           this.clienteSeleccionado = null;
 
           if (evento.id_cliente) {
+            this.clienteSeleccionado = {
+              id: evento.id_cliente,
 
-  this.clienteSeleccionado = {
-    id: evento.id_cliente,
+              nit: evento.cliente_NIT || '',
+              nombre: evento.cliente_Nombre || '',
+              apellido: evento.cliente_Apellido || '',
+              email: evento.cliente_Email || '',
+              telefono: evento.cliente_Telefono || '',
+              direccion: evento.cliente_Direccion || '',
 
-    nit: evento.cliente_NIT || '',
-    nombre: evento.cliente_Nombre || '',
-    apellido: evento.cliente_Apellido || '',
-    email: evento.cliente_Email || '',
-    telefono: evento.cliente_Telefono || '',
-    direccion: evento.cliente_Direccion || '',
+              dpi: evento.cliente_DPI || '',
+              celular: '',
+              tipoCliente: 0,
 
-    dpi: evento.cliente_DPI || '',
-    celular: '',
-    tipoCliente: 0,
+              fecha_Registro: '',
+              observacion01: '',
+              observacion02: '',
 
-    fecha_Registro: '',
-    observacion01: '',
-    observacion02: '',
+              estado: 1,
+              username: '',
+              m_Username: '',
+              fecha_Hora: '',
+              m_Fecha_Hora: null,
+              consecutivo_Interno: 0,
+            } as ClienteModel;
 
-    estado: 1,
-    username: '',
-    m_Username: '',
-    fecha_Hora: '',
-    m_Fecha_Hora: null,
-    consecutivo_Interno: 0,
-
-  } as ClienteModel;
-
-
-  this.clienteCompletoChange.emit(
-    this.clienteSeleccionado
-  );
-
-}
+            this.clienteCompletoChange.emit(this.clienteSeleccionado);
+          }
         } else {
           alert('Evento no encontrado');
           this.clienteSeleccionado = null;
@@ -555,7 +561,6 @@ export class DocumentoScreenComponent {
 
     // bloquear cambio de estado en nuevos
     this.modoEdicion = false;
-
   }
   // FIN FUNCION PARA LIMPIAR LA PANTALLA
 
@@ -775,7 +780,6 @@ export class DocumentoScreenComponent {
       // Por ahora es un dato quemado hasta consumir el AuthService y parametrizarlo con el usuario real que hace la petición
       username: this.authService.getUsername(),
     };
-
 
     // ==========================================================
     // CONSUMO DE SERVICIO CREAR CLIENTE (api crear cliente)

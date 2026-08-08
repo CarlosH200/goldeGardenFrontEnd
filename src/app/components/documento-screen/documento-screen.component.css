@@ -401,3 +401,167 @@ label {
     margin-bottom: 20px;
   }
 }
+
+/* ===== ESTILOS DE TARJETAS HORIZONTALES PARA DOCUMENTO ===== */
+.doc-section-card {
+  background-color: var(--color-fondoSecundario) !important;
+  border: 1.5px solid var(--color-Shadow) !important;
+  transition: all 0.3s ease;
+}
+
+body.dark-theme .doc-section-card {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.section-label {
+  color: var(--color-texto);
+  letter-spacing: 0.5px;
+  font-size: 0.78rem;
+}
+
+.section-label .material-icons {
+  color: var(--color-principal) !important;
+}
+
+/* Grupo de Búsqueda */
+.doc-search-group {
+  background-color: var(--color-fondo);
+  border-radius: 10px;
+  border: 1.5px solid var(--color-Shadow);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.doc-search-group:focus-within {
+  border-color: var(--color-principal);
+  box-shadow: 0 0 8px rgba(6, 91, 50, 0.25);
+}
+
+.doc-search-group .input-group-text {
+  background-color: transparent !important;
+  color: var(--color-texto) !important;
+  opacity: 0.6;
+}
+
+.doc-search-group input.form-control {
+  background-color: transparent !important;
+  color: var(--color-texto) !important;
+  font-size: 0.95rem;
+  border: none !important;
+  height: 40px !important;
+  box-shadow: none !important;
+}
+
+.btn-search-doc {
+  background-color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
+  border: none !important;
+  height: 40px;
+  transition: filter 0.2s ease, transform 0.1s ease;
+}
+
+.btn-search-doc:hover {
+  filter: brightness(1.15);
+}
+
+/* Badge del Evento */
+.doc-event-badge {
+  background-color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* Selector de Estados */
+.doc-state-select {
+  height: 38px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid var(--color-Shadow) !important;
+  background-color: var(--color-fondo) !important;
+  color: var(--color-texto) !important;
+  font-weight: 500;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.doc-state-select:focus:not(:disabled) {
+  border-color: var(--color-principal) !important;
+  box-shadow: 0 0 6px rgba(6, 91, 50, 0.25) !important;
+}
+
+.doc-state-select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Tira de Auditoría / Metadatos */
+.doc-audit-strip {
+  background-color: var(--color-fondo) !important;
+  border: 1px solid var(--color-Shadow);
+}
+
+.audit-item {
+  color: var(--color-texto);
+}
+
+.doc-user-badge {
+  background-color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.audit-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--color-Shadow);
+  opacity: 0.5;
+}
+
+/* Botones de Acción */
+.btn-action-primary {
+  height: 40px;
+  width: 42px;
+  background-color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-size: 0.88rem;
+  letter-spacing: 0.3px;
+  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-action-primary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.btn-action-primary:active {
+  transform: translateY(0);
+}
+
+.btn-action-secondary {
+  height: 40px;
+  width: 42px;
+  background-color: var(--color-secundario) !important;
+  color: var(--color-texto-invertido) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-action-secondary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.btn-action-secondary:active {
+  transform: translateY(0);
+}

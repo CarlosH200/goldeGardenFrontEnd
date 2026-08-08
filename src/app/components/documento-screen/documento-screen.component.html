@@ -1,54 +1,94 @@
 <div>
   <form class="event-form">
-    <div class="row mb-4">
-      <div class="col-12">
+    <!-- CONTENEDOR SUPERIOR EN 3 SECCIONES HORIZONTALES -->
+    <div class="doc-top-container mb-4">
+      <div class="row g-3 align-items-stretch">
 
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-
-          <!--IZQUIERDA: BUSCADOR -->
-          <div class="d-flex align-items-center gap-2">
-            <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado" class="input-btn-group form-control"
-              placeholder="ID Evento" style="width: 140px;">
-
-            <button type="button" class="buttonCircle btn btn-outline-dark" (click)="buscarEvento()">
-              <span class="material-icons">search</span>
-            </button>
+        <!-- SECCIÓN 1: BUSCADOR POR ID -->
+        <div class="col-12 col-lg-3">
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
+            <div class="section-label mb-2 d-flex align-items-center gap-1">
+              <span class="material-icons fs-6 text-primary">search</span>
+              <span class="fw-bold text-uppercase small">Buscar Evento por ID</span>
+            </div>
+            <div class="input-group doc-search-group">
+              <span class="input-group-text border-end-0">
+                <span class="material-icons">badge</span>
+              </span>
+              <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado" class="form-control border-start-0 ps-0"
+                placeholder="ID Evento">
+              <button type="button" class="btn btn-search-doc d-flex align-items-center px-3" (click)="buscarEvento()" title="Buscar Evento">
+                <span class="material-icons">search</span>
+              </button>
+            </div>
           </div>
+        </div>
 
-          <!--CENTRO: TÍTULO -->
-          <div class="text-center flex-grow-1">
-            <h2 class="mb-0" *ngIf="idEventoCreado">
-              Evento No. {{ idEventoCreado }}
-            </h2>
+        <!-- SECCIÓN 2: ESTADO E INFORMACIÓN DEL EVENTO -->
+        <div class="col-12 col-lg-6">
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+              <div class="section-label d-flex align-items-center gap-1">
+                <span class="material-icons fs-6 text-primary">info</span>
+                <span class="fw-bold text-uppercase small">Información y Estado</span>
+                <span class="badge doc-event-badge ms-2" *ngIf="idEventoCreado">
+                  No. {{ idEventoCreado }}
+                </span>
+              </div>
+              <!-- SELECTOR DE ESTADO -->
+              <div class="select-wrapper" style="min-width: 170px;">
+                <select class="form-select doc-state-select py-1" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
+                  [disabled]="!modoEdicion">
+                  <option *ngFor="let estado of Estados" [value]="estado.id">
+                    {{ estado.descripcion }} ({{ estado.id }})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- AUDITORÍA DE EVENTO (CREACIÓN Y MODIFICACIÓN) -->
+            <div class="doc-audit-strip d-flex align-items-center justify-content-around flex-wrap gap-2 p-2 rounded-3">
+              <div class="audit-item d-flex align-items-center gap-1 small">
+                <span class="material-icons opacity-75 fs-6">calendar_today</span>
+                <span class="opacity-75">Creación:</span>
+                <span class="fw-semibold">{{ pFechaCreacion || '---' }}</span>
+                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioCreacion">👤 {{ pUsuarioCreacion }}</span>
+              </div>
+              <div class="audit-divider d-none d-sm-block"></div>
+              <div class="audit-item d-flex align-items-center gap-1 small">
+                <span class="material-icons opacity-75 fs-6">edit_calendar</span>
+                <span class="opacity-75">Modificación:</span>
+                <span class="fw-semibold">{{ pFechaModificacion || 'Sin cambios' }}</span>
+                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioModificacion">👤 {{ pUsuarioModificacion }}</span>
+              </div>
+            </div>
+
           </div>
+        </div>
 
-          <!--DERECHA: ACCIONES -->
-          <div class="d-flex align-items-center gap-2">
+        <!-- SECCIÓN 3: ACCIONES Y FUNCIONES -->
+        <div class="col-12 col-lg-3">
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
+            <div class="section-label mb-2 d-flex align-items-center gap-1">
+              <span class="material-icons fs-6 text-primary">touch_app</span>
+              <span class="fw-bold text-uppercase small">Acciones</span>
+            </div>
+            <div class="doc-actions-toolbar d-flex align-items-center gap-2 flex-wrap">
 
-            <select class="form-select" style="min-width: 180px;" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
-              [disabled]="!modoEdicion">
+              <!-- BOTÓN NUEVO EVENTO (SOLO ÍCONO INTUITIVO) -->
+              <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="habilitarModoCreacionEvento()" title="Crear Nuevo Evento">
+                <span class="material-icons fs-5">note_add</span>
+              </button>
 
-              <option *ngFor="let estado of Estados" [value]="estado.id">
-                {{ estado.descripcion }} ({{ estado.id }})
-              </option>
+              <!-- BOTÓN IMPRIMIR -->
+              <button type="button" class="btn btn-action-secondary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="imprimirFormato()" title="Imprimir Documento">
+                <span class="material-icons fs-5">print</span>
+              </button>
 
-            </select>
+              <!-- Espacio para agregar más funciones con el tiempo -->
 
-            <button type="button" class="NewEventButton btn btn-outline-dark" (click)="habilitarModoCreacionEvento()">
-
-              <span class="material-icons align-middle textColor">add</span>
-              <span class="textColor">NUEVO EVENTO</span>
-
-            </button>
-
-            <button type="button" class="NewEventButton btn btn-outline-dark" (click)="imprimirFormato()">
-
-              <span class="material-icons align-middle textColor">print</span>
-
-            </button>
-
+            </div>
           </div>
-
         </div>
 
       </div>

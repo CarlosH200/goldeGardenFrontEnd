@@ -63,6 +63,11 @@ export class DocumentoScreenComponent {
   modoEdicion: boolean = false;
   // VARIABLE PARA ALMACENAR EL ID DEL EVENTO CREADO
   idEventoCreado: number | null = null;
+  // VARIABLES DE AUDITORÍA / METADATOS DEL EVENTO
+  pFechaCreacion: string = '';
+  pUsuarioCreacion: string = '';
+  pFechaModificacion: string = '';
+  pUsuarioModificacion: string = '';
   // VARIABLES PARA BUSQUEDA DE CLIENTES
   // Array para almacenar los clientes encontrados en la búsqueda
   clientesEncontrados: ClienteModel[] = [];
@@ -453,9 +458,13 @@ export class DocumentoScreenComponent {
           this.pDetallesEvento = evento.observacion || '';
 
           // =========================
-          // ESTADO DOCUMENTO
+          // ESTADO DOCUMENTO Y METADATOS
           // =========================
           this.pEstadoEvento = evento.estado;
+          this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
+          this.pUsuarioCreacion = evento.username || '';
+          this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
+          this.pUsuarioModificacion = evento.m_Username || '';
 
           // HABILITAR CAMBIO DE ESTADO
           this.modoEdicion = true;
@@ -526,6 +535,12 @@ export class DocumentoScreenComponent {
     this.pCapacidadEvento = 1;
 
     this.pDetallesEvento = '';
+
+    // AUDITORÍA / METADATOS
+    this.pFechaCreacion = '';
+    this.pUsuarioCreacion = '';
+    this.pFechaModificacion = '';
+    this.pUsuarioModificacion = '';
 
     // =========================
     // CLIENTE

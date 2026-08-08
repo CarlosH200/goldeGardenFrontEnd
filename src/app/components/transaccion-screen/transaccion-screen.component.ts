@@ -66,6 +66,13 @@ ngOnChanges(changes: SimpleChanges): void {
 
   loadingProductos = false;
 
+  // Estado del desplegable de resumen de evento
+  mostrarResumenEvento: boolean = false;
+
+  toggleResumenEvento(): void {
+    this.mostrarResumenEvento = !this.mostrarResumenEvento;
+  }
+
 
 
 

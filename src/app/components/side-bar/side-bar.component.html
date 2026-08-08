@@ -1,39 +1,67 @@
 <div class="app-container">
-  <div class="sidebar">
-    <div class="sidebar-profile">
-      <div class="logoEmpresa"></div>
 
-       <button class="buttonTheme" (click)="theme.toggleTheme()">
-      <span class="material-icons">
-        {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
-      </span>
-    </button>
+  <!-- BOTÓN FLOTANTE SUPERIOR IZQUIERDA PARA ABRIR MENÚ -->
+  <button type="button" class="sidebar-toggle-btn" (click)="toggleSidebar()" title="Menú de Navegación">
+    <span class="material-icons">menu</span>
+  </button>
+
+  <!-- DESTELLO DE FONDO (BACKDROP) -->
+  <div class="sidebar-backdrop" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
+
+  <!-- NAVEGACIÓN LATERAL (SIDEBAR DESPLEGABLE) -->
+  <div class="sidebar" [class.open]="isSidebarOpen">
+
+    <div class="sidebar-header d-flex align-items-center justify-content-between px-3 pt-2">
+      <div class="logoEmpresa"></div>
+      <button type="button" class="sidebar-close-btn" (click)="closeSidebar()" title="Cerrar Menú">
+        <span class="material-icons">close</span>
+      </button>
     </div>
 
-    <ul class="sidebar-menu">
+    <ul class="sidebar-menu mt-3">
       <li
         *ngFor="let item of menu"
         (click)="selectMenu(item)"
         [class.active]="item.enabled"
       >
-        <span class="material-icons">{{ item.icon }}</span>
-        {{ item.nombre }}
+        <span class="material-icons me-2">{{ item.icon }}</span>
+        <span>{{ item.nombre }}</span>
       </li>
     </ul>
 
+    <!-- SECCIÓN CONFIGURACIÓN (TEMA Y APARIENCIA) -->
+    <div class="sidebar-config-section p-3 border-top">
+      <div class="config-title text-uppercase small fw-bold mb-2 d-flex align-items-center gap-1">
+        <span class="material-icons fs-6 text-primary">settings</span>
+        <span>Configuración</span>
+      </div>
+      
+      <button type="button" class="theme-toggle-btn w-100 d-flex align-items-center justify-content-between p-2 rounded-3 border-0" (click)="theme.toggleTheme()">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons fs-5">
+            {{ theme.isDarkTheme() ? "dark_mode" : "light_mode" }}
+          </span>
+          <span class="small fw-semibold">Modo Oscuro</span>
+        </div>
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" role="switch" [checked]="theme.isDarkTheme()" readonly style="pointer-events: none;">
+        </div>
+      </button>
+    </div>
+
+    <!-- CERRAR SESIÓN -->
     <div class="sidebar-bottom">
-      <li (click)="handleLogout()">
+      <li (click)="handleLogout()" class="logout-item">
         <span class="material-icons">logout</span>
-        Sign Out
+        <span>Cerrar Sesión</span>
       </li>
     </div>
+
   </div>
 
-  <button class="sidebar-toggle">
-    <span class="material-icons mainButton">menu</span>
-  </button>
-
+  <!-- CONTENIDO PRINCIPAL A FULL ANCHO -->
   <div class="main-content">
     <ng-container *ngComponentOutlet="activeComponent"></ng-container>
   </div>
+
 </div>

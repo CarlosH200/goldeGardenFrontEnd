@@ -7,37 +7,85 @@
   padding-bottom: 120px;
 }
 
-.encabezado {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 18px;
-  color: red;
-  background: var(--color-principal) !important;
-  border-radius: 14px;
-  flex-wrap: wrap;
-  gap: 10px;
+/* ===== DESPLEGABLE DE RESUMEN DE EVENTO ===== */
+.event-summary-toggle {
+  background-color: var(--color-fondoSecundario) !important;
+  color: var(--color-texto) !important;
+  border: 1.5px solid var(--color-Shadow) !important;
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-strong {
+body.dark-theme .event-summary-toggle {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.event-summary-toggle:hover {
+  filter: brightness(1.08);
+}
+
+.summary-icon {
+  color: var(--color-principal) !important;
+}
+
+.summary-badge-event {
+  background-color: var(--color-principal) !important;
+  color: var(--color-texto-invertido) !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.summary-badge-client {
+  background-color: var(--color-fondo) !important;
+  color: var(--color-texto) !important;
+  border: 1px solid var(--color-Shadow);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.summary-total-chip {
   color: var(--color-texto);
 }
 
-.textoInvertido {
+.chevron-icon {
+  color: var(--color-principal) !important;
+}
+
+/* Contenido del Resumen Desplegado */
+.event-summary-content {
+  background-color: var(--color-fondoSecundario) !important;
+  border: 1.5px solid var(--color-Shadow) !important;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-card {
+  background-color: var(--color-fondo) !important;
+  border: 1px solid var(--color-Shadow) !important;
+  color: var(--color-texto);
+}
+
+.summary-card-title {
+  color: var(--color-texto);
+  letter-spacing: 0.5px;
+}
+
+.summary-card-body {
+  color: var(--color-texto);
+}
+
+.summary-item-qty {
+  background-color: var(--color-principal) !important;
   color: var(--color-texto-invertido) !important;
-}
-
-.textoNoInvertido {
-  color: var(--color-texto) !important;
-}
-
-.badge-items {
-  background: rgba(255,255,255,0.15);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: bold;
+  font-size: 0.75rem;
 }
 
 .form-row {

@@ -16,11 +16,14 @@ import { MenuDisplayModel } from '../../models/menuDisplaysModel';
 })
 export class SideBarComponent {
 
-  // 🔥 lista del menú
+  // lista del menú
   menu: MenuDisplayModel[] = [];
 
-  // 🔥 ESTE ES EL QUE TE FALTABA
+  // componente activo a renderizar
   activeComponent: any = null;
+
+  // Estado del menú lateral (desplegable)
+  isSidebarOpen: boolean = false;
 
   constructor(
     private router: Router,
@@ -34,12 +37,18 @@ export class SideBarComponent {
     this.activeComponent = this.menuProvider.getActive()?.component;
   }
 
-  // lo dejamos por si lo usas en otro lado
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
 
-  // 🔥 esta función activa el item y cambia el componente
   selectMenu(item: MenuDisplayModel) {
     this.menuProvider.setActiveById(item.id);
 
@@ -48,11 +57,14 @@ export class SideBarComponent {
 
     // actualizar el componente que se renderiza
     this.activeComponent = this.menuProvider.getActive()?.component;
+
+    // ocultar automáticamente el menú lateral al seleccionar un módulo
+    this.closeSidebar();
   }
 
   handleLogout() {
-  this.authService.logout();      //borra sesión
-  this.router.navigate(['login']); //sin slash (respeta baseHref)
-}
+    this.authService.logout();      //borra sesión
+    this.router.navigate(['login']); //sin slash (respeta baseHref)
+  }
 
 }

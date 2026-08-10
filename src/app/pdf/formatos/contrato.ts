@@ -24,21 +24,22 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
       {
         columns: [
           {
-            // Columna Izquierda: Nombre y detalles
+            width: 'auto',
             stack: [
+              ...(data.logo ? [{ image: data.logo, width: 100, margin: [0, 0, 0, 10] as [number, number, number, number] }] : []),
               { text: 'GOLDEN GARDEN', style: 'headerEmpresa' },
               { text: 'JARDÍN DE EVENTOS', style: 'subHeaderEmpresa' },
-              { text: '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango', style: 'datosEmpresa' },
-              { text: 'Contacto: 32861562 | Facebook: golden gardeen jardin de eventos', style: 'datosEmpresa' }
+              { text: data.empresa?.direccion || '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango', style: 'datosEmpresa' },
+              { text: `Teléfono: ${data.empresa?.telefono || '32861562'}`, style: 'datosEmpresa' },
+              { text: data.empresa?.redes || 'Facebook: golden gardeen jardin de eventos', style: 'datosEmpresa' }
             ],
-            width: '*'
           },
           {
-            // Columna Derecha: Espacio decorativo o Logo
-            canvas: [
-              { type: 'rect', x: 0, y: 0, w: 100, h: 40, r: 4, lineColor: PALETA_COLORES.secundario, lineWidth: 1 }
+            width: '*',
+            stack: [
+              { text: 'CONTRATO DE ARRENDAMIENTO Y REGLAMENTO INTERNO', style: 'tituloDocumento', margin: [0, 10, 0, 0] },
+              { text: data.evento?.titulo || 'Contrato de Evento', style: 'subHeaderEmpresa', margin: [0, 4, 0, 0] },
             ],
-            width: 'auto',
             alignment: 'right'
           }
         ]

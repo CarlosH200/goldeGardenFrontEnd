@@ -19,13 +19,17 @@ export class EventComponent {
   ) { }
 
   ngOnInit(){
+    console.log(
+      'CLIENTE INICIAL:',
+      this.clienteSeleccionadoData
+    );
+  }
 
- console.log(
-   'CLIENTE INICIAL:',
-   this.clienteSeleccionadoData
- );
-
-}
+  onNuevoEvento(): void {
+    this.idEventoCreado = null;
+    this.clienteSeleccionadoData = null;
+    this.totalTransaccion = 0;
+  }
 
   // Variable para cambiar la pestaña seleccionada entre documento, transacciones y pago
   selectedTab: string = 'documento';

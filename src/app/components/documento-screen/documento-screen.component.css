@@ -152,6 +152,33 @@
   color: var(--color-texto-invertido) !important;
 }
 
+.impresion-opciones {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-fondo);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  min-width: 160px;
+  padding: 8px 0;
+  z-index: 2000;
+}
+
+.impresion-opciones .dropdown-item {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  text-align: left;
+  color: var(--color-texto);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.impresion-opciones .dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 /* Selectores */
 .form-select {
   border-radius: 6px;

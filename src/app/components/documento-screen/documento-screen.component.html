@@ -81,9 +81,19 @@
               </button>
 
               <!-- BOTÓN IMPRIMIR -->
-              <button type="button" class="btn btn-action-secondary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="imprimirFormato()" title="Imprimir Documento">
-                <span class="material-icons fs-5">print</span>
-              </button>
+              <div class="position-relative">
+                <button type="button" class="btn btn-action-secondary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="toggleOpcionesImpresion()" title="Imprimir Documento">
+                  <span class="material-icons fs-5">print</span>
+                </button>
+                <div class="impresion-opciones shadow-sm" *ngIf="mostrarOpcionesImpresion">
+                  <button type="button" class="dropdown-item" (click)="imprimirFormato(TipoDocumento.Cotizacion)">
+                    Cotización
+                  </button>
+                  <button type="button" class="dropdown-item" (click)="imprimirFormato(TipoDocumento.Contrato)">
+                    Contrato
+                  </button>
+                </div>
+              </div>
 
               <!-- Espacio para agregar más funciones con el tiempo -->
 

@@ -1,23 +1,30 @@
-export interface DocumentoPDF{
-
-    empresa:any;
-
-    evento:any;
-
-    cliente:any;
-
-    productos:any[];
-
-    pagos:any[];
-
-    observaciones:string;
-
-    subtotal:number;
-
-    descuento:number;
-
-    iva:number;
-
-    total:number;
-
+export interface DocumentoPDF {
+  empresa?: any;
+  evento?: any;
+  cliente?: any;
+  productos?: any[];
+  pagos?: any[];
+  observaciones?: string;
+  subtotal?: number;
+  descuento?: number;
+  iva?: number;
+  total?: number;
+  logo?: string;
+  clienteNombre?: string;
+  clienteDpi?: string;
+  clienteTelefono?: string;
+  clienteCorreo?: string;
+  eventoTipo?: string;
+  eventoFecha?: string;
+  eventoHorario?: string;
+  eventoUbicacion?: string;
+  eventoOrganizador?: string;
+  eventoDescripcion?: string;
+  montoTotal?: string | number;
+  montoAnticipo?: string | number;
+  montoSaldo?: string | number;
+  dia?: string;
+  mes?: string;
+  anio?: string;
+  representante?: string;
 }

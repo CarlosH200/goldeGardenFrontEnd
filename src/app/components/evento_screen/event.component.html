@@ -42,28 +42,30 @@
   <!-- ===================================================== -->
   <div [hidden]="selectedTab !== 'documento'">
     <app-documento-screen
+      [idEvento]="idEventoCreado"
+      [cliente]="clienteSeleccionadoData"
+      [totalTransaccion]="totalTransaccion"
       (eventoCreado)="idEventoCreado = $event"
       (clienteCompletoChange)="clienteSeleccionadoData = $event"
-    >
-    </app-documento-screen>
+      (nuevoEvento)="onNuevoEvento()"
+    ></app-documento-screen>
   </div>
 
   <!-- ===================================================== -->
   <!-- TRANSACCIONES -->
   <!-- ===================================================== -->
-  <div [hidden]="selectedTab !== 'transacciones'">
+  <div *ngIf="selectedTab === 'transacciones'">
     <app-transaccion-screen
-  [idEvento]="idEventoCreado"
-  [cliente]="clienteSeleccionadoData"
-  (totalGeneralChange)="totalTransaccion = $event">
-    >
-    </app-transaccion-screen>
+      [idEvento]="idEventoCreado"
+      [cliente]="clienteSeleccionadoData"
+      (totalGeneralChange)="totalTransaccion = $event"
+    ></app-transaccion-screen>
   </div>
 
   <!-- ===================================================== -->
   <!-- PAGO -->
   <!-- ===================================================== -->
-  <div [hidden]="selectedTab !== 'pago'">
+  <div *ngIf="selectedTab === 'pago'">
      <app-forma-pago-screen
      [idEvento]="idEventoCreado"
      [cliente]="clienteSeleccionadoData"

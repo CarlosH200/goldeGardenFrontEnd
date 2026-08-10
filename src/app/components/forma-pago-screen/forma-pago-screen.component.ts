@@ -4,7 +4,7 @@ import {
   Input,
   OnInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -18,21 +18,24 @@ import { CuentaBancariaModel } from '../../models/cuentaBancariaModel';
 import { CuentaBancariaService } from '../../services/cuentaBancariaService';
 import { PagoModel } from '../../models/pagoModel';
 import { PagosService } from '../../services/pagosService';
+import { TransaccionesService } from '../../services/transacciones.service';
+import { EventosService } from '../../services/eventosService';
 
 @Component({
   selector: 'app-forma-pago-screen',
   imports: [CommonModule, FormsModule],
   templateUrl: './forma-pago-screen.component.html',
-  styleUrl: './forma-pago-screen.component.css'
+  styleUrl: './forma-pago-screen.component.css',
 })
-export class FormaPagoScreenComponent
-implements OnInit, OnChanges {
-
+export class FormaPagoScreenComponent implements OnInit, OnChanges {
   @Input() idEvento: number | null = null;
 
   @Input() cliente: any = null;
 
   @Input() totalTransaccion = 0;
+
+  // Estado del desplegable de resumen de evento
+  mostrarResumenEvento: boolean = false;
 
   formaPagoSeleccionada = '';
 
@@ -48,6 +51,12 @@ implements OnInit, OnChanges {
 
   pagos: PagoModel[] = [];
 
+  // Transacciones cargadas para el resumen de evento
+  transacciones: any[] = [];
+
+  // Datos del evento cargados para el resumen
+  eventoData: any = null;
+
   formasPago: FormaPagoModel[] = [];
 
   tiposMovimiento: TipoMovimientoModel[] = [];
@@ -62,312 +71,213 @@ implements OnInit, OnChanges {
 
   bancoSeleccionado = '';
 
-
   constructor(
     private formaPagoService: FormaPagoService,
     private tipoMovimientoService: TipoMovimientoService,
     private bancoService: BancoService,
     private cuentaBancariaService: CuentaBancariaService,
     private pagosService: PagosService,
-  ) { }
- 
+    private transaccionesService: TransaccionesService,
+    private eventosService: EventosService,
+  ) {}
+
+  private resetEventState(): void {
+    this.eventoData = null;
+    this.transacciones = [];
+    this.pagos = [];
+    this.montoPago = 0;
+    this.referencia = '';
+    this.autorizacion = '';
+    this.tipoMovimientoSeleccionado = '';
+    this.formaPagoSeleccionada = this.formasPago[0]?.id?.toString() ?? '';
+    this.bancoSeleccionado = this.bancos[0]?.id?.toString() ?? '';
+    this.cuentaSeleccionada = this.cuentasEmpresa[0]?.id?.toString() ?? '';
+    this.bancoOrigen = this.bancos[0]?.descripcion ?? '';
+    this.cuentaDestino = this.cuentasEmpresa[0]?.numero_Cuenta ?? '';
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
-
-  if (changes['idEvento']) {
-
-    if (this.idEvento) {
-
-      this.cargarPagos();
-
+    if (changes['idEvento']) {
+      if (this.idEvento) {
+        this.resetEventState();
+        this.cargarPagos();
+        this.cargarTransacciones();
+        this.cargarEvento();
+      } else {
+        this.resetEventState();
+      }
     }
 
+    if (changes['cliente']) {
+      console.log('CLIENTE RECIBIDO EN FORMA PAGO:', this.cliente);
+    }
   }
 
-  if (changes['cliente']) {
+  ngOnInit(): void {
+    this.cargarFormasPago();
 
-    console.log(
-      'CLIENTE RECIBIDO EN FORMA PAGO:',
-      this.cliente
-    );
+    this.cargarTiposMovimiento();
 
+    this.cargarBancos();
   }
-
-}
-
-ngOnInit(): void {
-
-  this.cargarFormasPago();
-
-  this.cargarTiposMovimiento();
-
-  this.cargarBancos();
-
-}
-
-  
 
   cargarPagos(): void {
-
     if (!this.idEvento) {
       return;
     }
 
-    this.pagosService
-      .obtenerPagos(this.idEvento)
-      .subscribe({
+    this.pagosService.obtenerPagos(this.idEvento).subscribe({
+      next: (response) => {
+        this.pagos = response.data;
+      },
 
-        next: (response) => {
-
-          this.pagos = response.data;
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Error cargando pagos',
-            error
-          );
-
-        }
-
-      });
-
+      error: (error) => {
+        console.error('Error cargando pagos', error);
+      },
+    });
   }
 
   private establecerValoresPorDefecto(): void {
-
-    this.formaPagoSeleccionada =
-      (this.formasPago[0]?.id ?? '')
-        .toString();
+    this.formaPagoSeleccionada = (this.formasPago[0]?.id ?? '').toString();
 
     const anticipo = this.tiposMovimiento.find(
-      x => x.descripcion === 'ANTICIPO'
+      (x) => x.descripcion === 'ANTICIPO',
     );
 
-    this.tipoMovimientoSeleccionado =
-      (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
-        .toString();
+    this.tipoMovimientoSeleccionado = (
+      anticipo?.id ??
+      this.tiposMovimiento[0]?.id ??
+      ''
+    ).toString();
 
-    this.bancoSeleccionado =
-      (this.bancos[0]?.id ?? '')
-        .toString();
+    this.bancoSeleccionado = (this.bancos[0]?.id ?? '').toString();
 
-    this.cuentaSeleccionada =
-      (this.cuentasEmpresa[0]?.id ?? '')
-        .toString();
-
+    this.cuentaSeleccionada = (this.cuentasEmpresa[0]?.id ?? '').toString();
   }
 
+  cargarCuentasBancarias(idBanco: number): void {
+    this.cuentaBancariaService.getCuentasBancarias(idBanco).subscribe({
+      next: (response) => {
+        this.cuentasEmpresa = response;
 
-  cargarCuentasBancarias(
-    idBanco: number
-  ): void {
-
-    this.cuentaBancariaService
-      .getCuentasBancarias(idBanco)
-      .subscribe({
-
-        next: (response) => {
-
-          this.cuentasEmpresa = response;
-
-          if (this.cuentasEmpresa.length > 0) {
-
-            this.cuentaSeleccionada =
-              this.cuentasEmpresa[0].id.toString();
-
-          }
-          else {
-
-            this.cuentaSeleccionada = '';
-
-          }
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Error cargando cuentas bancarias',
-            error
-          );
-
+        if (this.cuentasEmpresa.length > 0) {
+          this.cuentaSeleccionada = this.cuentasEmpresa[0].id.toString();
+        } else {
+          this.cuentaSeleccionada = '';
         }
+      },
 
-      });
-
+      error: (error) => {
+        console.error('Error cargando cuentas bancarias', error);
+      },
+    });
   }
 
   cargarBancos(): void {
+    this.bancoService.getBancos().subscribe({
+      next: (response) => {
+        this.bancos = response;
 
-    this.bancoService
-      .getBancos()
-      .subscribe({
+        if (this.bancos.length > 0) {
+          this.bancoSeleccionado = this.bancos[0].id.toString();
 
-        next: (response) => {
+          this.bancoOrigen = this.bancos[0].descripcion;
 
-          this.bancos = response;
-
-          if (this.bancos.length > 0) {
-
-            this.bancoSeleccionado =
-              this.bancos[0].id.toString();
-
-            this.bancoOrigen =
-              this.bancos[0].descripcion;
-
-            this.cargarCuentasBancarias(
-              this.bancos[0].id
-            );
-
-          }
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Error cargando bancos',
-            error
-          );
-
+          this.cargarCuentasBancarias(this.bancos[0].id);
         }
+      },
 
-      });
-
+      error: (error) => {
+        console.error('Error cargando bancos', error);
+      },
+    });
   }
 
   onBancoChange(): void {
-
     const banco = this.bancos.find(
-      x => x.id === Number(this.bancoSeleccionado)
+      (x) => x.id === Number(this.bancoSeleccionado),
     );
 
-    this.bancoOrigen =
-      banco?.descripcion ?? '';
+    this.bancoOrigen = banco?.descripcion ?? '';
 
-    this.cargarCuentasBancarias(
-      Number(this.bancoSeleccionado)
-    );
-
+    this.cargarCuentasBancarias(Number(this.bancoSeleccionado));
   }
 
   get bancoActual(): BancoModel | undefined {
-
-    return this.bancos.find(
-      x => x.id === Number(this.bancoSeleccionado)
-    );
-
+    return this.bancos.find((x) => x.id === Number(this.bancoSeleccionado));
   }
 
   get cuentaActual(): CuentaBancariaModel | undefined {
-
     return this.cuentasEmpresa.find(
-      x => x.id === Number(this.cuentaSeleccionada)
+      (x) => x.id === Number(this.cuentaSeleccionada),
     );
-
   }
 
+  toggleResumenEvento(): void {
+    this.mostrarResumenEvento = !this.mostrarResumenEvento;
+  }
 
   cargarTiposMovimiento(): void {
+    this.tipoMovimientoService.getTiposMovimiento().subscribe({
+      next: (response) => {
+        this.tiposMovimiento = response;
 
-    this.tipoMovimientoService
-      .getTiposMovimiento()
-      .subscribe({
+        // DEFAULT: ANTICIPO (recomendado negocio)
+        const anticipo = this.tiposMovimiento.find(
+          (x) => x.descripcion === 'ANTICIPO',
+        );
 
-        next: (response) => {
+        this.tipoMovimientoSeleccionado = (
+          anticipo?.id ??
+          this.tiposMovimiento[0]?.id ??
+          ''
+        ).toString();
+      },
 
-          this.tiposMovimiento = response;
-
-          // DEFAULT: ANTICIPO (recomendado negocio)
-          const anticipo = this.tiposMovimiento.find(
-            x => x.descripcion === 'ANTICIPO'
-          );
-
-          this.tipoMovimientoSeleccionado =
-            (anticipo?.id ?? this.tiposMovimiento[0]?.id ?? '')
-              .toString();
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Error cargando tipos de movimiento',
-            error
-          );
-
-        }
-
-      });
-
+      error: (error) => {
+        console.error('Error cargando tipos de movimiento', error);
+      },
+    });
   }
 
   cargarFormasPago(): void {
+    this.formaPagoService.getFormasPago().subscribe({
+      next: (response) => {
+        this.formasPago = response;
 
-    this.formaPagoService
-      .getFormasPago()
-      .subscribe({
+        // DEFAULT: primera forma activa
+        this.formaPagoSeleccionada = (this.formasPago[0]?.id ?? '').toString();
+      },
 
-        next: (response) => {
-
-          this.formasPago = response;
-
-          // DEFAULT: primera forma activa
-          this.formaPagoSeleccionada =
-            (this.formasPago[0]?.id ?? '')
-              .toString();
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Error cargando formas de pago',
-            error
-          );
-
-        }
-
-      });
-
+      error: (error) => {
+        console.error('Error cargando formas de pago', error);
+      },
+    });
   }
 
   get formaPagoActual(): FormaPagoModel | undefined {
-
     return this.formasPago.find(
-      x => x.id === Number(this.formaPagoSeleccionada)
+      (x) => x.id === Number(this.formaPagoSeleccionada),
     );
-
   }
 
   get mostrarBanco(): boolean {
-
     return this.formaPagoActual?.posee_Banco ?? false;
-
   }
 
   get mostrarCuentaBancaria(): boolean {
-
     return this.formaPagoActual?.posee_Cuenta_Bancaria ?? false;
-
   }
 
   get mostrarReferencia(): boolean {
-
     return this.formaPagoActual?.posee_Referencia ?? false;
-
   }
 
   get mostrarAutorizacion(): boolean {
-
     return this.formaPagoActual?.posee_Autorizarion ?? false;
-
   }
 
   agregarPago(): void {
-
     if (!this.idEvento) {
       console.error('No se recibió el id del evento.');
       return;
@@ -384,7 +294,6 @@ ngOnInit(): void {
     }
 
     const body = {
-
       id_evento: this.idEvento,
 
       id_cliente: this.cliente.id,
@@ -395,8 +304,7 @@ ngOnInit(): void {
 
       monto_Total: this.totalTransaccion,
 
-      saldo_Pendiente:
-        this.totalTransaccion - Number(this.montoPago),
+      saldo_Pendiente: this.totalTransaccion - Number(this.montoPago),
 
       descripcion: '',
 
@@ -408,104 +316,138 @@ ngOnInit(): void {
 
       m_Username: null,
 
-      id_Tipo_Movimiento:
-        Number(this.tipoMovimientoSeleccionado),
+      id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
 
       referencia: this.referencia,
 
       autorizacion: this.autorizacion,
 
-      id_Banco:
-        Number(this.bancoSeleccionado),
+      id_Banco: Number(this.bancoSeleccionado),
 
-      id_Cuenta_Bancaria:
-        Number(this.cuentaSeleccionada)
-
+      id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
     };
 
     console.log('BODY PAGO:', body);
 
-    this.pagosService
-      .insertarPago(body)
-      .subscribe({
+    this.pagosService.insertarPago(body).subscribe({
+      next: (response) => {
+        console.log('Pago insertado', response);
 
-        next: (response) => {
+        this.cargarPagos();
 
-          console.log('Pago insertado', response);
+        this.limpiar();
+      },
 
-          this.cargarPagos();
-
-          this.limpiar();
-
-        },
-
-        error: (error) => {
-
-          console.error('Error insertando pago', error);
-
-        }
-
-      });
-
+      error: (error) => {
+        console.error('Error insertando pago', error);
+      },
+    });
   }
   eliminarPago(index: number) {
-
     this.pagos.splice(index, 1);
-
   }
 
   limpiar() {
-
     this.establecerValoresPorDefecto();
     this.montoPago = 0;
     this.referencia = '';
     this.autorizacion = '';
-    this.bancoOrigen =
-      this.bancos[0]?.descripcion ?? '';
-    this.cuentaSeleccionada =
-      this.cuentasEmpresa[0]?.id.toString() ?? '';
+    this.eventoData = null;
+    this.bancoOrigen = this.bancos[0]?.descripcion ?? '';
+    this.cuentaSeleccionada = this.cuentasEmpresa[0]?.id.toString() ?? '';
 
-    this.cuentaDestino =
-      this.cuentasEmpresa[0]?.numero_Cuenta ?? '';
+    this.cuentaDestino = this.cuentasEmpresa[0]?.numero_Cuenta ?? '';
   }
 
   get totalPagado(): number {
-
     return this.pagos.reduce(
+      (acc, p) => acc + Number(p.monto_Pagado),
 
-      (acc, p) =>
-
-        acc + Number(p.monto_Pagado),
-
-      0
-
+      0,
     );
-
   }
 
   get saldoPendiente(): number {
-
-    return Math.max(
-      this.totalTransaccion - this.totalPagado,
-      0
-    );
-
+    return Math.max(this.totalTransaccion - this.totalPagado, 0);
   }
 
   onCuentaChange(): void {
-
-    this.cuentaDestino =
-      this.cuentaActual?.numero_Cuenta ?? '';
-
+    this.cuentaDestino = this.cuentaActual?.numero_Cuenta ?? '';
   }
 
   get cambio(): number {
-
-    return Math.max(
-      this.totalPagado - this.totalTransaccion,
-      0
-    );
-
+    return Math.max(this.totalPagado - this.totalTransaccion, 0);
   }
 
+  // ==========================================================
+  // CARGAR TRANSACCIONES DEL EVENTO (para resumen)
+  // ==========================================================
+  cargarTransacciones(): void {
+    if (!this.idEvento) {
+      return;
+    }
+
+    this.transaccionesService
+      .buscarTransaccionesEvento(this.idEvento)
+      .subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.transacciones = res.data.map((t: any) => ({
+              id: t.id_producto,
+              cantidad: Number(t.cantidad),
+              subtotal: Number(t.monto),
+              detalle: t.descripcion,
+              precio: Number(t.monto) / Number(t.cantidad),
+              nombre: t.observacion_01,
+              nombre_Producto: t.observacion_01,
+              descripcion: t.descripcion,
+              precio_Unitario: Number(t.monto) / Number(t.cantidad),
+            }));
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar transacciones en forma pago', err);
+        },
+      });
+  }
+
+  // ==========================================================
+  // CARGAR EVENTO (para resumen: tipo, fechas)
+  // ==========================================================
+  cargarEvento(): void {
+    if (!this.idEvento) {
+      return;
+    }
+
+    this.eventosService.obtenerEvento(this.idEvento).subscribe({
+      next: (res) => {
+        if (res?.success && res?.data) {
+          this.eventoData = res.data;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar evento en forma pago', err);
+      },
+    });
+  }
+
+  // ==========================================================
+  // TOTAL GENERAL (suma de transacciones)
+  // ==========================================================
+  get totalGeneral(): number {
+    return this.transacciones.reduce(
+      (acc, item) => acc + Number(item.subtotal),
+      0,
+    );
+  }
+
+  // ==========================================================
+  // TOTAL UNIDADES
+  // ==========================================================
+  get totalUnidades(): number {
+    return this.transacciones.reduce(
+      (acc, item) => acc + Number(item.cantidad),
+      0,
+    );
+  }
 }

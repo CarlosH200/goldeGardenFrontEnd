@@ -70,7 +70,7 @@ body.dark-theme .event-summary-toggle {
 .summary-card {
   background-color: var(--color-fondo) !important;
   border: 1px solid var(--color-Shadow) !important;
-  color: var(--color-texto);
+  color: var(--color-texto) !important;
 }
 
 .summary-card-title {
@@ -336,7 +336,7 @@ td {
 
 .footer-total h1, span {
   margin: 0;
-  color: var(--color-texto-invertido) !important;
+  color: var(--color-texto) !important;
 }
 
 .buttonCircle {

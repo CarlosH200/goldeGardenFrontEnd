@@ -19,7 +19,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { TransaccionesService } from '../../services/transacciones.service';
+import { firstValueFrom } from 'rxjs';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  Input,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { PdfService } from '../../pdf/pdf.service';
 import { TipoDocumento } from '../../pdf/enums/tipo-documento.enum';
 import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
@@ -30,14 +39,30 @@ import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
   templateUrl: './documento-screen.component.html',
   styleUrl: './documento-screen.component.css',
 })
-export class DocumentoScreenComponent {
+export class DocumentoScreenComponent implements OnChanges {
   // Evento para recibir el id de el evento creado
   @Output()
   eventoCreado = new EventEmitter<number>();
 
+  @Output()
+  nuevoEvento = new EventEmitter<void>();
+
   // Evento para recibir el id del cliente seleccionado
   @Output()
   clienteCompletoChange = new EventEmitter<any>();
+
+  @Input() idEvento: number | null = null;
+  @Input() cliente: ClienteModel | null = null;
+  @Input() totalTransaccion = 0;
+
+  transacciones: any[] = [];
+
+  public TipoDocumento = TipoDocumento;
+  opcionesImpresion = [
+    { tipo: TipoDocumento.Cotizacion, label: 'Cotización' },
+    { tipo: TipoDocumento.Contrato, label: 'Contrato' },
+  ];
+  mostrarOpcionesImpresion = false;
 
   // Modelo para datos del cliente
   clienteForm: Partial<ClienteModel> = {
@@ -120,8 +145,7 @@ export class DocumentoScreenComponent {
     public theme: ThemeService,
     public dialog: MatDialog,
     private authService: AuthService,
-    private pdfService: PdfService,
-
+    private pdfService: PdfService,    private transaccionesService: TransaccionesService,
     //NUEVO SERVICE
     private clientesService: ClientesService,
   ) {}
@@ -136,11 +160,58 @@ export class DocumentoScreenComponent {
     this.getEstados();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['idEvento'] && this.idEvento) {
+      this.cargarEventoPorId(this.idEvento);
+    }
+
+    if (changes['cliente'] && this.cliente) {
+      this.clienteSeleccionado = this.cliente;
+    }
+  }
+
   // FUNCION PARA HABILITAR MODO CREACION DE EVENTO O MODO CONSULTA DE EVENTO
   habilitarModoCreacionEvento(): void {
     this.limpiarPantalla();
 
     this.modoConsulta = false;
+    this.clienteCompletoChange.emit(null);
+    this.nuevoEvento.emit();
+  }
+
+  toggleOpcionesImpresion(): void {
+    this.mostrarOpcionesImpresion = !this.mostrarOpcionesImpresion;
+  }
+
+  async obtenerLogoDataUrl(): Promise<string | null> {
+    try {
+      const response = await fetch('assets/goldengarden.png');
+      const blob = await response.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('No se pudo cargar el logo:', error);
+      return null;
+    }
+  }
+
+  obtenerDescripcionUbicacion(idUbicacion: number | string): string {
+    const ubicacion = this.ubicaciones.find((u) => u.id === Number(idUbicacion));
+    return ubicacion?.descripcion || 'N/A';
+  }
+
+  obtenerDescripcionOrganizador(idOrganizador: number | string): string {
+    const organizador = this.Organizadores.find((o) => o.id === Number(idOrganizador));
+    return organizador?.descripcion || 'N/A';
+  }
+
+  obtenerDescripcionTipoEvento(idTipoEvento: number | string): string {
+    const tipo = this.tipoEvento.find((t) => t.id === Number(idTipoEvento));
+    return tipo?.descripcion || 'N/A';
   }
 
   // Método para obtener la descripción de la capacidad
@@ -161,35 +232,14 @@ export class DocumentoScreenComponent {
       : `${idCapacidad} Personas`;
   }
 
-  // Método para obtener la descripción de la capacidad
-  obtenerDescripcionTipoEvento(idTipoEvento: number | string): string {
-    if (!idTipoEvento) return 'N/A';
-
-    // Busca dentro del arreglo TipoEvento que ya tienes cargado de tu API
-    const tipoEventoEncontrado = this.tipoEvento.find(
-      (t) => t.id === Number(idTipoEvento),
-    );
-
-    // Si la encuentra retorna su propiedad (p. ej. descripcion o nombre),
-    // de lo contrario un fallback con el id o 'N/A'
-    return tipoEventoEncontrado
-      ? tipoEventoEncontrado.descripcion ||
-          tipoEventoEncontrado.descripcion ||
-          `${idTipoEvento} Personas`
-      : `${idTipoEvento} Personas`;
-  }
-
-  // FUNCION PARA EJETUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR
-  // FUNCION PARA EJECUTAR EL PROCESO DE IMPRESION CON EL BOTON IMPRIMIR (DINÁMICO)
-  imprimirFormato(): void {
-    // 1. Validar que exista un cliente seleccionado o cargado
+  async imprimirFormato(tipo: TipoDocumento): Promise<void> {
     if (!this.clienteSeleccionado) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
           titulo: 'Atención',
           mensaje:
-            'Debes seleccionar o buscar un evento/cliente antes de generar el contrato.',
+            'Debes seleccionar o buscar un evento/cliente antes de generar el documento.',
           tipo: 'warning',
           icon: 'warning',
         },
@@ -197,7 +247,10 @@ export class DocumentoScreenComponent {
       return;
     }
 
-    // 2. Extraer y parsear fechas para el encabezado legal del contrato
+    this.mostrarOpcionesImpresion = false;
+
+    const logoDataUrl = await this.obtenerLogoDataUrl();
+
     const fechaInicio = this.pFechaInicioEvento
       ? new Date(this.pFechaInicioEvento)
       : new Date();
@@ -217,16 +270,14 @@ export class DocumentoScreenComponent {
       'diciembre',
     ];
     const mesStr = meses[fechaInicio.getMonth()];
-    const anioStr = fechaInicio.getFullYear().toString().slice(-2); // "26"
+    const anioStr = fechaInicio.getFullYear().toString().slice(-2);
 
-    // 3. Formatear la fecha del evento
     const fechaEventoFormateada = fechaInicio.toLocaleDateString('es-GT', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
     });
 
-    // 4. Formatear rango de horario contratado
     const horaInicioStr = this.pFechaInicioEvento
       ? this.pFechaInicioEvento.substring(11, 16)
       : '';
@@ -235,38 +286,53 @@ export class DocumentoScreenComponent {
       : '';
     const horarioContratado = `${horaInicioStr} hrs - ${horaFinStr} hrs`;
 
-    // 5. Construir objeto de datos mapeado para el Contrato
+    if (this.idEventoCreado && this.transacciones.length === 0) {
+      await this.cargarTransacciones(this.idEventoCreado);
+    }
+
+    const montoTotalNumber = this.transacciones.length
+      ? this.transacciones.reduce(
+          (sum, item) => sum + Number(item.total ?? item.monto ?? 0),
+          0,
+        )
+      : Number(this.totalTransaccion || 0);
+
+    const montoTotal = Number(montoTotalNumber).toFixed(2);
+    const montoAnticipo = montoTotalNumber / 2;
+    const montoSaldo = montoTotalNumber - montoAnticipo;
+
     const documento: DocumentoPDF | any = {
-      // Encabezado legal
+      logo: logoDataUrl,
       dia: diaStr,
       mes: mesStr,
       anio: anioStr,
       representante: 'Administración Golden Garden',
-
-      // Sección I: Datos del Cliente
       clienteNombre:
         `${this.clienteSeleccionado.nombre || ''} ${this.clienteSeleccionado.apellido || ''}`.trim(),
       clienteDpi: this.clienteSeleccionado.dpi || 'N/A',
-      clienteEdadEstado: 'N/A', // Puedes mapearlo si agregas el campo en tu formulario
+      clienteEdadEstado: 'N/A',
       clienteTelefono:
         this.clienteSeleccionado.telefono ||
         this.clienteSeleccionado.celular ||
         'N/A',
       clienteCorreo: this.clienteSeleccionado.email || 'N/A',
-
-      // Datos Logísticos del Evento
       eventoTipo: this.obtenerDescripcionTipoEvento(this.pTipoEvento),
       eventoInvitados: this.obtenerDescripcionCapacidad(this.pCapacidadEvento),
       eventoFecha: fechaEventoFormateada,
       eventoHorario: horarioContratado,
-
-      // Montos (Si manejas valores dinámicos los sustituyes aquí)
-      montoTotal: '0.00',
-      montoAnticipo: '0.00',
-      montoSaldo: '0.00',
-
-      // Referencias directas de tu interfaz por compatibilidad
-      empresa: { nombre: 'Golden Garden' },
+      eventoUbicacion: this.obtenerDescripcionUbicacion(this.pUbicacionEvento),
+      eventoOrganizador: this.obtenerDescripcionOrganizador(this.pOrganizadorEvento),
+      eventoDescripcion: this.pDescripcionEvento || 'N/A',
+      montoTotal,
+      montoAnticipo: montoAnticipo.toFixed(2),
+      montoSaldo: montoSaldo.toFixed(2),
+      empresa: {
+        nombre: 'Golden Garden',
+        direccion:
+          '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango',
+        telefono: '32861562',
+        redes: 'Facebook: golden gardeen jardin de eventos',
+      },
       cliente: this.clienteSeleccionado,
       evento: {
         id: this.idEventoCreado,
@@ -283,10 +349,15 @@ export class DocumentoScreenComponent {
         detalles: this.pDetallesEvento,
       },
       observaciones: this.pDetallesEvento,
+      subtotal: Number(montoTotalNumber),
+      descuento: 0,
+      iva: 0,
+      total: Number(montoTotalNumber),
+      productos: this.transacciones,
+      pagos: [],
     };
 
-    // 6. Invocar al servicio seleccionando el tipo de documento Contrato
-    this.pdfService.imprimir(TipoDocumento.Contrato, documento);
+    this.pdfService.imprimir(tipo, documento);
   }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
@@ -475,6 +546,7 @@ export class DocumentoScreenComponent {
           this.clienteSeleccionado = null;
 
           if (evento.id_cliente) {
+            this.cargarTransacciones(evento.id);
             this.clienteSeleccionado = {
               id: evento.id_cliente,
 
@@ -514,6 +586,41 @@ export class DocumentoScreenComponent {
       },
     });
   }
+  async cargarTransacciones(idEvento: number): Promise<void> {
+    if (!idEvento) {
+      this.transacciones = [];
+      return;
+    }
+
+    try {
+      const res: any = await firstValueFrom(
+        this.transaccionesService.buscarTransaccionesEvento(idEvento),
+      );
+
+      if (res?.success && Array.isArray(res.data)) {
+        this.transacciones = res.data.map((t: any) => {
+          const cantidad = Number(t.cantidad) || 1;
+          const monto = Number(t.monto) || 0;
+
+          return {
+            id: t.id_producto || t.id || null,
+            descripcion: t.descripcion || t.observacion_01 || 'Artículo',
+            nombre: t.observacion_01 || t.descripcion || 'Artículo',
+            cantidad,
+            precio: cantidad ? monto / cantidad : monto,
+            total: monto,
+            monto,
+          };
+        });
+      } else {
+        this.transacciones = [];
+      }
+    } catch (err) {
+      console.error('Error cargando transacciones para cotización', err);
+      this.transacciones = [];
+    }
+  }
+
   // FUNCION PARA LIMPIAR LA PANTALLA
   limpiarPantalla(): void {
     // =========================

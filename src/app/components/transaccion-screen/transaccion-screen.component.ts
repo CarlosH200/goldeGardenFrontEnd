@@ -6,7 +6,9 @@ import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
+import { EventosService } from '../../services/eventosService';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-transaccion-screen',
@@ -21,22 +23,35 @@ export class TransaccionScreenComponent implements OnChanges {
     private authService: AuthService,
     private transaccionesService: TransaccionesService,
     private dialog: MatDialog,
+    private eventosService: EventosService,
   ) {}
  
-  
+  private resetEventState(): void {
+    this.eventoData = null;
+    this.transacciones = [];
+    this.productoBuscado = '';
+    this.productoEncontrado = null;
+    this.productosFiltrados = [];
+    this.cantidad = 1;
+    this.detalleProducto = '';
+    this.viewDetailTransaccion = false;
+    this.actualizarTotal();
+  }
+
   // ==========================================================
-// DETECTAR CAMBIOS EN EVENTO
-// ==========================================================
-ngOnChanges(changes: SimpleChanges): void {
-
-  if (changes['idEvento']) {
-
-    if (this.idEvento) {
-
-      this.cargarTransacciones();
+  // DETECTAR CAMBIOS EN EVENTO
+  // ==========================================================
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['idEvento']) {
+      if (this.idEvento) {
+        this.resetEventState();
+        this.cargarTransacciones();
+        this.cargarEvento();
+      } else {
+        this.resetEventState();
+      }
     }
   }
-}
 
 @Output() totalGeneralChange =
   new EventEmitter<number>();
@@ -45,6 +60,9 @@ ngOnChanges(changes: SimpleChanges): void {
   // input para recibir el id del cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
   @Input() cliente: any = null;
 
+
+  // Datos del evento cargados para el resumen
+  eventoData: any = null;
 
   totalTransaccion = 0;
 
@@ -181,6 +199,32 @@ ngOnChanges(changes: SimpleChanges): void {
 
     this.mostrarDropdown = false;
   }
+
+
+  // ==========================================================
+  // CARGAR EVENTO (para resumen: tipo, fechas)
+  // ==========================================================
+  cargarEvento(): void {
+    if (!this.idEvento) {
+      return;
+    }
+
+    this.eventosService
+      .obtenerEvento(this.idEvento)
+      .subscribe({
+        next: (res) => {
+          if (res?.success && res?.data) {
+            this.eventoData = res.data;
+            console.log('Evento cargado en Transaciones en Eventodata:', this.eventoData);
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar evento en forma pago', err);
+        }
+      });
+  }
+
+
 
   // ==========================================================
   // AGREGAR PRODUCTO
@@ -358,23 +402,21 @@ cargarTransacciones(): void {
 
         if (res?.success) {
 
-          this.transacciones = res.data.map((t: any) => ({
+              this.transacciones = res.data
+            .map((t: any) => {
+              const cantidad = Number(t.cantidad) || 1;
+              const monto = Number(t.monto) || 0;
 
-            id: t.id_producto,
-
-            cantidad: Number(t.cantidad),
-
-            subtotal: Number(t.monto),
-
-            detalle: t.descripcion,
-
-            precio:
-              Number(t.monto) / Number(t.cantidad),
-
-            nombre: t.observacion_01,
-
-            descripcion: t.descripcion
-          }));
+              return {
+                id: t.id || t.id_producto || null,
+                descripcion: t.descripcion || t.nombre || 'Descripción no disponible',
+                observacion: t.observacion_01 || '',
+                cantidad,
+                precio: cantidad ? monto / cantidad : monto,
+                subtotal: monto,
+              };
+            })
+            .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
 
           console.log(
             'TRANSACCIONES CARGADAS:',

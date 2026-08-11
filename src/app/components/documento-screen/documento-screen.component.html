@@ -96,6 +96,12 @@
               </div>
 
               <!-- Espacio para agregar más funciones con el tiempo -->
+              <!-- Indicador de bloqueo -->
+              <div class="d-flex align-items-center gap-2">
+                <span *ngIf="isLocked" class="badge bg-danger">Bloqueado</span>
+                <button *ngIf="isLocked" type="button" class="btn btn-outline-secondary" (click)="unlockDocument()">Desbloquear</button>
+                <span *ngIf="!isLocked" class="badge bg-success">Editable</span>
+              </div>
 
             </div>
           </div>

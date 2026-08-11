@@ -20,7 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import {
   Component,
   Output,
@@ -152,6 +152,9 @@ export class DocumentoScreenComponent implements OnChanges {
     //NUEVO SERVICE
     private clientesService: ClientesService,
   ) {}
+
+  isLocked: boolean = false;
+  private lockSub?: Subscription;
 
   ngOnInit(): void {
     this.limpiarPantalla();
@@ -368,6 +371,27 @@ export class DocumentoScreenComponent implements OnChanges {
     }
   }
 
+  unlockDocument(): void {
+    if (!this.idEventoCreado) return;
+
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Desbloquear documento',
+        mensaje:
+          '¿Desea desbloquear el documento para permitir cambios en transacciones y pagos? Esta acción permitirá editar el documento nuevamente.',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res !== false) {
+        this.documentLockService.unlock(this.idEventoCreado!);
+      }
+    });
+  }
+
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
   getFechaConHora(hora: number, minutos: number): string {
     const now = new Date();
@@ -582,6 +606,11 @@ export class DocumentoScreenComponent implements OnChanges {
             } as ClienteModel;
 
             this.clienteCompletoChange.emit(this.clienteSeleccionado);
+            // subscribe to lock state for this event
+            this.lockSub?.unsubscribe();
+            this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
+              this.isLocked = v;
+            });
           }
         } else {
           alert('Evento no encontrado');

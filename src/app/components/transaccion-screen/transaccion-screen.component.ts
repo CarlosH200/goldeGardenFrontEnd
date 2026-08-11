@@ -275,8 +275,8 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    // Validar si el documento está bloqueado o ya tiene pagos
-    if (this.isLocked || this.hasPayments) {
+    // Validar si el documento está bloqueado
+    if (this.isLocked) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
@@ -475,7 +475,7 @@ cargarTransacciones(): void {
   // ==========================================================
   eliminarProducto(index: number) {
 
-    if (this.isLocked || this.hasPayments) {
+    if (this.isLocked) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {

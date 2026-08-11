@@ -109,7 +109,9 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
         this.resetEventState();
       }
     }
+          OnDestroy,
 
+        import { Subscription } from 'rxjs';
     if (changes['cliente']) {
       console.log('CLIENTE RECIBIDO EN FORMA PAGO:', this.cliente);
     }
@@ -118,6 +120,8 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.cargarFormasPago();
 
+          isLocked: boolean = false;
+          private lockSub?: Subscription;
     this.cargarTiposMovimiento();
 
     this.cargarBancos();
@@ -126,6 +130,9 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
   cargarPagos(): void {
     if (!this.idEvento) {
       return;
+                // subscribe to lock state
+                this.lockSub?.unsubscribe();
+                this.lockSub = this.documentLockService.isLocked$(this.idEvento).subscribe((v) => (this.isLocked = v));
     }
 
     this.pagosService.obtenerPagos(this.idEvento).subscribe({
@@ -157,6 +164,10 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
     this.cuentaSeleccionada = (this.cuentasEmpresa[0]?.id ?? '').toString();
   }
 
+            if (this.isLocked) {
+              console.error('Documento bloqueado. Desbloquéalo para agregar pagos.');
+              return;
+            }
   cargarCuentasBancarias(idBanco: number): void {
     this.cuentaBancariaService.getCuentasBancarias(idBanco).subscribe({
       next: (response) => {
@@ -277,6 +288,9 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
 
   get mostrarAutorizacion(): boolean {
     return this.formaPagoActual?.posee_Autorizarion ?? false;
+          ngOnDestroy(): void {
+            this.lockSub?.unsubscribe();
+          }
   }
 
   agregarPago(): void {

@@ -392,6 +392,39 @@ export class DocumentoScreenComponent implements OnChanges {
     });
   }
 
+  onLockToggle(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    if (checked) {
+      // Bloquear sin confirmación cuando el usuario marca el checkbox
+      if (this.idEventoCreado) this.documentLockService.lock(this.idEventoCreado);
+      this.isLocked = true;
+      return;
+    }
+
+    // Al quitar el check pedir confirmación para desbloquear
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Desbloquear documento',
+        mensaje:
+          '¿Desea desbloquear el documento para permitir cambios en transacciones y pagos? Esta acción permitirá editar el documento nuevamente.',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res !== false) {
+        if (this.idEventoCreado) this.documentLockService.unlock(this.idEventoCreado);
+        this.isLocked = false;
+      } else {
+        // revertir checkbox si cancela
+        this.isLocked = true;
+      }
+    });
+  }
+
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA
   getFechaConHora(hora: number, minutos: number): string {
     const now = new Date();

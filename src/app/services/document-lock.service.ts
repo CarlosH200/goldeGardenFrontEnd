@@ -10,7 +10,8 @@ export class DocumentLockService {
   private ensureSubject(id: number): BehaviorSubject<boolean> {
     let s = this.locks.get(id);
     if (!s) {
-      s = new BehaviorSubject<boolean>(false);
+      // Por defecto, asumir documento bloqueado hasta que el usuario lo desbloquee
+      s = new BehaviorSubject<boolean>(true);
       this.locks.set(id, s);
     }
     return s;
@@ -25,7 +26,7 @@ export class DocumentLockService {
   }
 
   isLocked$(id: number | null): Observable<boolean> {
-    if (id == null) return new BehaviorSubject<boolean>(false).asObservable();
+    if (id == null) return new BehaviorSubject<boolean>(true).asObservable();
     return this.ensureSubject(id).asObservable();
   }
 }

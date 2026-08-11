@@ -179,10 +179,12 @@ export class DocumentoScreenComponent implements OnChanges {
   // FUNCION PARA HABILITAR MODO CREACION DE EVENTO O MODO CONSULTA DE EVENTO
   habilitarModoCreacionEvento(): void {
     this.limpiarPantalla();
-
     this.modoConsulta = false;
     this.clienteCompletoChange.emit(null);
     this.nuevoEvento.emit();
+
+    // Por defecto, al crear un nuevo documento debe quedar bloqueado hasta que el usuario lo pase a editable
+    this.isLocked = true;
   }
 
   toggleOpcionesImpresion(): void {
@@ -292,7 +294,32 @@ export class DocumentoScreenComponent implements OnChanges {
       : '';
     const horarioContratado = `${horaInicioStr} hrs - ${horaFinStr} hrs`;
 
-    if (this.idEventoCreado && this.transacciones.length === 0) {
+    // Antes de imprimir, persistir cambios del documento y recargar transacciones desde backend
+    if (this.idEventoCreado) {
+      // intentar actualizar el evento con los datos actuales del formulario
+      const bodyUpdate = {
+        titulo: this.pTituloEvento,
+        descripcion: this.pDescripcionEvento,
+        fecha_Ini: this.pFechaInicioEvento,
+        fecha_Fin: this.pFechaFinEvento,
+        fecha_Entrega: this.pFechaEntregaEvento,
+        fecha_Recepcion: this.pFechaRecogerEvento,
+        ubicacion: this.pUbicacionEvento,
+        organizador: this.pOrganizadorEvento,
+        tipo_Evento: this.pTipoEvento,
+        capacidad_Evento: this.pCapacidadEvento,
+        observacion: this.pDetallesEvento,
+        estado: this.pEstadoEvento,
+        username: this.authService.getUsername(),
+        id_cliente: this.clienteSeleccionado?.id,
+      };
+
+      try {
+        await firstValueFrom(this.eventosService.actualizarEvento(this.idEventoCreado, bodyUpdate));
+      } catch (err) {
+        console.warn('No se pudo actualizar evento antes de imprimir:', err);
+      }
+
       await this.cargarTransacciones(this.idEventoCreado);
     }
 
@@ -396,32 +423,36 @@ export class DocumentoScreenComponent implements OnChanges {
     const checked = (event.target as HTMLInputElement).checked;
 
     if (checked) {
-      // Bloquear sin confirmación cuando el usuario marca el checkbox
+      // Bloquear inmediatamente cuando el usuario marca el checkbox
       if (this.idEventoCreado) this.documentLockService.lock(this.idEventoCreado);
       this.isLocked = true;
       return;
     }
 
-    // Al quitar el check pedir confirmación para desbloquear
+    // Al quitar el check: desbloquear inmediatamente para permitir cambios,
+    // pero mostrar advertencia. Si el usuario cancela, revertir al estado bloqueado.
+    this.isLocked = false;
+    if (this.idEventoCreado) this.documentLockService.unlock(this.idEventoCreado);
+
     const dialogRef = this.dialog.open(AlertGenericComponent, {
       width: '450px',
       data: {
         titulo: 'Desbloquear documento',
         mensaje:
-          '¿Desea desbloquear el documento para permitir cambios en transacciones y pagos? Esta acción permitirá editar el documento nuevamente.',
+          'Está a punto de desbloquear el documento. Mientras esté desbloqueado, podrá editar transacciones y pagos. ¿Desea continuar?',
         tipo: 'warning',
         icon: 'warning',
+        botones: ['Continuar', 'Cancelar'],
       },
     });
 
     dialogRef.afterClosed().subscribe((res) => {
-      if (res !== false) {
-        if (this.idEventoCreado) this.documentLockService.unlock(this.idEventoCreado);
-        this.isLocked = false;
-      } else {
-        // revertir checkbox si cancela
+      if (res === false) {
+        // usuario canceló -> volver a bloquear
+        if (this.idEventoCreado) this.documentLockService.lock(this.idEventoCreado);
         this.isLocked = true;
       }
+      // si confirma (res !== false), dejar desbloqueado hasta que se imprima o se vuelva a bloquear
     });
   }
 
@@ -639,6 +670,11 @@ export class DocumentoScreenComponent implements OnChanges {
             } as ClienteModel;
 
             this.clienteCompletoChange.emit(this.clienteSeleccionado);
+            // asegurar bloqueo por defecto al cargar el evento
+            if (evento.id) {
+              this.documentLockService.lock(evento.id);
+            }
+
             // subscribe to lock state for this event
             this.lockSub?.unsubscribe();
             this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
@@ -753,6 +789,9 @@ export class DocumentoScreenComponent implements OnChanges {
 
     // bloquear cambio de estado en nuevos
     this.modoEdicion = false;
+
+    // nuevo documento por defecto bloqueado
+    this.isLocked = true;
   }
   // FIN FUNCION PARA LIMPIAR LA PANTALLA
 

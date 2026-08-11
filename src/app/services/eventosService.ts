@@ -18,6 +18,10 @@ export class EventosService {
     return this.http.post<EventoResponse>(this.apiUrl, body);
   }
 
+  actualizarEvento(id: number, body: any): Observable<EventoResponse> {
+    return this.http.put<EventoResponse>(`${this.apiUrl}/${id}`, body);
+  }
+
   obtenerEvento(id: number): Observable<{ success: boolean, data: EventosModel }> {
     return this.http.get<{ success: boolean, data: EventosModel }>(`${this.apiUrl}/${id}`);
   }

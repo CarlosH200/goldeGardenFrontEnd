@@ -30,6 +30,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { PdfService } from '../../pdf/pdf.service';
+import { DocumentLockService } from '../../services/document-lock.service';
 import { TipoDocumento } from '../../pdf/enums/tipo-documento.enum';
 import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
 
@@ -145,7 +146,9 @@ export class DocumentoScreenComponent implements OnChanges {
     public theme: ThemeService,
     public dialog: MatDialog,
     private authService: AuthService,
-    private pdfService: PdfService,    private transaccionesService: TransaccionesService,
+    private pdfService: PdfService,
+    private transaccionesService: TransaccionesService,
+    private documentLockService: DocumentLockService,
     //NUEVO SERVICE
     private clientesService: ClientesService,
   ) {}
@@ -358,6 +361,11 @@ export class DocumentoScreenComponent implements OnChanges {
     };
 
     this.pdfService.imprimir(tipo, documento);
+
+    // Bloquear el documento después de imprimir para evitar cambios en transacciones
+    if (this.idEventoCreado) {
+      this.documentLockService.lock(this.idEventoCreado);
+    }
   }
 
   // FUNCION PARA OBTENER LA FECHA DE HOY EN FORMATO YYYY-MM-DD PARA LOS INPUTS DE FECHA

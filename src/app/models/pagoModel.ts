@@ -22,7 +22,7 @@ export interface PagoModel {
 
   username: string;
 
-  m_Username: string;
+  m_Username: string | null;
 
   fecha_Hora: string;
 

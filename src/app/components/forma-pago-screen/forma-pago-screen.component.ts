@@ -20,6 +20,7 @@ import { PagoModel } from '../../models/pagoModel';
 import { PagosService } from '../../services/pagosService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { EventosService } from '../../services/eventosService';
+import { DocumentLockService } from '../../services/document-lock.service';
 
 @Component({
   selector: 'app-forma-pago-screen',
@@ -79,6 +80,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
     private pagosService: PagosService,
     private transaccionesService: TransaccionesService,
     private eventosService: EventosService,
+    private documentLockService: DocumentLockService,
   ) {}
 
   private resetEventState(): void {
@@ -293,6 +295,22 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
       return;
     }
 
+    // Validaciones: no permitir agregar si ya no hay saldo pendiente
+    if (this.saldoPendiente <= 0) {
+      console.error('No hay saldo pendiente. No se pueden agregar más formas de pago.');
+      return;
+    }
+
+    if (Number(this.montoPago) <= 0) {
+      console.error('El monto a pagar debe ser mayor a 0.');
+      return;
+    }
+
+    const nuevoSaldoPendiente = Math.max(
+      this.totalTransaccion - (this.totalPagado + Number(this.montoPago)),
+      0,
+    );
+
     const body = {
       id_evento: this.idEvento,
 
@@ -304,7 +322,8 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
 
       monto_Total: this.totalTransaccion,
 
-      saldo_Pendiente: this.totalTransaccion - Number(this.montoPago),
+      // Calcula el saldo pendiente considerando los pagos ya agregados
+      saldo_Pendiente: nuevoSaldoPendiente,
 
       descripcion: '',
 
@@ -333,8 +352,44 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges {
       next: (response) => {
         console.log('Pago insertado', response);
 
-        this.cargarPagos();
+        // Si el backend devolvió un id, hacemos un agregado optimista local
+        const pagoLocal: PagoModel = {
+          id: response?.id ?? 0,
+          id_evento: this.idEvento ?? 0,
+          id_cliente: this.cliente.id,
+          id_forma_pago: Number(this.formaPagoSeleccionada),
+          monto_Pagado: Number(this.montoPago),
+          monto_Total: this.totalTransaccion,
+          saldo_Pendiente: nuevoSaldoPendiente,
+          descripcion: this.formaPagoActual?.descripcion ?? '',
+          fecha_Pago: new Date().toISOString(),
+          estado: 1,
+          username: 'ADMIN',
+          m_Username: null,
+          fecha_Hora: new Date().toISOString(),
+          m_Fecha_Hora: null,
+          consecutivo_Interno: 0,
+          id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
+          referencia: this.referencia,
+          autorizacion: this.autorizacion,
+          id_Banco: Number(this.bancoSeleccionado),
+          id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
+          forma_Pago: this.formaPagoActual?.descripcion ?? '',
+          tipo_Movimiento:
+            this.tiposMovimiento.find((t) => t.id === Number(this.tipoMovimientoSeleccionado))?.descripcion ?? '',
+          banco: this.bancoOrigen ?? '',
+          cuenta_Bancaria: this.cuentaDestino ?? '',
+          estado_Descripcion: 'Registrado',
+        };
 
+        this.pagos.push(pagoLocal);
+
+        // Bloquear documento en cuanto haya al menos un pago
+        if (this.idEvento) {
+          this.documentLockService.lock(this.idEvento);
+        }
+
+        // Limpiar campos de entrada
         this.limpiar();
       },
 

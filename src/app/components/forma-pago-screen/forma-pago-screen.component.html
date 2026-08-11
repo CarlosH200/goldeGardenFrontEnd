@@ -226,7 +226,7 @@
 
       </div>
 
-      <button class="btn-agregar" (click)="agregarPago()">
+      <button class="btn-agregar" (click)="agregarPago()" [disabled]="saldoPendiente <= 0">
 
         <i class="material-icons">add_card</i>
 

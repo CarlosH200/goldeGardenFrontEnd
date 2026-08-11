@@ -4,10 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ProductosService } from '../../services/productos.service';
 import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
+import { PagosService } from '../../services/pagosService';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
 import { EventosService } from '../../services/eventosService';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { DocumentLockService } from '../../services/document-lock.service';
+import { Subscription } from 'rxjs';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, OnDestroy } from '@angular/core';
 import { Console } from 'console';
 
 @Component({
@@ -17,13 +20,15 @@ import { Console } from 'console';
   styleUrl: './transaccion-screen.component.css',
 })
 
-export class TransaccionScreenComponent implements OnChanges {
+export class TransaccionScreenComponent implements OnChanges, OnDestroy {
   constructor(
     private productosService: ProductosService,
     private authService: AuthService,
     private transaccionesService: TransaccionesService,
     private dialog: MatDialog,
     private eventosService: EventosService,
+    private pagosService: PagosService,
+    private documentLockService: DocumentLockService,
   ) {}
  
   private resetEventState(): void {
@@ -81,6 +86,12 @@ export class TransaccionScreenComponent implements OnChanges {
   viewDetailTransaccion = false;
 
   transacciones: any[] = [];
+
+  hasPayments: boolean = false;
+
+  isLocked: boolean = false;
+
+  private lockSub?: Subscription;
 
   loadingProductos = false;
 
@@ -216,6 +227,8 @@ export class TransaccionScreenComponent implements OnChanges {
           if (res?.success && res?.data) {
             this.eventoData = res.data;
             console.log('Evento cargado en Transaciones en Eventodata:', this.eventoData);
+              // actualizar estado de pagos y bloqueo
+              this.checkPaymentsAndLock();
           }
         },
         error: (err) => {
@@ -254,6 +267,22 @@ export class TransaccionScreenComponent implements OnChanges {
         data: {
           titulo: 'Cliente requerido',
           mensaje: 'Debes seleccionar un cliente.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+
+      return;
+    }
+
+    // Validar si el documento está bloqueado o ya tiene pagos
+    if (this.isLocked || this.hasPayments) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Documento bloqueado',
+          mensaje:
+            'El documento está bloqueado o ya tiene formas de pago aplicadas. Desbloquéalo para modificar transacciones.',
           tipo: 'warning',
           icon: 'warning',
         },
@@ -424,6 +453,8 @@ cargarTransacciones(): void {
           );
 
           this.actualizarTotal();
+            // actualizar estado de pagos y bloqueo
+            this.checkPaymentsAndLock();
         }
       },
 
@@ -444,11 +475,75 @@ cargarTransacciones(): void {
   // ==========================================================
   eliminarProducto(index: number) {
 
-  this.transacciones.splice(index, 1);
+    if (this.isLocked || this.hasPayments) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Documento bloqueado',
+          mensaje:
+            'No se puede eliminar una transacción porque el documento está bloqueado o ya tiene pagos aplicados.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
 
-  this.actualizarTotal();
+      return;
+    }
+
+    this.transacciones.splice(index, 1);
+
+    this.actualizarTotal();
 
 }
+
+  // Comprueba si el evento tiene pagos y si está bloqueado
+  private checkPaymentsAndLock(): void {
+    if (!this.idEvento) {
+      this.hasPayments = false;
+      this.isLocked = false;
+      return;
+    }
+
+    this.pagosService.obtenerPagos(this.idEvento).subscribe({
+      next: (res) => {
+        this.hasPayments = (res?.data?.length ?? 0) > 0;
+      },
+      error: (err) => {
+        console.error('Error comprobando pagos del evento', err);
+        this.hasPayments = false;
+      },
+    });
+
+    // subscribe to lock state
+    this.lockSub?.unsubscribe();
+    this.lockSub = this.documentLockService
+      .isLocked$(this.idEvento)
+      .subscribe((v) => (this.isLocked = v));
+  }
+
+  ngOnDestroy(): void {
+    this.lockSub?.unsubscribe();
+  }
+
+  unlockDocument(): void {
+    if (!this.idEvento) return;
+
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Desbloquear documento',
+        mensaje: '¿Desea desbloquear el documento para permitir cambios en transacciones?',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res !== false) {
+        this.documentLockService.unlock(this.idEvento!);
+      }
+    });
+  }
 
   // ==========================================================
   // AUMENTAR

@@ -189,10 +189,16 @@
           placeholder="Observaciones o detalle de la transacción..."></textarea>
       </div>
 
-      <button class="btn-agregar" (click)="agregarProducto()">
+      <div class="d-flex gap-2">
+        <button class="btn-agregar" (click)="agregarProducto()" [disabled]="isLocked || hasPayments">
         <i class="material-icons">playlist_add</i>
         Agregar Transacción
-      </button>
+        </button>
+
+        <button *ngIf="isLocked" class="btn btn-outline-secondary" (click)="unlockDocument()">
+          Desbloquear
+        </button>
+      </div>
     </div>
 
     <!-- RESUMEN -->
@@ -253,7 +259,7 @@
             <td>Q{{ item.precio.toFixed(2) }}</td>
             <td>Q{{ item.subtotal.toFixed(2) }}</td>
             <td>
-              <button class="buttonDelete" (click)="eliminarProducto(i)">
+              <button class="buttonDelete" (click)="eliminarProducto(i)" [disabled]="isLocked || hasPayments">
                 <i class="material-icons">delete</i>
               </button>
             </td>

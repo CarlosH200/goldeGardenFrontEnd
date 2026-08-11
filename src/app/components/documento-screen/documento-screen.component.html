@@ -99,8 +99,8 @@
               <!-- Indicador de bloqueo (checkbox) -->
               <div class="d-flex align-items-center gap-2">
                 <label class="form-check-label d-flex align-items-center gap-2">
-                  <input class="form-check-input" type="checkbox" [(ngModel)]="isLocked" (change)="onLockToggle($event)" />
-                  <span>{{ isLocked ? 'Bloqueado' : 'Editable' }}</span>
+                  <input class="form-check-input" type="checkbox" [checked]="isLocked" (change)="onLockToggle($event)" />
+                  <span>{{ isLocked ? 'Bloqueado' : 'Desbloqueado' }}</span>
                 </label>
               </div>
 

@@ -183,8 +183,8 @@ export class DocumentoScreenComponent implements OnChanges {
     this.clienteCompletoChange.emit(null);
     this.nuevoEvento.emit();
 
-    // Por defecto, al crear un nuevo documento debe quedar bloqueado hasta que el usuario lo pase a editable
-    this.isLocked = true;
+    // Al crear un nuevo documento debe quedar desbloqueado hasta que se imprima o el usuario lo bloquee
+    this.isLocked = false;
   }
 
   toggleOpcionesImpresion(): void {
@@ -672,14 +672,24 @@ export class DocumentoScreenComponent implements OnChanges {
             this.clienteCompletoChange.emit(this.clienteSeleccionado);
             // asegurar bloqueo por defecto al cargar el evento
             if (evento.id) {
+              console.log('[Documento] forzando lock para evento', evento.id);
               this.documentLockService.lock(evento.id);
+              // forzar estado local inmediatamente para que el checkbox aparezca marcado
+              this.isLocked = true;
             }
 
             // subscribe to lock state for this event
             this.lockSub?.unsubscribe();
             this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
+              console.log('[Documento] lock state changed for', evento.id, v);
               this.isLocked = v;
             });
+
+            // Garantizar visualmente que el documento aparece bloqueado al cargar (evita carreras)
+            this.isLocked = true;
+            setTimeout(() => {
+              this.isLocked = true;
+            }, 100);
           }
         } else {
           alert('Evento no encontrado');
@@ -790,8 +800,8 @@ export class DocumentoScreenComponent implements OnChanges {
     // bloquear cambio de estado en nuevos
     this.modoEdicion = false;
 
-    // nuevo documento por defecto bloqueado
-    this.isLocked = true;
+    // nuevo documento por defecto desbloqueado (se usará desbloqueado al crear)
+    this.isLocked = false;
   }
   // FIN FUNCION PARA LIMPIAR LA PANTALLA
 

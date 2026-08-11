@@ -113,7 +113,10 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
         this.lockSub?.unsubscribe();
         this.lockSub = this.documentLockService
           .isLocked$(this.idEvento)
-          .subscribe((v) => (this.isLocked = v));
+          .subscribe((v) => {
+            console.log('[FormaPago] lock state for', this.idEvento, v);
+            this.isLocked = v;
+          });
       } else {
         this.resetEventState();
       }

@@ -490,9 +490,49 @@ cargarTransacciones(): void {
       return;
     }
 
-    this.transacciones.splice(index, 1);
+    const transaccion = this.transacciones[index];
+    
+    if (!transaccion) {
+      return;
+    }
 
-    this.actualizarTotal();
+    // Si la transacción tiene un ID (fue guardada en la BD), eliminarla del servidor
+    if (transaccion.id) {
+      this.transaccionesService.eliminarTransaccion(transaccion.id).subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.transacciones.splice(index, 1);
+            this.actualizarTotal();
+
+            this.dialog.open(AlertGenericComponent, {
+              width: '450px',
+              data: {
+                titulo: 'Transacción eliminada',
+                mensaje: 'La transacción fue eliminada correctamente.',
+                tipo: 'success',
+                icon: 'check_circle',
+              },
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error eliminando transacción:', err);
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Error',
+              mensaje: err?.error?.mensaje || 'Error al eliminar la transacción',
+              tipo: 'error',
+              icon: 'error',
+            },
+          });
+        },
+      });
+    } else {
+      // Si no tiene ID, solo eliminar localmente
+      this.transacciones.splice(index, 1);
+      this.actualizarTotal();
+    }
 
 }
 

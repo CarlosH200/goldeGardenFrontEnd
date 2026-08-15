@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { FormaPagoModel } from '../../models/formaPagoModel';
 import { FormaPagoService } from '../../services/formaPagoService';
@@ -23,10 +24,11 @@ import { PagosService } from '../../services/pagosService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { EventosService } from '../../services/eventosService';
 import { DocumentLockService } from '../../services/document-lock.service';
+import { AlertGenericComponent } from '../alert-generic/alert-generic.component';
 
 @Component({
   selector: 'app-forma-pago-screen',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,MatDialogModule],
   templateUrl: './forma-pago-screen.component.html',
   styleUrl: './forma-pago-screen.component.css',
 })
@@ -85,6 +87,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     private transaccionesService: TransaccionesService,
     private eventosService: EventosService,
     private documentLockService: DocumentLockService,
+    private dialog: MatDialog,
   ) {}
 
   private resetEventState(): void {
@@ -123,7 +126,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     if (changes['cliente']) {
-      console.log('CLIENTE RECIBIDO EN FORMA PAGO:', this.cliente);
+      // console.log('CLIENTE RECIBIDO EN FORMA PAGO:', this.cliente);
     }
   }
 
@@ -135,20 +138,21 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   cargarPagos(): void {
-    if (!this.idEvento) {
-      return;
-    }
-
-    this.pagosService.obtenerPagos(this.idEvento).subscribe({
-      next: (response) => {
-        this.pagos = response.data;
-      },
-
-      error: (error) => {
-        console.error('Error cargando pagos', error);
-      },
-    });
+  if (!this.idEvento) {
+    return;
   }
+
+  this.pagosService.obtenerPagos(this.idEvento).subscribe({
+    next: (response) => {
+      // Solo incluir pagos activos (estado = 1)
+      this.pagos = response.data.filter(p => p.estado === 1);
+    },
+    error: (error) => {
+      console.error('Error cargando pagos', error);
+    },
+  });
+}
+
 
   private establecerValoresPorDefecto(): void {
     this.formaPagoSeleccionada = (this.formasPago[0]?.id ?? '').toString();
@@ -289,132 +293,191 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     return this.formaPagoActual?.posee_Autorizarion ?? false;
   }
 
-  agregarPago(): void {
-    if (this.isLocked) {
-      console.error('Documento bloqueado. Desbloquéalo para agregar pagos.');
-      return;
-    }
-    if (!this.idEvento) {
-      console.error('No se recibió el id del evento.');
-      return;
-    }
+agregarPago(): void {
+  console.log('Estado del lock al intentar agregar:', this.isLocked);
 
-    if (!this.cliente) {
-      console.error('No se recibió el cliente.');
-      return;
-    }
+  // 🔴 Bloqueo desactivado temporalmente para pruebas
+  // if (this.isLocked) {
+  //   console.error('Documento bloqueado. No se puede agregar pagos.');
+  //   return;
+  // }
 
-    if (!this.formaPagoSeleccionada) {
-      console.error('Debe seleccionar una forma de pago.');
-      return;
-    }
+  if (!this.idEvento) {
+    console.error('No se recibió el id del evento.');
+    return;
+  }
 
-    // Validaciones: no permitir agregar si ya no hay saldo pendiente
-    if (this.saldoPendiente <= 0) {
-      console.error('No hay saldo pendiente. No se pueden agregar más formas de pago.');
-      return;
-    }
+  if (!this.cliente) {
+    console.error('No se recibió el cliente.');
+    return;
+  }
 
-    if (Number(this.montoPago) <= 0) {
-      console.error('El monto a pagar debe ser mayor a 0.');
-      return;
-    }
+  if (!this.formaPagoSeleccionada) {
+    console.error('Debe seleccionar una forma de pago.');
+    return;
+  }
 
-    const nuevoSaldoPendiente = Math.max(
-      this.totalTransaccion - (this.totalPagado + Number(this.montoPago)),
-      0,
-    );
+  // Validaciones: no permitir agregar si ya no hay saldo pendiente
+  if (this.saldoPendiente <= 0) {
+    console.error('No hay saldo pendiente. No se pueden agregar más formas de pago.');
+    return;
+  }
 
-    const body = {
-      id_evento: this.idEvento,
+  if (Number(this.montoPago) <= 0) {
+    console.error('El monto a pagar debe ser mayor a 0.');
+    return;
+  }
 
-      id_cliente: this.cliente.id,
+  const nuevoSaldoPendiente = Math.max(
+    this.totalTransaccion - (this.totalPagado + Number(this.montoPago)),
+    0,
+  );
 
-      id_forma_pago: Number(this.formaPagoSeleccionada),
+  const body = {
+    id_evento: this.idEvento,
+    id_cliente: this.cliente.id,
+    id_forma_pago: Number(this.formaPagoSeleccionada),
+    monto_Pagado: Number(this.montoPago),
+    monto_Total: this.totalTransaccion,
+    saldo_Pendiente: nuevoSaldoPendiente,
+    descripcion: '',
+    fecha_Pago: new Date(),
+    estado: 1, // siempre activo al insertar
+    username: 'ADMIN',
+    m_Username: null,
+    id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
+    referencia: this.referencia,
+    autorizacion: this.autorizacion,
+    id_Banco: Number(this.bancoSeleccionado),
+    id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
+  };
 
-      monto_Pagado: Number(this.montoPago),
+  console.log('BODY PAGO:', body);
 
-      monto_Total: this.totalTransaccion,
+  this.pagosService.insertarPago(body).subscribe({
+    next: (response) => {
+      console.log('Pago insertado', response);
 
-      // Calcula el saldo pendiente considerando los pagos ya agregados
-      saldo_Pendiente: nuevoSaldoPendiente,
+      // Agregado optimista local
+      const pagoLocal: PagoModel = {
+        id: response?.id ?? 0,
+        id_evento: this.idEvento ?? 0,
+        id_cliente: this.cliente.id,
+        id_forma_pago: Number(this.formaPagoSeleccionada),
+        monto_Pagado: Number(this.montoPago),
+        monto_Total: this.totalTransaccion,
+        saldo_Pendiente: nuevoSaldoPendiente,
+        descripcion: this.formaPagoActual?.descripcion ?? '',
+        fecha_Pago: new Date().toISOString(),
+        estado: 1,
+        username: 'ADMIN',
+        m_Username: null,
+        fecha_Hora: new Date().toISOString(),
+        m_Fecha_Hora: null,
+        consecutivo_Interno: 0,
+        id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
+        referencia: this.referencia,
+        autorizacion: this.autorizacion,
+        id_Banco: Number(this.bancoSeleccionado),
+        id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
+        forma_Pago: this.formaPagoActual?.descripcion ?? '',
+        tipo_Movimiento:
+          this.tiposMovimiento.find((t) => t.id === Number(this.tipoMovimientoSeleccionado))?.descripcion ?? '',
+        banco: this.bancoOrigen ?? '',
+        cuenta_Bancaria: this.cuentaDestino ?? '',
+        estado_Descripcion: 'Registrado',
+      };
 
-      descripcion: '',
+      this.pagos.push(pagoLocal);
 
-      fecha_Pago: new Date(),
+      // Bloquear documento en cuanto haya al menos un pago
+      if (this.idEvento) {
+        this.documentLockService.lock(this.idEvento);
+      }
 
-      estado: 1,
+      // Limpiar campos de entrada
+      this.limpiar();
+    },
+    error: (error) => {
+      console.error('Error insertando pago', error);
+    },
+  });
+}
 
-      username: 'ADMIN',
 
-      m_Username: null,
 
-      id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
 
-      referencia: this.referencia,
-
-      autorizacion: this.autorizacion,
-
-      id_Banco: Number(this.bancoSeleccionado),
-
-      id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
-    };
-
-    console.log('BODY PAGO:', body);
-
-    this.pagosService.insertarPago(body).subscribe({
-      next: (response) => {
-        console.log('Pago insertado', response);
-
-        // Si el backend devolvió un id, hacemos un agregado optimista local
-        const pagoLocal: PagoModel = {
-          id: response?.id ?? 0,
-          id_evento: this.idEvento ?? 0,
-          id_cliente: this.cliente.id,
-          id_forma_pago: Number(this.formaPagoSeleccionada),
-          monto_Pagado: Number(this.montoPago),
-          monto_Total: this.totalTransaccion,
-          saldo_Pendiente: nuevoSaldoPendiente,
-          descripcion: this.formaPagoActual?.descripcion ?? '',
-          fecha_Pago: new Date().toISOString(),
-          estado: 1,
-          username: 'ADMIN',
-          m_Username: null,
-          fecha_Hora: new Date().toISOString(),
-          m_Fecha_Hora: null,
-          consecutivo_Interno: 0,
-          id_Tipo_Movimiento: Number(this.tipoMovimientoSeleccionado),
-          referencia: this.referencia,
-          autorizacion: this.autorizacion,
-          id_Banco: Number(this.bancoSeleccionado),
-          id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
-          forma_Pago: this.formaPagoActual?.descripcion ?? '',
-          tipo_Movimiento:
-            this.tiposMovimiento.find((t) => t.id === Number(this.tipoMovimientoSeleccionado))?.descripcion ?? '',
-          banco: this.bancoOrigen ?? '',
-          cuenta_Bancaria: this.cuentaDestino ?? '',
-          estado_Descripcion: 'Registrado',
-        };
-
-        this.pagos.push(pagoLocal);
-
-        // Bloquear documento en cuanto haya al menos un pago
-        if (this.idEvento) {
-          this.documentLockService.lock(this.idEvento);
-        }
-
-        // Limpiar campos de entrada
-        this.limpiar();
-      },
-
-      error: (error) => {
-        console.error('Error insertando pago', error);
+eliminarPago(index: number) {
+  // Si el documento está bloqueado, no permitir eliminar
+  if (!this.isLocked) {
+    console.error('Documento bloqueado. No se puede eliminar pagos.');
+    this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Documento bloqueado',
+        mensaje:
+          'No se puede eliminar un pago porque el documento está bloqueado.',
+        tipo: 'warning',
+        icon: 'warning',
       },
     });
+    return;
   }
-  eliminarPago(index: number) {
+
+  const pago = this.pagos[index];
+
+  if (!pago) {
+    return;
+  }
+
+  // Si el pago tiene un ID (fue guardado en la BD), cambiar su estado en el servidor
+  if (pago.id) {
+    this.pagosService.cambiarEstadoPago(pago.id, 2).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          // Eliminarlo de la lista local (solo pagos activos)
+          this.pagos.splice(index, 1);
+
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Pago marcado como eliminado',
+              mensaje: 'El estado del pago se cambió correctamente.',
+              tipo: 'success',
+              icon: 'check_circle',
+            },
+          });
+
+          // Si no hay más pagos activos, desbloquear el documento
+          if (this.pagos.length === 0 && this.idEvento) {
+            this.documentLockService.unlock(this.idEvento);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error cambiando estado del pago:', err);
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Error',
+            mensaje: err?.error?.mensaje || 'Error al cambiar el estado del pago',
+            tipo: 'error',
+            icon: 'error',
+          },
+        });
+      },
+    });
+  } else {
+    // Si no tiene ID, solo eliminar localmente
     this.pagos.splice(index, 1);
+
+    // Si no hay más pagos activos, desbloquear el documento
+    if (this.pagos.length === 0 && this.idEvento) {
+      this.documentLockService.unlock(this.idEvento);
+    }
   }
+}
+
 
   limpiar() {
     this.establecerValoresPorDefecto();
@@ -432,17 +495,15 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.lockSub?.unsubscribe();
   }
 
-  get totalPagado(): number {
-    return this.pagos.reduce(
-      (acc, p) => acc + Number(p.monto_Pagado),
+ get totalPagado(): number {
+  return this.pagos
+    .filter(p => p.estado === 1)
+    .reduce((acc, p) => acc + Number(p.monto_Pagado), 0);
+}
 
-      0,
-    );
-  }
-
-  get saldoPendiente(): number {
-    return Math.max(this.totalTransaccion - this.totalPagado, 0);
-  }
+get saldoPendiente(): number {
+  return Math.max(this.totalTransaccion - this.totalPagado, 0);
+}
 
   onCuentaChange(): void {
     this.cuentaDestino = this.cuentaActual?.numero_Cuenta ?? '';

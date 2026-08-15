@@ -38,4 +38,14 @@ buscarTransaccionesEvento(idEvento: number): Observable<any> {
     `${this.apiUrl}/evento/${idEvento}`
   );
 }
+
+  // ==========================================================
+  // ELIMINAR TRANSACCION
+  // ==========================================================
+  eliminarTransaccion(idTransaccion: number): Observable<any> {
+
+    return this.http.delete<any>(
+      `${this.apiUrl}/${idTransaccion}`
+    );
+  }
 }

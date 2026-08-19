@@ -19,7 +19,7 @@ export class EventosService {
   }
 
   actualizarEvento(id: number, body: any): Observable<EventoResponse> {
-    return this.http.put<EventoResponse>(`${this.apiUrl}/${id}`, body);
+    return this.http.patch<EventoResponse>(`${this.apiUrl}/${id}`, body);
   }
 
   obtenerEvento(id: number): Observable<{ success: boolean, data: EventosModel }> {

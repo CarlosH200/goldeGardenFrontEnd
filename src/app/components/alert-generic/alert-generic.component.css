@@ -1,80 +1,70 @@
 /* =========================
-   TITULO (centrado real)
+   TITULO
 ========================= */
-
-
 .title {
   display: flex;
   align-items: center;
-  justify-content: center; /* 👈 centra todo horizontalmente */
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
 
-  margin: 10px;
-  padding-top: 10px;
+  margin: 12px 0;
+  padding: 12px;
   font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .icon {
-  font-size: 32px;
+  font-size: 30px;
   line-height: 1;
 }
 
 .titulo-texto {
-  line-height: 1.2;
+  line-height: 1.3;
 }
-
-/* herencia de color */
-.title .icon,
-.title .titulo-texto {
-  color: inherit;
-}
-
 
 /* Colores por tipo */
 .success {
-  color: var(--color-success) !important;
+  color: var(--color-success);
 }
-
 .error {
-  color: var(--color-error) !important;
+  color: var(--color-error);
 }
-
 .warning {
-  color: var(--color-warning) !important;
+  color: var(--color-warning);
 }
 
 /* =========================
-   MENSAJE
+   MENSAJE PRINCIPAL
 ========================= */
 .mensaje-principal {
-  margin: 8px 0 14px 0;
-  font-size: 14px;
-  color: var(--color-texto) !important;
-  line-height: 1.5;
+  margin: 12px 0 16px 0;
+  font-size: 15px;
+  color: var(--color-texto);
+  line-height: 1.6;
+  text-align: center;
 }
 
 /* =========================
-   DETALLES (caja pro)
+   DETALLES
 ========================= */
 .caja-info {
-  background: var(--color-fondo);
-  border: 1px solid transparent;
-  color: var(--color-texto) !important;
-  border-radius: 16px;
-  padding: 14px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 16px;
 }
 
 .fila {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
 
   padding: 8px 0;
-  border-bottom: 1px dashed #e5e7eb;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
 .fila:last-child {
@@ -82,45 +72,54 @@
 }
 
 .label {
-  font-weight: 800;
+  font-weight: 600;
   color: var(--color-texto);
-  min-width: 70px;
+  min-width: 80px;
 }
 
 .valor {
-  color: #374151;
+  color: rgba(255, 255, 255, 0.85);
   text-align: right;
   word-break: break-word;
   max-width: 240px;
 }
 
 /* =========================
-   ACCIONES + BOTON PRO
+   ACCIONES
 ========================= */
 .acciones {
-  padding: 14px 24px 18px 24px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
 }
 
-/* botón elegante */
-.btn-aceptar {
-  border-radius: 16px !important;
-  padding: 10px 22px !important;
-  font-weight: 800 !important;
+/* Botones */
+.btn-aceptar,
+.btn-cancelar {
+  border-radius: 12px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
   text-transform: none !important;
-  letter-spacing: 0.2px !important;
-
-  /* look más premium */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  letter-spacing: 0.3px !important;
+  transition: all 0.2s ease-in-out;
 }
 
-/* efecto hover elegante */
+.btn-aceptar {
+  background: var(--color-success) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
 .btn-aceptar:hover {
-  filter: brightness(0.97);
+  filter: brightness(1.05);
 }
 
-/* quita el feo ripple si querés (opcional) */
-/*
-:host ::ng-deep .mat-mdc-button-persistent-ripple {
-  display: none !important;
+.btn-cancelar {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--color-texto) !important;
 }
-*/
+
+.btn-cancelar:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}

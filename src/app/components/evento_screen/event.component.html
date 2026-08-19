@@ -54,7 +54,7 @@
   <!-- ===================================================== -->
   <!-- TRANSACCIONES -->
   <!-- ===================================================== -->
-  <div *ngIf="selectedTab === 'transacciones'">
+  <div [hidden]="selectedTab !== 'transacciones'">
     <app-transaccion-screen
       [idEvento]="idEventoCreado"
       [cliente]="clienteSeleccionadoData"
@@ -65,7 +65,7 @@
   <!-- ===================================================== -->
   <!-- PAGO -->
   <!-- ===================================================== -->
-  <div *ngIf="selectedTab === 'pago'">
+  <div [hidden]="selectedTab !== 'pago'">
      <app-forma-pago-screen
      [idEvento]="idEventoCreado"
      [cliente]="clienteSeleccionadoData"

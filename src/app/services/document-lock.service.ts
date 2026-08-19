@@ -5,28 +5,73 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class DocumentLockService {
+
+  /**
+   * Guarda un BehaviorSubject por cada evento.
+   *
+   * La llave del Map es el idEvento.
+   *
+   * Ejemplo:
+   *
+   * Evento 10 → true
+   * Evento 20 → false
+   * Evento 30 → true
+   */
   private locks = new Map<number, BehaviorSubject<boolean>>();
 
-  private ensureSubject(id: number): BehaviorSubject<boolean> {
-    let s = this.locks.get(id);
-    if (!s) {
-      // Por defecto, asumir documento bloqueado hasta que el usuario lo desbloquee
-      s = new BehaviorSubject<boolean>(true);
-      this.locks.set(id, s);
+  /**
+   * Obtiene el BehaviorSubject correspondiente al evento.
+   *
+   * Si todavía no existe, se crea.
+   *
+   * IMPORTANTE:
+   * Se mantiene true como valor inicial para conservar
+   * el comportamiento de seguridad que ya tenía tu aplicación.
+   */
+  private ensureSubject(id: number | string): BehaviorSubject<boolean> {
+    const numId = Number(id);
+    let subject = this.locks.get(numId);
+
+    if (!subject) {
+      subject = new BehaviorSubject<boolean>(false);
+      this.locks.set(numId, subject);
     }
-    return s;
+
+    return subject;
   }
 
-  lock(id: number): void {
+  /**
+   * Bloquea un documento.
+   */
+  lock(id: number | string): void {
+    if (id == null) return;
     this.ensureSubject(id).next(true);
   }
 
-  unlock(id: number): void {
+  /**
+   * Desbloquea un documento.
+   */
+  unlock(id: number | string): void {
+    if (id == null) return;
     this.ensureSubject(id).next(false);
   }
 
-  isLocked$(id: number | null): Observable<boolean> {
-    if (id == null) return new BehaviorSubject<boolean>(true).asObservable();
+  /**
+   * Establece directamente el estado de bloqueo.
+   */
+  setLocked(id: number | string, locked: boolean): void {
+    if (id == null) return;
+    this.ensureSubject(id).next(locked);
+  }
+
+  /**
+   * Permite que Documento, Transacción y Pago
+   * escuchen el mismo estado de bloqueo.
+   */
+  isLocked$(id: number | string | null): Observable<boolean> {
+    if (id == null || id === '') {
+      return new BehaviorSubject<boolean>(false).asObservable();
+    }
     return this.ensureSubject(id).asObservable();
   }
 }

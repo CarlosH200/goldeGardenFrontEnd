@@ -26,16 +26,25 @@ export interface EventosModel {
   m_Username: string;
 
   fecha_Hora: string;
-  
+
   m_Fecha_Hora: string | null;
 
   consecutivo_Interno: number;
 
+  bloqueado: boolean;
+
+  impreso: boolean;
+
+  impresiones: number;
+
   id_cliente: number;
 
-  // 🔗 descriptivos
+  // campos descriptivos
   ubicacion_Nombre: string;
+
   organizador_Nombre: string;
+
   tipo_Evento_Descripcion: string;
+
   estado_Descripcion: string;
 }

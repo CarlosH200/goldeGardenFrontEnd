@@ -230,7 +230,7 @@
 
       
 
-      <button class="btn-agregar" (click)="agregarPago()" [disabled]="saldoPendiente <= 0">
+      <button class="btn-agregar" (click)="agregarPago()" [disabled]="isLocked || saldoPendiente <= 0">
   <i class="material-icons">add_card</i>
   Agregar Pago
 </button>
@@ -350,7 +350,7 @@
 
             <td>
 
-              <button class="buttonDelete" (click)="eliminarPago(i)">
+              <button class="buttonDelete" (click)="eliminarPago(i)" [disabled]="isLocked">
 
                 <i class="material-icons">
                   delete

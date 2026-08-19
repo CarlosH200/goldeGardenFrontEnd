@@ -1,13 +1,9 @@
-
-
 <h2 mat-dialog-title class="title" [ngClass]="data.tipo">
   <span class="material-symbols-outlined icon">
     {{ data.icon }}
   </span>
   <span class="titulo-texto">{{ data.titulo }}</span>
 </h2>
-
-
 
 <mat-dialog-content>
   <p class="mensaje-principal">{{ data.mensaje }}</p>
@@ -21,7 +17,20 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="acciones">
-  <button mat-flat-button class="btn-aceptar" mat-dialog-close  (click)="closeDialog()" type="button">
-    Aceptar
-  </button>
+  <!-- Si mostrarBotones es true, mostramos Cancelar/Aceptar -->
+  <ng-container *ngIf="data.mostrarBotones; else soloAceptar">
+    <button mat-flat-button class="btn-cancelar" mat-dialog-close="cancelar" type="button">
+      Cancelar
+    </button>
+    <button mat-flat-button class="btn-aceptar" mat-dialog-close="confirmar" type="button">
+      Aceptar
+    </button>
+  </ng-container>
+
+  <!--Si mostrarBotones es false o no viene, solo mostramos Aceptar -->
+  <ng-template #soloAceptar>
+    <button mat-flat-button class="btn-aceptar" mat-dialog-close type="button">
+      Aceptar
+    </button>
+  </ng-template>
 </mat-dialog-actions>

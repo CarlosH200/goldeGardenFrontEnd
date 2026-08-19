@@ -135,6 +135,15 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.cargarFormasPago();
     this.cargarTiposMovimiento();
     this.cargarBancos();
+    if (this.idEvento) {
+      this.lockSub?.unsubscribe();
+      this.lockSub = this.documentLockService
+        .isLocked$(this.idEvento)
+        .subscribe((v) => {
+          console.log('[FormaPago] lock state for', this.idEvento, v);
+          this.isLocked = v;
+        });
+    }
   }
 
   cargarPagos(): void {
@@ -299,35 +308,81 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
   agregarPago(): void {
     console.log('Estado del lock al intentar agregar:', this.isLocked);
 
-    // 🔴 Bloqueo desactivado temporalmente para pruebas
-    // if (this.isLocked) {
-    //   console.error('Documento bloqueado. No se puede agregar pagos.');
-    //   return;
-    // }
+    if (this.isLocked) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Documento bloqueado',
+          mensaje: 'El documento está bloqueado. Desbloquéalo para agregar formas de pago.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+      return;
+    }
 
     if (!this.idEvento) {
-      console.error('No se recibió el id del evento.');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Evento requerido',
+          mensaje: 'Debes cargar un evento primero antes de agregar formas de pago.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
       return;
     }
 
     if (!this.cliente) {
-      console.error('No se recibió el cliente.');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Cliente requerido',
+          mensaje: 'Debes seleccionar un cliente.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
       return;
     }
 
     if (!this.formaPagoSeleccionada) {
-      console.error('Debe seleccionar una forma de pago.');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Forma de pago requerida',
+          mensaje: 'Debe seleccionar una forma de pago válida.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
       return;
     }
 
-    // Validaciones: no permitir agregar si ya no hay saldo pendiente
     if (this.saldoPendiente <= 0) {
-      console.error('No hay saldo pendiente. No se pueden agregar más formas de pago.');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Sin saldo pendiente',
+          mensaje: 'No hay saldo pendiente por pagar en este evento.',
+          tipo: 'info',
+          icon: 'info',
+        },
+      });
       return;
     }
 
     if (Number(this.montoPago) <= 0) {
-      console.error('El monto a pagar debe ser mayor a 0.');
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Monto inválido',
+          mensaje: 'El monto a pagar debe ser mayor a Q0.00.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
       return;
     }
 
@@ -420,80 +475,83 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
 
 
 
-  eliminarPago(index: number) {
-    // Si el documento está bloqueado, no permitir eliminar
-    if (!this.isLocked) {
-      console.error('Documento bloqueado. No se puede eliminar pagos.');
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Documento bloqueado',
-          mensaje:
-            'No se puede eliminar un pago porque el documento está bloqueado.',
-          tipo: 'warning',
-          icon: 'warning',
-        },
-      });
-      return;
-    }
+eliminarPago(index: number) {
+  const pago = this.pagos[index];
+  if (!pago) return;
 
-    const pago = this.pagos[index];
+  if (this.isLocked) {
+    this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Documento bloqueado',
+        mensaje: 'No se puede eliminar un pago porque el documento está bloqueado.',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+    return;
+  }
 
-    if (!pago) {
-      return;
-    }
+  // Abrir diálogo de confirmación
+  const dialogRef = this.dialog.open(AlertGenericComponent, {
+    width: '450px',
+    data: {
+      titulo: 'Confirmación',
+      mensaje: '¿Está seguro de eliminar este pago?',
+      tipo: 'warning',
+      icon: 'warning',
+      mostrarBotones: true
+    },
+  });
 
-    // Si el pago tiene un ID (fue guardado en la BD), cambiar su estado en el servidor
-    if (pago.id) {
-      this.pagosService.cambiarEstadoPago(pago.id, 2).subscribe({
-        next: (res) => {
-          if (res?.success) {
-            // Eliminarlo de la lista local (solo pagos activos)
-            this.pagos.splice(index, 1);
+  dialogRef.afterClosed().subscribe((resultado) => {
+    if (resultado === 'confirmar' || resultado === true) {
+      // Si el pago tiene un ID (fue guardado en la BD), cambiar su estado en el servidor
+      if (pago.id) {
+        this.pagosService.cambiarEstadoPago(pago.id, 2).subscribe({
+          next: (res) => {
+            if (res?.success) {
+              this.pagos.splice(index, 1);
+              this.cargarPagos();
+              this.montoPago = this.saldoPendiente;
 
-            this.cargarPagos();
-            this.montoPago = this.saldoPendiente;
+              this.dialog.open(AlertGenericComponent, {
+                width: '450px',
+                data: {
+                  titulo: 'Pago eliminado',
+                  mensaje: 'El pago fue eliminado correctamente.',
+                  tipo: 'success',
+                  icon: 'check_circle',
+                },
+              });
 
-
+              if (this.pagos.length === 0 && this.idEvento) {
+                this.documentLockService.unlock(this.idEvento);
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Error cambiando estado del pago:', err);
             this.dialog.open(AlertGenericComponent, {
               width: '450px',
               data: {
-                titulo: 'Pago marcado como eliminado',
-                mensaje: 'El estado del pago se cambió correctamente.',
-                tipo: 'success',
-                icon: 'check_circle',
+                titulo: 'Error',
+                mensaje: err?.error?.mensaje || 'Error al cambiar el estado del pago',
+                tipo: 'error',
+                icon: 'error',
               },
             });
-
-            // Si no hay más pagos activos, desbloquear el documento
-            if (this.pagos.length === 0 && this.idEvento) {
-              this.documentLockService.unlock(this.idEvento);
-            }
-          }
-        },
-        error: (err) => {
-          console.error('Error cambiando estado del pago:', err);
-          this.dialog.open(AlertGenericComponent, {
-            width: '450px',
-            data: {
-              titulo: 'Error',
-              mensaje: err?.error?.mensaje || 'Error al cambiar el estado del pago',
-              tipo: 'error',
-              icon: 'error',
-            },
-          });
-        },
-      });
-    } else {
-      // Si no tiene ID, solo eliminar localmente
-      this.pagos.splice(index, 1);
-
-      // Si no hay más pagos activos, desbloquear el documento
-      if (this.pagos.length === 0 && this.idEvento) {
-        this.documentLockService.unlock(this.idEvento);
+          },
+        });
+      } else {
+        this.pagos.splice(index, 1);
+        if (this.pagos.length === 0 && this.idEvento) {
+          this.documentLockService.unlock(this.idEvento);
+        }
       }
     }
-  }
+  });
+}
 
 
   limpiar() {
@@ -518,8 +576,12 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       .reduce((acc, p) => acc + Number(p.monto_Pagado), 0);
   }
 
+  get montoTotalEvento(): number {
+    return this.totalTransaccion > 0 ? this.totalTransaccion : this.totalGeneral;
+  }
+
   get saldoPendiente(): number {
-    return Math.max(this.totalTransaccion - this.totalPagado, 0);
+    return Math.max(this.montoTotalEvento - this.totalPagado, 0);
   }
 
   onCuentaChange(): void {
@@ -527,7 +589,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get cambio(): number {
-    return Math.max(this.totalPagado - this.totalTransaccion, 0);
+    return Math.max(this.totalPagado - this.montoTotalEvento, 0);
   }
 
   // ==========================================================
@@ -554,6 +616,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
               descripcion: t.descripcion,
               precio_Unitario: Number(t.monto) / Number(t.cantidad),
             }));
+            this.montoPago = this.saldoPendiente;
           }
         },
         error: (err) => {
@@ -574,6 +637,9 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       next: (res) => {
         if (res?.success && res?.data) {
           this.eventoData = res.data;
+          const bloqueadoBD = res.data.bloqueado === true;
+          this.isLocked = bloqueadoBD;
+          this.documentLockService.setLocked(this.idEvento!, bloqueadoBD);
         }
       },
       error: (err) => {

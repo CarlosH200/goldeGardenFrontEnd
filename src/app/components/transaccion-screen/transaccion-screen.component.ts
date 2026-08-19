@@ -10,8 +10,7 @@ import { AlertGenericComponent } from '../alert-generic/alert-generic.component'
 import { EventosService } from '../../services/eventosService';
 import { DocumentLockService } from '../../services/document-lock.service';
 import { Subscription } from 'rxjs';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, OnDestroy } from '@angular/core';
-import { Console } from 'console';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, OnDestroy, ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-transaccion-screen',
@@ -20,7 +19,7 @@ import { Console } from 'console';
   styleUrl: './transaccion-screen.component.css',
 })
 
-export class TransaccionScreenComponent implements OnChanges, OnDestroy {
+export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private productosService: ProductosService,
     private authService: AuthService,
@@ -29,8 +28,16 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
     private eventosService: EventosService,
     private pagosService: PagosService,
     private documentLockService: DocumentLockService,
-  ) {}
- 
+    private cdr: ChangeDetectorRef,   //inyecta ChangeDetectorRef
+  ) { }
+
+  ngOnInit(): void {
+    if (this.idEvento) {
+      this.cargarTransacciones();
+      this.cargarEvento();
+    }
+  }
+
   private resetEventState(): void {
     this.eventoData = null;
     this.transacciones = [];
@@ -58,8 +65,8 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
     }
   }
 
-@Output() totalGeneralChange =
-  new EventEmitter<number>();
+  @Output() totalGeneralChange =
+    new EventEmitter<number>();
   // input para recibir el id del evento o cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
   @Input() idEvento: number | null = null;
   // input para recibir el id del cliente, dependiendo del tipo de transacción que se esté realizando (compra o venta)
@@ -105,13 +112,13 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
 
 
 
-   actualizarTotal(): void {
+  actualizarTotal(): void {
 
-  console.log('EMITIENDO TOTAL:', this.totalGeneral);
+    // console.log('EMITIENDO TOTAL:', this.totalGeneral);
 
-  this.totalGeneralChange.emit(this.totalGeneral);
+    this.totalGeneralChange.emit(this.totalGeneral);
 
-}
+  }
   // ==========================================================
   // FILTRAR PRODUCTOS DESDE API
   // ==========================================================
@@ -226,13 +233,14 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
         next: (res) => {
           if (res?.success && res?.data) {
             this.eventoData = res.data;
-            console.log('Evento cargado en Transaciones en Eventodata:', this.eventoData);
-              // actualizar estado de pagos y bloqueo
-              this.checkPaymentsAndLock();
+            const bloqueadoBD = res.data.bloqueado === true;
+            this.isLocked = bloqueadoBD;
+            this.documentLockService.setLocked(this.idEvento!, bloqueadoBD);
+            this.checkPaymentsAndLock();
           }
         },
         error: (err) => {
-          console.error('Error al cargar evento en forma pago', err);
+          console.error('Error al cargar evento en transacciones', err);
         }
       });
   }
@@ -244,6 +252,15 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
   // ==========================================================
   agregarProducto() {
     if (!this.productoEncontrado) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Producto requerido',
+          mensaje: 'Debes buscar y seleccionar un producto antes de agregar la transacción.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
       return;
     }
 
@@ -324,7 +341,7 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
       cantidad: this.cantidad,
     };
 
-    console.log('BODY TRANSACCION:', body);
+    // // console.log('BODY TRANSACCION:', body);
 
     // ==========================================================
     // INSERTAR EN API
@@ -345,7 +362,7 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
             existe.subtotal = existe.cantidad * existe.precio;
           } else {
             this.transacciones.push({
-              
+
               ...this.productoEncontrado,
 
               cantidad: this.cantidad,
@@ -354,7 +371,7 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
 
               subtotal,
 
-              
+
             });
           }
 
@@ -414,95 +431,113 @@ export class TransaccionScreenComponent implements OnChanges, OnDestroy {
 
 
 
-// ==========================================================
-// CARGAR TRANSACCIONES DEL EVENTO
-// ==========================================================
-cargarTransacciones(): void {
-
-  if (!this.idEvento) {
-    return;
-  }
-
-  this.transaccionesService
-    .buscarTransaccionesEvento(this.idEvento)
-    .subscribe({
-
-      next: (res) => {
-
-        if (res?.success) {
-
-              this.transacciones = res.data
-            .map((t: any) => {
-              const cantidad = Number(t.cantidad) || 1;
-              const monto = Number(t.monto) || 0;
-
-              return {
-                id: t.id || t.id_producto || null,
-                descripcion: t.descripcion || t.nombre || 'Descripción no disponible',
-                observacion: t.observacion_01 || '',
-                cantidad,
-                precio: cantidad ? monto / cantidad : monto,
-                subtotal: monto,
-              };
-            })
-            .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
-
-          console.log(
-            'TRANSACCIONES CARGADAS:',
-            this.transacciones
-          );
-
-          this.actualizarTotal();
-            // actualizar estado de pagos y bloqueo
-            this.checkPaymentsAndLock();
-        }
-      },
-
-      error: (err) => {
-
-        console.error(
-          'Error al cargar transacciones',
-          err
-        );
-      }
-    });
-}
-
-  
-
   // ==========================================================
-  // ELIMINAR PRODUCTO
+  // CARGAR TRANSACCIONES DEL EVENTO
   // ==========================================================
-  eliminarProducto(index: number) {
+  cargarTransacciones(): void {
 
-    if (this.isLocked) {
-      this.dialog.open(AlertGenericComponent, {
-        width: '450px',
-        data: {
-          titulo: 'Documento bloqueado',
-          mensaje:
-            'No se puede eliminar una transacción porque el documento está bloqueado o ya tiene pagos aplicados.',
-          tipo: 'warning',
-          icon: 'warning',
-        },
-      });
-
+    if (!this.idEvento) {
       return;
     }
 
-    const transaccion = this.transacciones[index];
-    
-    if (!transaccion) {
+    this.transaccionesService
+      .buscarTransaccionesEvento(this.idEvento)
+      .subscribe({
+
+        next: (res) => {
+
+          if (res?.success) {
+
+            this.transacciones = res.data
+              .map((t: any) => {
+                const cantidad = Number(t.cantidad) || 1;
+                const monto = Number(t.monto) || 0;
+
+                return {
+                  id: t.id || t.id_producto || null,
+                  descripcion: t.descripcion || t.nombre || 'Descripción no disponible',
+                  observacion: t.observacion_01 || '',
+                  cantidad,
+                  precio: cantidad ? monto / cantidad : monto,
+                  subtotal: monto,
+                };
+              })
+              .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
+
+            // console.log(
+            //   'TRANSACCIONES CARGADAS:',
+            //   this.transacciones
+            // );
+
+            this.actualizarTotal();
+            // actualizar estado de pagos y bloqueo
+            this.checkPaymentsAndLock();
+          }
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Error al cargar transacciones',
+            err
+          );
+        }
+      });
+  }
+
+
+
+// ==========================================================
+// ELIMINAR PRODUCTO
+// ==========================================================
+eliminarProducto(index: number) {
+  const transaccion = this.transacciones[index];
+  if (!transaccion) return;
+
+  if (this.isLocked) {
+    this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Documento bloqueado',
+        mensaje: 'No se puede eliminar la transacción porque el documento está bloqueado.',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+    return;
+  }
+
+  // 👇 Abrimos el diálogo con botones Cancelar/Aceptar
+  const dialogRef = this.dialog.open(AlertGenericComponent, {
+    width: '450px',
+    data: {
+      titulo: 'Confirmar eliminación',
+      mensaje: '¿Estás seguro de eliminar esta transacción?',
+      tipo: 'warning',
+      icon: 'warning',
+      mostrarBotones: true
+    },
+  });
+
+  dialogRef.afterClosed().subscribe((resultado) => {
+    if (resultado !== 'confirmar' && resultado !== true) {
       return;
     }
 
     // Si la transacción tiene un ID (fue guardada en la BD), eliminarla del servidor
     if (transaccion.id) {
-      this.transaccionesService.eliminarTransaccion(transaccion.id).subscribe({
+      this.transaccionesService.eliminarTransaccion(
+        transaccion.id,
+        this.authService.getUsername()
+      ).subscribe({
         next: (res) => {
           if (res?.success) {
             this.transacciones.splice(index, 1);
-            this.actualizarTotal();
+
+            setTimeout(() => {
+              this.actualizarTotal();
+              this.cdr.detectChanges();
+            });
 
             this.dialog.open(AlertGenericComponent, {
               width: '450px',
@@ -531,10 +566,16 @@ cargarTransacciones(): void {
     } else {
       // Si no tiene ID, solo eliminar localmente
       this.transacciones.splice(index, 1);
-      this.actualizarTotal();
-    }
 
+      setTimeout(() => {
+        this.actualizarTotal();
+        this.cdr.detectChanges();
+      });
+    }
+  });
 }
+
+
 
   // Comprueba si el evento tiene pagos y si está bloqueado
   private checkPaymentsAndLock(): void {

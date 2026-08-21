@@ -1,3 +1,96 @@
+
+
+/* bloque de codigo de estilos de pantalla de carga */
+/* bloque de codigo de estilos de pantalla de carga */
+
+/* imagen para pantalla de carga con tema claro y oscuro */
+.logoLoadingEmpresa {
+  width: 150px;
+  height: 125px; /* ajustado para quitar espacio extra */
+  display: flex;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: center;
+  justify-content: center;
+  background-image: var(--theme-image-url) !important; 
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* estilos pantalla de carga */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-fondo);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: var(--color-texto);
+}
+
+/* contenedor interno */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+}
+
+/* puntos animados debajo del logo */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-principal);
+  animation: dots 1.3s infinite linear;
+  margin: 0;
+  transform: translateX(-45px);
+}
+
+@keyframes dots {
+  10% {
+    box-shadow:
+      30px 0 var(--color-principal),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-secundario);
+  }
+  33% {
+    box-shadow:
+      30px 0 var(--color-principal),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-secundario);
+  }
+  66% {
+    box-shadow:
+      30px 0 var(--color-secundario),
+      60px 0 var(--color-principal),
+      90px 0 var(--color-secundario);
+  }
+  100% {
+    box-shadow:
+      30px 0 var(--color-secundario),
+      60px 0 var(--color-secundario),
+      90px 0 var(--color-principal);
+  }
+}
+
+/* quitar margen default del p */
+.spinner-container p {
+  margin: 0;
+}
+
+
+/* bloque de codigo de estilos de pantalla de carga */
+/* bloque de codigo de estilos de pantalla de carga */
+
+
 /* Títulos dentro del formulario numero de evento */
 .event-form h2 {
   font-weight: 700;

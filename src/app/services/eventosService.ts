@@ -25,4 +25,8 @@ export class EventosService {
   obtenerEvento(id: number): Observable<{ success: boolean, data: EventosModel }> {
     return this.http.get<{ success: boolean, data: EventosModel }>(`${this.apiUrl}/${id}`);
   }
+
+  obtenerEventos(): Observable<{ success: boolean, data: EventosModel[] }> {
+    return this.http.get<{ success: boolean, data: EventosModel[] }>(this.apiUrl);
+  }
 }

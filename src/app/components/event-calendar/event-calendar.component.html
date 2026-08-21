@@ -1,63 +1,468 @@
-<div class="calendar-container">
-  <!-- Controles -->
-  <div class="calendar-header">
-    <button>&lt;</button>
-    <h2>Mayo 2025</h2>
-    <button>&gt;</button>
+<div class="ec-container">
+
+  <!-- ===================================================== -->
+  <!-- PESTAÑAS PRINCIPALES: LISTA / CALENDARIO               -->
+  <!-- ===================================================== -->
+  <ul class="nav custom-tabs mb-0">
+    <li class="nav-item">
+      <button class="nav-link pestañaPersonalizada" [ngClass]="{ active: activeTab === 'lista' }"
+        (click)="activeTab = 'lista'">
+        <span class="material-symbols-outlined tab-icon">list_alt</span>
+        Lista
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link pestañaPersonalizada" [ngClass]="{ active: activeTab === 'calendario' }"
+        (click)="activeTab = 'calendario'">
+        <span class="material-symbols-outlined tab-icon">calendar_month</span>
+        Calendario
+      </button>
+    </li>
+
+    <!-- Botón refrescar -->
+    <li class="nav-item ms-auto d-flex align-items-center">
+      <button class="btn-icon" (click)="loadEventos()" title="Refrescar eventos">
+        <span class="material-symbols-outlined" [class.spin]="loading">refresh</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- ===================================================== -->
+  <!-- LOADING -->
+  <!-- ===================================================== -->
+  <div class="ec-loading" *ngIf="loading">
+    <span class="material-symbols-outlined spin">progress_activity</span>
+    <span>Cargando eventos...</span>
   </div>
 
-  <!-- Selector de vista -->
-  <div class="calendar-view-toggle">
-    <button class="active">Mes</button>
-    <button>Día</button>
-    <button>Año</button>
-  </div>
+  <!-- ===================================================== -->
+  <!-- LAYOUT: CONTENIDO + DETALLE                            -->
+  <!-- ===================================================== -->
+  <div class="ec-layout" *ngIf="!loading">
 
-  <!-- Vista del mes -->
-  <div class="calendar-month-view">
-    <div class="calendar-day-name">Dom</div>
-    <div class="calendar-day-name">Lun</div>
-    <div class="calendar-day-name">Mar</div>
-    <div class="calendar-day-name">Mié</div>
-    <div class="calendar-day-name">Jue</div>
-    <div class="calendar-day-name">Vie</div>
-    <div class="calendar-day-name">Sáb</div>
+    <!-- =============== PANEL PRINCIPAL =============== -->
+    <div class="ec-main" [class.with-detail]="showDetail">
 
-    <!-- 42 celdas para cubrir 6 semanas -->
-    <div class="calendar-day">28</div>
-    <div class="calendar-day">29</div>
-    <div class="calendar-day">30</div>
-    <div class="calendar-day">1</div>
-    <div class="calendar-day">2</div>
-    <div class="calendar-day">3</div>
-    <div class="calendar-day">4</div>
-    <!-- ... continúa con el resto de los días del mes -->
-  </div>
+      <!-- ======================= -->
+      <!-- PESTAÑA: LISTA          -->
+      <!-- ======================= -->
+      <div *ngIf="activeTab === 'lista'" class="ec-list-view">
 
-  <!-- Vista del día -->
-  <div class="calendar-day-view hidden">
-    <h3>24 Mayo 2025</h3>
-    <ul class="day-events">
-      <li>🕘 09:00 AM - Reunión de equipo</li>
-      <li>🕑 02:00 PM - Llamada con cliente</li>
-    </ul>
-  </div>
+        <!-- Buscador -->
+        <div class="ec-search-bar">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input type="text" class="ec-search-input" placeholder="Buscar por título, cliente, ubicación..."
+            [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+          <button *ngIf="searchQuery" class="btn-icon btn-clear" (click)="searchQuery = ''; onSearchChange()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
 
-  <!-- Vista del año -->
-  <div class="calendar-year-view hidden">
-    <div class="calendar-year-grid">
-      <div class="calendar-month">Enero</div>
-      <div class="calendar-month">Febrero</div>
-      <div class="calendar-month">Marzo</div>
-      <div class="calendar-month">Abril</div>
-      <div class="calendar-month">Mayo</div>
-      <div class="calendar-month">Junio</div>
-      <div class="calendar-month">Julio</div>
-      <div class="calendar-month">Agosto</div>
-      <div class="calendar-month">Septiembre</div>
-      <div class="calendar-month">Octubre</div>
-      <div class="calendar-month">Noviembre</div>
-      <div class="calendar-month">Diciembre</div>
+        <!-- Contador -->
+        <div class="ec-list-count">
+          <span>{{ filteredEventos.length }} evento{{ filteredEventos.length !== 1 ? 's' : '' }} encontrado{{
+            filteredEventos.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Sin resultados -->
+        <div class="ec-empty" *ngIf="filteredEventos.length === 0">
+          <span class="material-symbols-outlined empty-icon">event_busy</span>
+          <p>No se encontraron eventos</p>
+        </div>
+
+        <!-- Lista de eventos -->
+        <div class="ec-event-list">
+          <div class="ec-event-card" *ngFor="let evento of filteredEventos" (click)="onEventClick(evento)"
+            [class.selected]="selectedEvent?.id === evento.id">
+
+            <div class="ec-card-color-bar" [style.background]="getEventColor(evento)"></div>
+
+            <div class="ec-card-body">
+              <div class="ec-card-header-row">
+                <h4 class="ec-card-title">{{ evento.titulo }}</h4>
+                <span class="ec-estado-badge" [ngClass]="getEstadoClass(evento.estado)">
+                  {{ evento.estado_Descripcion || 'Activo' }}
+                </span>
+              </div>
+
+              <p class="ec-card-desc" *ngIf="evento.descripcion">{{ evento.descripcion }}</p>
+
+              <div class="ec-card-meta">
+                <div class="ec-meta-item">
+                  <span class="material-symbols-outlined">calendar_today</span>
+                  <span>{{ formatDate(evento.fecha_Ini) }}</span>
+                </div>
+                <div class="ec-meta-item" *ngIf="evento.ubicacion_Nombre">
+                  <span class="material-symbols-outlined">location_on</span>
+                  <span>{{ evento.ubicacion_Nombre }}</span>
+                </div>
+                <div class="ec-meta-item" *ngIf="evento.organizador_Nombre">
+                  <span class="material-symbols-outlined">person</span>
+                  <span>{{ evento.organizador_Nombre }}</span>
+                </div>
+                <div class="ec-meta-item" *ngIf="evento.tipo_Evento_Descripcion">
+                  <span class="material-symbols-outlined">category</span>
+                  <span>{{ evento.tipo_Evento_Descripcion }}</span>
+                </div>
+              </div>
+
+              <div class="ec-card-id">
+                <span class="material-symbols-outlined">tag</span>
+                EVT-{{ evento.id }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================= -->
+      <!-- PESTAÑA: CALENDARIO     -->
+      <!-- ======================= -->
+      <div *ngIf="activeTab === 'calendario'" class="ec-calendar-view">
+
+        <!-- Header del calendario -->
+        <div class="ec-cal-header">
+          <div class="ec-cal-nav">
+            <button class="btn-icon" (click)="prev()" title="Anterior">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <h3 class="ec-cal-title">{{ getCurrentLabel() }}</h3>
+            <button class="btn-icon" (click)="next()" title="Siguiente">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <button class="btn-today" (click)="goToToday()">Hoy</button>
+          </div>
+
+          <div class="ec-cal-view-toggle">
+            <button class="btn-view" [class.active]="calendarView === 'mes'"
+              (click)="setCalendarView('mes')">Mes</button>
+            <button class="btn-view" [class.active]="calendarView === 'semana'"
+              (click)="setCalendarView('semana')">Semana</button>
+            <button class="btn-view" [class.active]="calendarView === 'dia'"
+              (click)="setCalendarView('dia')">Día</button>
+          </div>
+        </div>
+
+        <!-- ===== VISTA MES ===== -->
+        <div class="ec-month-grid" *ngIf="calendarView === 'mes'">
+          <!-- Nombres de días -->
+          <div class="ec-day-name" *ngFor="let name of weekDayNames">{{ name }}</div>
+
+          <!-- Celdas de días -->
+          <div class="ec-day-cell" *ngFor="let day of calendarDays" [class.other-month]="!day.isCurrentMonth"
+            [class.today]="day.isToday" (click)="onDayClick(day)">
+
+            <span class="ec-day-number">{{ day.day }}</span>
+
+            <div class="ec-day-events">
+              <div class="ec-day-event-chip" *ngFor="let ev of day.events.slice(0, 3)"
+                [style.background]="getEventColor(ev)" (click)="onEventClick(ev); $event.stopPropagation()"
+                [title]="ev.titulo">
+                {{ ev.titulo.length > 12 ? (ev.titulo | slice:0:12) + '…' : ev.titulo }}
+              </div>
+              <div class="ec-day-more" *ngIf="day.events.length > 3">
+                +{{ day.events.length - 3 }} más
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VISTA SEMANA ===== -->
+        <div class="ec-week-grid" *ngIf="calendarView === 'semana'">
+          <div class="ec-week-day" *ngFor="let day of weekDays" [class.today]="day.isToday">
+
+            <div class="ec-week-day-header">
+              <span class="ec-week-day-name">{{ weekDayNames[day.date.getDay()] }}</span>
+              <span class="ec-week-day-number" [class.today-number]="day.isToday">{{ day.day }}</span>
+            </div>
+
+            <div class="ec-week-day-events">
+              <div class="ec-empty-day" *ngIf="day.events.length === 0">
+                <span class="material-symbols-outlined">remove</span>
+              </div>
+              <div class="ec-week-event-card" *ngFor="let ev of day.events"
+                [style.border-left-color]="getEventColor(ev)" (click)="onEventClick(ev)">
+                <strong>{{ ev.titulo }}</strong>
+                <span class="ec-week-event-time">{{ formatTime(ev.fecha_Ini) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VISTA DÍA ===== -->
+        <div class="ec-day-detail-view" *ngIf="calendarView === 'dia'">
+          <div class="ec-day-timeline">
+            <div class="ec-empty" *ngIf="dayEvents.length === 0">
+              <span class="material-symbols-outlined empty-icon">event_busy</span>
+              <p>No hay eventos para este día</p>
+            </div>
+
+            <div class="ec-timeline-event" *ngFor="let ev of dayEvents" [style.border-left-color]="getEventColor(ev)"
+              (click)="onEventClick(ev)">
+              <div class="ec-timeline-time">
+                <span class="material-symbols-outlined">schedule</span>
+                {{ formatTime(ev.fecha_Ini) }} - {{ formatTime(ev.fecha_Fin) }}
+              </div>
+              <h4 class="ec-timeline-title">{{ ev.titulo }}</h4>
+              <p class="ec-timeline-desc" *ngIf="ev.descripcion">{{ ev.descripcion }}</p>
+              <div class="ec-timeline-meta">
+                <span *ngIf="ev.ubicacion_Nombre">
+                  <span class="material-symbols-outlined">location_on</span>
+                  {{ ev.ubicacion_Nombre }}
+                </span>
+                <span *ngIf="ev.tipo_Evento_Descripcion">
+                  <span class="material-symbols-outlined">category</span>
+                  {{ ev.tipo_Evento_Descripcion }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== PANEL DETALLE =============== -->
+    <div class="ec-detail-panel" [class.open]="showDetail">
+
+      <!-- Backdrop móvil -->
+      <div class="ec-detail-backdrop" *ngIf="showDetail" (click)="closeDetail()"></div>
+
+      <div class="ec-detail-content" *ngIf="selectedEvent">
+        <!-- Header -->
+        <div class="ec-detail-header">
+          <h3>Detalle del Evento</h3>
+          <button class="btn-icon" (click)="closeDetail()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="ec-detail-scroll">
+
+          <!-- Loading -->
+          <div class="ec-loading" *ngIf="detailLoading" style="padding: 2rem;">
+            <span class="material-symbols-outlined spin">progress_activity</span>
+            <span>Cargando detalle...</span>
+          </div>
+
+          <!-- SECCIÓN: EVENTO -->
+          <div class="ec-detail-section">
+            <div class="ec-section-title">
+              <span class="material-symbols-outlined">event</span>
+              Datos del Evento
+            </div>
+
+            <div class="ec-detail-field">
+              <span class="ec-field-label">Título</span>
+              <span class="ec-field-value">{{ selectedEvent.titulo }}</span>
+            </div>
+            <div class="ec-detail-field" *ngIf="selectedEvent.descripcion">
+              <span class="ec-field-label">Descripción</span>
+              <span class="ec-field-value">{{ selectedEvent.descripcion }}</span>
+            </div>
+            <div class="ec-detail-row">
+              <div class="ec-detail-field">
+                <span class="ec-field-label">Fecha Inicio</span>
+                <span class="ec-field-value">{{ formatDateTime(selectedEvent.fecha_Ini) }}</span>
+              </div>
+              <div class="ec-detail-field">
+                <span class="ec-field-label">Fecha Fin</span>
+                <span class="ec-field-value">{{ formatDateTime(selectedEvent.fecha_Fin) }}</span>
+              </div>
+            </div>
+            <div class="ec-detail-row">
+              <div class="ec-detail-field">
+                <span class="ec-field-label">Entrega</span>
+                <span class="ec-field-value">{{ formatDateTime(selectedEvent.fecha_Entrega) }}</span>
+              </div>
+              <div class="ec-detail-field">
+                <span class="ec-field-label">Recepción</span>
+                <span class="ec-field-value">{{ formatDateTime(selectedEvent.fecha_Recepcion) }}</span>
+              </div>
+            </div>
+            <div class="ec-detail-row">
+              <div class="ec-detail-field" *ngIf="selectedEvent.ubicacion_Nombre">
+                <span class="ec-field-label">Ubicación</span>
+                <span class="ec-field-value">{{ selectedEvent.ubicacion_Nombre }}</span>
+              </div>
+              <div class="ec-detail-field" *ngIf="selectedEvent.tipo_Evento_Descripcion">
+                <span class="ec-field-label">Tipo Evento</span>
+                <span class="ec-field-value">{{ selectedEvent.tipo_Evento_Descripcion }}</span>
+              </div>
+            </div>
+            <div class="ec-detail-row">
+              <div class="ec-detail-field" *ngIf="selectedEvent.organizador_Nombre">
+                <span class="ec-field-label">Organizador</span>
+                <span class="ec-field-value">{{ selectedEvent.organizador_Nombre }}</span>
+              </div>
+              <div class="ec-detail-field">
+                <span class="ec-field-label">Estado</span>
+                <span class="ec-estado-badge" [ngClass]="getEstadoClass(selectedEvent.estado)">
+                  {{ selectedEvent.estado_Descripcion || 'Activo' }}
+                </span>
+              </div>
+            </div>
+            <div class="ec-detail-field" *ngIf="selectedEvent.Observacion">
+              <span class="ec-field-label">Observaciones</span>
+              <span class="ec-field-value">{{ selectedEvent.Observacion }}</span>
+            </div>
+          </div>
+
+          <!-- SECCIÓN: CLIENTE -->
+          <div class="ec-detail-section" *ngIf="selectedEvent.id_cliente">
+            <div class="ec-section-title">
+              <span class="material-symbols-outlined">person</span>
+              Datos del Cliente
+            </div>
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////  DESCOMENTAR CUANDO YA SE TENGA AL CLIENTE SELECCIONADO ///////////
+/////////////////////////////////////////////////////////////////////////////
+
+            <!-- <div class="ec-client-info">
+              <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Nombre">
+                <span class="ec-field-label">Nombre</span>
+                <span class="ec-field-value">
+                  {{ selectedEvent?.cliente_Nombre }} {{ selectedEvent?.cliente_Apellido }}
+                </span>
+              </div>
+
+              <div class="ec-detail-row">
+                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Telefono">
+                  <span class="ec-field-label">Teléfono</span>
+                  <span class="ec-field-value">{{ selectedEvent?.cliente_Telefono }}</span>
+                </div>
+                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Email">
+                  <span class="ec-field-label">Email</span>
+                  <span class="ec-field-value">{{ selectedEvent?.cliente_Email }}</span>
+                </div>
+              </div>
+
+              <div class="ec-detail-row">
+                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_NIT">
+                  <span class="ec-field-label">NIT</span>
+                  <span class="ec-field-value">{{ selectedEvent?.cliente_NIT }}</span>
+                </div>
+                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_DPI">
+                  <span class="ec-field-label">DPI</span>
+                  <span class="ec-field-value">{{ selectedEvent?.cliente_DPI }}</span>
+                </div>
+              </div>
+
+              <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Direccion">
+                <span class="ec-field-label">Dirección</span>
+                <span class="ec-field-value">{{ selectedEvent?.cliente_Direccion }}</span>
+              </div>
+            </div> -->
+
+          </div>
+
+          <!-- SECCIÓN: TRANSACCIONES -->
+          <div class="ec-detail-section" *ngIf="!detailLoading">
+            <div class="ec-section-title">
+              <span class="material-symbols-outlined">receipt_long</span>
+              Transacciones
+              <span class="ec-section-count">({{ detailTransacciones.length }})</span>
+            </div>
+
+            <div class="ec-empty-small" *ngIf="detailTransacciones.length === 0">
+              Sin transacciones registradas
+            </div>
+
+            <div class="ec-table-wrapper" *ngIf="detailTransacciones.length > 0">
+              <table class="ec-table">
+                <thead>
+                  <tr>
+                    <th>Descripción</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-right">Precio</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let t of detailTransacciones">
+                    <td>{{ t.descripcion }}</td>
+                    <td class="text-center">{{ t.cantidad }}</td>
+                    <td class="text-right">{{ formatCurrency(t.precio) }}</td>
+                    <td class="text-right">{{ formatCurrency(t.total) }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3" class="text-right"><strong>Total Transacciones</strong></td>
+                    <td class="text-right"><strong>{{ formatCurrency(totalTransacciones) }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECCIÓN: PAGOS -->
+          <div class="ec-detail-section" *ngIf="!detailLoading">
+            <div class="ec-section-title">
+              <span class="material-symbols-outlined">payments</span>
+              Pagos
+              <span class="ec-section-count">({{ detailPagos.length }})</span>
+            </div>
+
+            <div class="ec-empty-small" *ngIf="detailPagos.length === 0">
+              Sin pagos registrados
+            </div>
+
+            <div class="ec-table-wrapper" *ngIf="detailPagos.length > 0">
+              <table class="ec-table">
+                <thead>
+                  <tr>
+                    <th>Forma de Pago</th>
+                    <th class="text-right">Monto</th>
+                    <th>Fecha</th>
+                    <th>Referencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of detailPagos">
+                    <td>{{ p.forma_Pago || 'N/A' }}</td>
+                    <td class="text-right">{{ formatCurrency(p.monto_Pagado) }}</td>
+                    <td>{{ formatDate(p.fecha_Pago) }}</td>
+                    <td>{{ p.referencia || '—' }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td class="text-right"><strong>Total Pagado</strong></td>
+                    <td class="text-right"><strong>{{ formatCurrency(totalPagado) }}</strong></td>
+                    <td colspan="2"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- SECCIÓN: RESUMEN FINANCIERO -->
+          <div class="ec-detail-section ec-financial-summary" *ngIf="!detailLoading">
+            <div class="ec-section-title">
+              <span class="material-symbols-outlined">account_balance</span>
+              Resumen Financiero
+            </div>
+
+            <div class="ec-summary-grid">
+              <div class="ec-summary-item">
+                <span class="ec-summary-label">Total Transacciones</span>
+                <span class="ec-summary-value">{{ formatCurrency(totalTransacciones) }}</span>
+              </div>
+              <div class="ec-summary-item ec-summary-success">
+                <span class="ec-summary-label">Total Pagado</span>
+                <span class="ec-summary-value">{{ formatCurrency(totalPagado) }}</span>
+              </div>
+              <div class="ec-summary-item" [ngClass]="saldoPendiente > 0 ? 'ec-summary-danger' : 'ec-summary-success'">
+                <span class="ec-summary-label">Saldo Pendiente</span>
+                <span class="ec-summary-value">{{ formatCurrency(saldoPendiente) }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
+
 </div>

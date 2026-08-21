@@ -1,3 +1,12 @@
+
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="spinner-container">
+    <div class="logoLoadingEmpresa"></div>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+
 <div>
   <form class="event-form">
     <!-- CONTENEDOR SUPERIOR EN 3 SECCIONES HORIZONTALES -->
@@ -16,7 +25,7 @@
                 <span class="material-icons">badge</span>
               </span>
               <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado" class="form-control border-start-0 ps-0"
-                placeholder="ID Evento">
+                placeholder="ID Evento" (keyup.enter)="buscarEvento()">
               <button type="button" class="btn btn-search-doc d-flex align-items-center px-3" (click)="buscarEvento()" title="Buscar Evento">
                 <span class="material-icons">search</span>
               </button>
@@ -81,13 +90,13 @@
               </button>
 
               <!-- BOTÓN GUARDAR CAMBIOS -->
-              <button type="button" class="btn btn-success d-flex align-items-center justify-content-center p-2 rounded-3" *ngIf="!modoConsulta" (click)="guardarEvento()" [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'">
+              <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" *ngIf="!modoConsulta" (click)="guardarEvento()" [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'">
                 <span class="material-icons fs-5">save</span>
               </button>
 
               <!-- BOTÓN IMPRIMIR -->
               <div class="position-relative">
-                <button type="button" class="btn btn-action-secondary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="toggleOpcionesImpresion()" title="Imprimir Documento">
+                <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="toggleOpcionesImpresion()" title="Imprimir Documento">
                   <span class="material-icons fs-5">print</span>
                 </button>
                 <div class="impresion-opciones shadow-sm" *ngIf="mostrarOpcionesImpresion">

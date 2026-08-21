@@ -82,6 +82,8 @@ export class DocumentoScreenComponent implements OnChanges {
     fecha_Registro: new Date().toLocaleDateString(), // Solo para mostrar en el modal, tu API debería manejar la fecha real
   };
 
+  // Variable para controlar pantalla de carga mientras se realiza algun proceso.
+  isLoading: boolean = false;
   // Variable para controlar el modo consulta de documento hasta hacer clic en nuevo evento
   modoConsulta: boolean = true;
   // VARIABLES PARA EL MODO DE EDICION DE ESTADOS Y ESTADO POR DEFECTO AL CRER UN EVENTO
@@ -796,133 +798,144 @@ onLockToggle(event: Event): void {
   }
   // FIN FUNCION PARA GUARDAR EVENTO
 
-  // FUNCION PARA LLAMAR A CARGAR EVENTO POR ID Y MOSTRARLO EN PANTALLA (SE PUEDE USAR PARA MOSTRAR LOS DATOS DE UN EVENTO RECIEN CREADO O PARA BUSCAR CUALQUIER EVENTO POR SU ID)
-  buscarEvento(): void {
-    if (!this.idEventoCreado) {
-      alert('Debes ingresar un ID');
-      return;
-    }
-
-    this.cargarEventoPorId(this.idEventoCreado);
+// ==========================================================
+// BUSCAR EVENTO POR ID
+// ==========================================================
+buscarEvento(): void {
+  if (!this.idEventoCreado) {
+    alert('Debes ingresar un ID');
+    return;
   }
 
-  // ==========================================================
-  // CARGAR EVENTO POR ID (CON CLIENTE)
-  // ==========================================================
-  cargarEventoPorId(id: number | null): void {
-    if (!id) return;
+  this.isLoading = true; // 👈 activar pantalla de carga
+  this.cargarEventoPorId(this.idEventoCreado);
+}
 
-    this.eventosService.obtenerEvento(id).subscribe({
-      next: (res: any) => {
-        if (res?.success && res?.data) {
-          const evento = res.data;
+// ==========================================================
+// CARGAR EVENTO POR ID (CON CLIENTE)
+// ==========================================================
+cargarEventoPorId(id: number | null): void {
+  if (!id) return;
 
-          // EMITIR EVENTO AL PADRE
-          this.eventoCreado.emit(evento.id);
+  this.isLoading = true; // 👈 activar pantalla de carga
 
-          // =========================
-          // EVENTO
-          // =========================
-          this.pTituloEvento = evento.titulo;
-          this.pDescripcionEvento = evento.descripcion;
+  this.eventosService.obtenerEvento(id).subscribe({
+    next: (res: any) => {
+      if (res?.success && res?.data) {
+        const evento = res.data;
 
-          this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
-          this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
-          this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
-          this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
+        // EMITIR EVENTO AL PADRE
+        this.eventoCreado.emit(evento.id);
 
-          this.pUbicacionEvento = evento.ubicacion;
-          this.pOrganizadorEvento = evento.organizador;
-          this.pTipoEvento = evento.tipo_Evento;
-          this.pCapacidadEvento = evento.capacidad_Evento;
+        // =========================
+        // EVENTO
+        // =========================
+        this.pTituloEvento = evento.titulo;
+        this.pDescripcionEvento = evento.descripcion;
 
-          this.pDetallesEvento = evento.observacion || '';
+        this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
+        this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
+        this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
+        this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
 
-          // =========================
-          // ESTADO DOCUMENTO Y METADATOS
-          // =========================
-          this.pEstadoEvento = evento.estado;
-          this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
-          this.pUsuarioCreacion = evento.username || '';
-          this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
-          this.pUsuarioModificacion = evento.m_Username || '';
+        this.pUbicacionEvento = evento.ubicacion;
+        this.pOrganizadorEvento = evento.organizador;
+        this.pTipoEvento = evento.tipo_Evento;
+        this.pCapacidadEvento = evento.capacidad_Evento;
 
-          // =========================
-          // CAMPOS NUEVOS:
-          // IMPRESO / BLOQUEADO / IMPRESIONES
-          // =========================
+        this.pDetallesEvento = evento.observacion || '';
 
-          this.pImpreso = evento.impreso === true;
+        // =========================
+        // ESTADO DOCUMENTO Y METADATOS
+        // =========================
+        this.pEstadoEvento = evento.estado;
+        this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
+        this.pUsuarioCreacion = evento.username || '';
+        this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
+        this.pUsuarioModificacion = evento.m_Username || '';
 
-          this.pBloqueado = evento.bloqueado === true;
+        // =========================
+        // CAMPOS NUEVOS:
+        // IMPRESO / BLOQUEADO / IMPRESIONES
+        // =========================
+        this.pImpreso = evento.impreso === true;
+        this.pBloqueado = evento.bloqueado === true;
+        this.pimpresiones = Number(evento.impresiones || 0);
 
-          this.pimpresiones = Number(evento.impresiones || 0);
+        // El estado de bloqueo depende del campo bloqueado en la base de datos
+        const bloqueadoActual = this.pBloqueado;
 
-          // El estado de bloqueo depende del campo bloqueado en la base de datos
-          const bloqueadoActual = this.pBloqueado;
+        // Actualizamos el estado local del componente y del formulario
+        this.isLocked = bloqueadoActual;
+        this.modoConsulta = bloqueadoActual;
+        this.modoEdicion = !bloqueadoActual;
 
-          // Actualizamos el estado local del componente y del formulario
-          this.isLocked = bloqueadoActual;
-          this.modoConsulta = bloqueadoActual;
-          this.modoEdicion = !bloqueadoActual;
+        // Publicamos el estado al DocumentLockService
+        this.documentLockService.setLocked(evento.id, bloqueadoActual);
 
-          // Publicamos el estado al DocumentLockService.
-          // Transacción y Pago recibirán automáticamente este mismo estado.
-          this.documentLockService.setLocked(
-            evento.id,
-            bloqueadoActual
-          );
-
-          // =========================
-          // CLIENTE (DESDE EVENTO - JOIN SQL)
-          // =========================
-          this.clienteSeleccionado = null;
-
-          if (evento.id_cliente) {
-            this.cargarTransacciones(evento.id);
-            this.clienteSeleccionado = {
-              id: evento.id_cliente,
-              nit: evento.cliente_NIT || '',
-              nombre: evento.cliente_Nombre || '',
-              apellido: evento.cliente_Apellido || '',
-              email: evento.cliente_Email || '',
-              telefono: evento.cliente_Telefono || '',
-              direccion: evento.cliente_Direccion || '',
-              dpi: evento.cliente_DPI || '',
-              celular: '',
-              tipoCliente: 0,
-              fecha_Registro: '',
-              observacion01: '',
-              observacion02: '',
-              estado: 1,
-              username: '',
-              m_Username: '',
-              fecha_Hora: '',
-              m_Fecha_Hora: null,
-              consecutivo_Interno: 0,
-            } as ClienteModel;
-
-            this.clienteCompletoChange.emit(this.clienteSeleccionado);
-
-            // subscribe to lock state for this event
-            this.lockSub?.unsubscribe();
-            this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
-              console.log('[Documento] lock state changed for', evento.id, v);
-              this.isLocked = v;
-            });
-          }
-        } else {
-          alert('Evento no encontrado');
-          this.clienteSeleccionado = null;
-        }
-      },
-      error: (err: any) => {
-        alert('Error al cargar evento');
+        // =========================
+        // CLIENTE (DESDE EVENTO - JOIN SQL)
+        // =========================
         this.clienteSeleccionado = null;
-      },
-    });
-  }
 
+        if (evento.id_cliente) {
+          this.cargarTransacciones(evento.id);
+          this.clienteSeleccionado = {
+            id: evento.id_cliente,
+            nit: evento.cliente_NIT || '',
+            nombre: evento.cliente_Nombre || '',
+            apellido: evento.cliente_Apellido || '',
+            email: evento.cliente_Email || '',
+            telefono: evento.cliente_Telefono || '',
+            direccion: evento.cliente_Direccion || '',
+            dpi: evento.cliente_DPI || '',
+            celular: '',
+            tipoCliente: 0,
+            fecha_Registro: '',
+            observacion01: '',
+            observacion02: '',
+            estado: 1,
+            username: '',
+            m_Username: '',
+            fecha_Hora: '',
+            m_Fecha_Hora: null,
+            consecutivo_Interno: 0,
+          } as ClienteModel;
+
+          this.clienteCompletoChange.emit(this.clienteSeleccionado);
+
+          // subscribe to lock state for this event
+          this.lockSub?.unsubscribe();
+          this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
+            console.log('[Documento] lock state changed for', evento.id, v);
+            this.isLocked = v;
+          });
+        }
+
+        // 👇 retraso de 1 segundo antes de ocultar la pantalla
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 1000);
+
+      } else {
+        alert('Evento no encontrado');
+        this.clienteSeleccionado = null;
+
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 1000);
+      }
+    },
+    error: (err: any) => {
+      alert('Error al cargar evento');
+      this.clienteSeleccionado = null;
+
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 1000);
+    },
+  });
+}
 
 
   async cargarTransacciones(idEvento: number): Promise<void> {

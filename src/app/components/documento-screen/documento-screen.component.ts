@@ -448,206 +448,197 @@ export class DocumentoScreenComponent implements OnChanges {
     this.pdfService.imprimir(tipo, documento);
   }
 
- /**
- * Desbloquea manualmente el documento.
- *
- * IMPORTANTE:
- * - NO modifica "impreso".
- * - NO modifica "impresiones".
- * - Solamente cambia el estado actual de "bloqueado".
- */
-unlockDocument(): void {
+  /**
+  * Desbloquea manualmente el documento.
+  *
+  * IMPORTANTE:
+  * - NO modifica "impreso".
+  * - NO modifica "impresiones".
+  * - Solamente cambia el estado actual de "bloqueado".
+  */
+  unlockDocument(): void {
 
-  if (!this.idEventoCreado) {
-    return;
-  }
-
-  const idEvento = this.idEventoCreado;
-
-  const dialogRef = this.dialog.open(AlertGenericComponent, {
-    width: '450px',
-    data: {
-      titulo: 'Desbloquear documento',
-      mensaje:
-        '¿Desea desbloquear el documento para permitir cambios en transacciones y pagos? Esta acción permitirá editar el documento nuevamente.',
-      tipo: 'warning',
-      icon: 'warning',
-    },
-  });
-
-  dialogRef.afterClosed().subscribe((res) => {
-
-    if (res === false) {
+    if (!this.idEventoCreado) {
       return;
     }
 
-    const bodyUpdate = {
-      titulo: this.pTituloEvento,
-      descripcion: this.pDescripcionEvento,
-      fecha_Ini: this.pFechaInicioEvento,
-      fecha_Fin: this.pFechaFinEvento,
-      fecha_Entrega: this.pFechaEntregaEvento,
-      fecha_Recepcion: this.pFechaRecogerEvento,
-      ubicacion: this.pUbicacionEvento,
-      organizador: this.pOrganizadorEvento,
-      tipo_Evento: this.pTipoEvento,
-      capacidad_Evento: this.pCapacidadEvento,
-      observacion: this.pDetallesEvento,
-      estado: this.pEstadoEvento,
-      username: this.authService.getUsername(),
-      id_cliente: this.clienteSeleccionado?.id,
+    const idEvento = this.idEventoCreado;
 
-      impreso: this.pImpreso,
-      bloqueado: false,
-      impresiones: this.pimpresiones,
-    };
-
-    this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
-      next: () => {
-        this.pBloqueado = false;
-        this.isLocked = false;
-        this.modoConsulta = false;
-        this.modoEdicion = true;
-        this.documentLockService.unlock(idEvento);
-        console.log('[Documento] Documento desbloqueado:', idEvento);
-      },
-      error: (err) => {
-        console.error('[Documento] Error al desbloquear:', err);
-        this.dialog.open(AlertGenericComponent, {
-          width: '450px',
-          data: {
-            titulo: 'Error',
-            mensaje: 'No se pudo desbloquear el documento en el servidor.',
-            tipo: 'error',
-            icon: 'error',
-          },
-        });
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Desbloquear documento',
+        mensaje:
+          '¿Desea desbloquear el documento para permitir cambios en transacciones y pagos? Esta acción permitirá editar el documento nuevamente.',
+        tipo: 'warning',
+        icon: 'warning',
       },
     });
-  });
-}
 
+    dialogRef.afterClosed().subscribe((res) => {
 
+      if (res === false) {
+        return;
+      }
 
-/**
- * Controla manualmente el checkbox de bloqueo.
- *
- * checked = true
- *     → Bloquear inmediatamente.
- *
- * checked = false
- *     → Solicitar confirmación antes de desbloquear.
- */
-onLockToggle(event: Event): void {
+      const bodyUpdate = {
+        titulo: this.pTituloEvento,
+        descripcion: this.pDescripcionEvento,
+        fecha_Ini: this.pFechaInicioEvento,
+        fecha_Fin: this.pFechaFinEvento,
+        fecha_Entrega: this.pFechaEntregaEvento,
+        fecha_Recepcion: this.pFechaRecogerEvento,
+        ubicacion: this.pUbicacionEvento,
+        organizador: this.pOrganizadorEvento,
+        tipo_Evento: this.pTipoEvento,
+        capacidad_Evento: this.pCapacidadEvento,
+        observacion: this.pDetallesEvento,
+        estado: this.pEstadoEvento,
+        username: this.authService.getUsername(),
+        id_cliente: this.clienteSeleccionado?.id,
 
-  if (!this.idEventoCreado) {
-    return;
+        impreso: this.pImpreso,
+        bloqueado: false,
+        impresiones: this.pimpresiones,
+      };
+
+      this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
+        next: () => {
+          this.pBloqueado = false;
+          this.isLocked = false;
+          this.modoConsulta = false;
+          this.modoEdicion = true;
+          this.documentLockService.unlock(idEvento);
+          console.log('[Documento] Documento desbloqueado:', idEvento);
+        },
+        error: (err) => {
+          console.error('[Documento] Error al desbloquear:', err);
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Error',
+              mensaje: 'No se pudo desbloquear el documento en el servidor.',
+              tipo: 'error',
+              icon: 'error',
+            },
+          });
+        },
+      });
+    });
   }
 
-  const checkbox = event.target as HTMLInputElement;
-  const checked = checkbox.checked;
-  const idEvento = this.idEventoCreado;
 
-  if (checked) {
-    const bodyUpdate = {
-      titulo: this.pTituloEvento,
-      descripcion: this.pDescripcionEvento,
-      fecha_Ini: this.pFechaInicioEvento,
-      fecha_Fin: this.pFechaFinEvento,
-      fecha_Entrega: this.pFechaEntregaEvento,
-      fecha_Recepcion: this.pFechaRecogerEvento,
-      ubicacion: this.pUbicacionEvento,
-      organizador: this.pOrganizadorEvento,
-      tipo_Evento: this.pTipoEvento,
-      capacidad_Evento: this.pCapacidadEvento,
-      observacion: this.pDetallesEvento,
-      estado: this.pEstadoEvento,
-      username: this.authService.getUsername(),
-      id_cliente: this.clienteSeleccionado?.id,
 
-      impreso: this.pImpreso,
-      bloqueado: true,
-      impresiones: this.pimpresiones,
-    };
+  onLockToggle(event: Event): void {
 
-    this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
-      next: () => {
-        this.documentLockService.lock(idEvento);
+    if (!this.idEventoCreado) {
+      return;
+    }
+
+    const checkbox = event.target as HTMLInputElement;
+    const checked = checkbox.checked;
+    const idEvento = this.idEventoCreado;
+
+    if (checked) {
+      const bodyUpdate = {
+        titulo: this.pTituloEvento,
+        descripcion: this.pDescripcionEvento,
+        fecha_Ini: this.pFechaInicioEvento,
+        fecha_Fin: this.pFechaFinEvento,
+        fecha_Entrega: this.pFechaEntregaEvento,
+        fecha_Recepcion: this.pFechaRecogerEvento,
+        ubicacion: this.pUbicacionEvento,
+        organizador: this.pOrganizadorEvento,
+        tipo_Evento: this.pTipoEvento,
+        capacidad_Evento: this.pCapacidadEvento,
+        observacion: this.pDetallesEvento,
+        estado: this.pEstadoEvento,
+        username: this.authService.getUsername(),
+        id_cliente: this.clienteSeleccionado?.id,
+
+        impreso: this.pImpreso,
+        bloqueado: true,
+        impresiones: this.pimpresiones,
+      };
+
+      this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
+        next: () => {
+          this.documentLockService.lock(idEvento);
+          this.isLocked = true;
+          this.pBloqueado = true;
+          this.modoConsulta = true;
+          this.modoEdicion = false;
+        },
+        error: (err) => {
+          console.error('[Documento] Error al bloquear:', err);
+          checkbox.checked = false;
+        },
+      });
+      return;
+    }
+
+    checkbox.checked = true;
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Desbloquear documento',
+        mensaje:
+          'Está a punto de desbloquear el documento. Mientras esté desbloqueado, podrá editar transacciones y pagos. ¿Desea continuar?',
+        tipo: 'warning',
+        icon: 'warning',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+
+      if (res === false) {
         this.isLocked = true;
         this.pBloqueado = true;
         this.modoConsulta = true;
         this.modoEdicion = false;
-      },
-      error: (err) => {
-        console.error('[Documento] Error al bloquear:', err);
-        checkbox.checked = false;
-      },
+        return;
+      }
+
+      const bodyUpdate = {
+        titulo: this.pTituloEvento,
+        descripcion: this.pDescripcionEvento,
+        fecha_Ini: this.pFechaInicioEvento,
+        fecha_Fin: this.pFechaFinEvento,
+        fecha_Entrega: this.pFechaEntregaEvento,
+        fecha_Recepcion: this.pFechaRecogerEvento,
+        ubicacion: this.pUbicacionEvento,
+        organizador: this.pOrganizadorEvento,
+        tipo_Evento: this.pTipoEvento,
+        capacidad_Evento: this.pCapacidadEvento,
+        observacion: this.pDetallesEvento,
+        estado: this.pEstadoEvento,
+        username: this.authService.getUsername(),
+        id_cliente: this.clienteSeleccionado?.id,
+
+        impreso: this.pImpreso,
+        bloqueado: false,
+        impresiones: this.pimpresiones,
+      };
+
+      this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
+        next: () => {
+          this.documentLockService.unlock(idEvento);
+          this.isLocked = false;
+          this.pBloqueado = false;
+          this.modoConsulta = false;
+          this.modoEdicion = true;
+          checkbox.checked = false;
+        },
+        error: (err) => {
+          console.error('[Documento] Error al desbloquear:', err);
+          this.isLocked = true;
+          this.pBloqueado = true;
+          this.modoConsulta = true;
+          this.modoEdicion = false;
+        },
+      });
     });
-    return;
   }
-
-  checkbox.checked = true;
-  const dialogRef = this.dialog.open(AlertGenericComponent, {
-    width: '450px',
-    data: {
-      titulo: 'Desbloquear documento',
-      mensaje:
-        'Está a punto de desbloquear el documento. Mientras esté desbloqueado, podrá editar transacciones y pagos. ¿Desea continuar?',
-      tipo: 'warning',
-      icon: 'warning',
-    },
-  });
-
-  dialogRef.afterClosed().subscribe((res) => {
-
-    if (res === false) {
-      this.isLocked = true;
-      this.pBloqueado = true;
-      this.modoConsulta = true;
-      this.modoEdicion = false;
-      return;
-    }
-
-    const bodyUpdate = {
-      titulo: this.pTituloEvento,
-      descripcion: this.pDescripcionEvento,
-      fecha_Ini: this.pFechaInicioEvento,
-      fecha_Fin: this.pFechaFinEvento,
-      fecha_Entrega: this.pFechaEntregaEvento,
-      fecha_Recepcion: this.pFechaRecogerEvento,
-      ubicacion: this.pUbicacionEvento,
-      organizador: this.pOrganizadorEvento,
-      tipo_Evento: this.pTipoEvento,
-      capacidad_Evento: this.pCapacidadEvento,
-      observacion: this.pDetallesEvento,
-      estado: this.pEstadoEvento,
-      username: this.authService.getUsername(),
-      id_cliente: this.clienteSeleccionado?.id,
-
-      impreso: this.pImpreso,
-      bloqueado: false,
-      impresiones: this.pimpresiones,
-    };
-
-    this.eventosService.actualizarEvento(idEvento, bodyUpdate).subscribe({
-      next: () => {
-        this.documentLockService.unlock(idEvento);
-        this.isLocked = false;
-        this.pBloqueado = false;
-        this.modoConsulta = false;
-        this.modoEdicion = true;
-        checkbox.checked = false;
-      },
-      error: (err) => {
-        console.error('[Documento] Error al desbloquear:', err);
-        this.isLocked = true;
-        this.pBloqueado = true;
-        this.modoConsulta = true;
-        this.modoEdicion = false;
-      },
-    });
-  });
-}
 
 
 
@@ -798,144 +789,144 @@ onLockToggle(event: Event): void {
   }
   // FIN FUNCION PARA GUARDAR EVENTO
 
-// ==========================================================
-// BUSCAR EVENTO POR ID
-// ==========================================================
-buscarEvento(): void {
-  if (!this.idEventoCreado) {
-    alert('Debes ingresar un ID');
-    return;
+  // ==========================================================
+  // BUSCAR EVENTO POR ID
+  // ==========================================================
+  buscarEvento(): void {
+    if (!this.idEventoCreado) {
+      alert('Debes ingresar un ID');
+      return;
+    }
+
+    this.isLoading = true; // 👈 activar pantalla de carga
+    this.cargarEventoPorId(this.idEventoCreado);
   }
 
-  this.isLoading = true; // 👈 activar pantalla de carga
-  this.cargarEventoPorId(this.idEventoCreado);
-}
+  // ==========================================================
+  // CARGAR EVENTO POR ID (CON CLIENTE)
+  // ==========================================================
+  cargarEventoPorId(id: number | null): void {
+    if (!id) return;
 
-// ==========================================================
-// CARGAR EVENTO POR ID (CON CLIENTE)
-// ==========================================================
-cargarEventoPorId(id: number | null): void {
-  if (!id) return;
+    this.isLoading = true; // 👈 activar pantalla de carga
 
-  this.isLoading = true; // 👈 activar pantalla de carga
+    this.eventosService.obtenerEvento(id).subscribe({
+      next: (res: any) => {
+        if (res?.success && res?.data) {
+          const evento = res.data;
 
-  this.eventosService.obtenerEvento(id).subscribe({
-    next: (res: any) => {
-      if (res?.success && res?.data) {
-        const evento = res.data;
+          // EMITIR EVENTO AL PADRE
+          this.eventoCreado.emit(evento.id);
 
-        // EMITIR EVENTO AL PADRE
-        this.eventoCreado.emit(evento.id);
+          // =========================
+          // EVENTO
+          // =========================
+          this.pTituloEvento = evento.titulo;
+          this.pDescripcionEvento = evento.descripcion;
 
-        // =========================
-        // EVENTO
-        // =========================
-        this.pTituloEvento = evento.titulo;
-        this.pDescripcionEvento = evento.descripcion;
+          this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
+          this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
+          this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
+          this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
 
-        this.pFechaInicioEvento = this.formatearFecha(evento.fecha_Ini);
-        this.pFechaFinEvento = this.formatearFecha(evento.fecha_Fin);
-        this.pFechaEntregaEvento = this.formatearFecha(evento.fecha_Entrega);
-        this.pFechaRecogerEvento = this.formatearFecha(evento.fecha_Recepcion);
+          this.pUbicacionEvento = evento.ubicacion;
+          this.pOrganizadorEvento = evento.organizador;
+          this.pTipoEvento = evento.tipo_Evento;
+          this.pCapacidadEvento = evento.capacidad_Evento;
 
-        this.pUbicacionEvento = evento.ubicacion;
-        this.pOrganizadorEvento = evento.organizador;
-        this.pTipoEvento = evento.tipo_Evento;
-        this.pCapacidadEvento = evento.capacidad_Evento;
+          this.pDetallesEvento = evento.observacion || '';
 
-        this.pDetallesEvento = evento.observacion || '';
+          // =========================
+          // ESTADO DOCUMENTO Y METADATOS
+          // =========================
+          this.pEstadoEvento = evento.estado;
+          this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
+          this.pUsuarioCreacion = evento.username || '';
+          this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
+          this.pUsuarioModificacion = evento.m_Username || '';
 
-        // =========================
-        // ESTADO DOCUMENTO Y METADATOS
-        // =========================
-        this.pEstadoEvento = evento.estado;
-        this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
-        this.pUsuarioCreacion = evento.username || '';
-        this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
-        this.pUsuarioModificacion = evento.m_Username || '';
+          // =========================
+          // CAMPOS NUEVOS:
+          // IMPRESO / BLOQUEADO / IMPRESIONES
+          // =========================
+          this.pImpreso = evento.impreso === true;
+          this.pBloqueado = evento.bloqueado === true;
+          this.pimpresiones = Number(evento.impresiones || 0);
 
-        // =========================
-        // CAMPOS NUEVOS:
-        // IMPRESO / BLOQUEADO / IMPRESIONES
-        // =========================
-        this.pImpreso = evento.impreso === true;
-        this.pBloqueado = evento.bloqueado === true;
-        this.pimpresiones = Number(evento.impresiones || 0);
+          // El estado de bloqueo depende del campo bloqueado en la base de datos
+          const bloqueadoActual = this.pBloqueado;
 
-        // El estado de bloqueo depende del campo bloqueado en la base de datos
-        const bloqueadoActual = this.pBloqueado;
+          // Actualizamos el estado local del componente y del formulario
+          this.isLocked = bloqueadoActual;
+          this.modoConsulta = bloqueadoActual;
+          this.modoEdicion = !bloqueadoActual;
 
-        // Actualizamos el estado local del componente y del formulario
-        this.isLocked = bloqueadoActual;
-        this.modoConsulta = bloqueadoActual;
-        this.modoEdicion = !bloqueadoActual;
+          // Publicamos el estado al DocumentLockService
+          this.documentLockService.setLocked(evento.id, bloqueadoActual);
 
-        // Publicamos el estado al DocumentLockService
-        this.documentLockService.setLocked(evento.id, bloqueadoActual);
+          // =========================
+          // CLIENTE (DESDE EVENTO - JOIN SQL)
+          // =========================
+          this.clienteSeleccionado = null;
 
-        // =========================
-        // CLIENTE (DESDE EVENTO - JOIN SQL)
-        // =========================
-        this.clienteSeleccionado = null;
+          if (evento.id_cliente) {
+            this.cargarTransacciones(evento.id);
+            this.clienteSeleccionado = {
+              id: evento.id_cliente,
+              nit: evento.cliente_NIT || '',
+              nombre: evento.cliente_Nombre || '',
+              apellido: evento.cliente_Apellido || '',
+              email: evento.cliente_Email || '',
+              telefono: evento.cliente_Telefono || '',
+              direccion: evento.cliente_Direccion || '',
+              dpi: evento.cliente_DPI || '',
+              celular: '',
+              tipoCliente: 0,
+              fecha_Registro: '',
+              observacion01: '',
+              observacion02: '',
+              estado: 1,
+              username: '',
+              m_Username: '',
+              fecha_Hora: '',
+              m_Fecha_Hora: null,
+              consecutivo_Interno: 0,
+            } as ClienteModel;
 
-        if (evento.id_cliente) {
-          this.cargarTransacciones(evento.id);
-          this.clienteSeleccionado = {
-            id: evento.id_cliente,
-            nit: evento.cliente_NIT || '',
-            nombre: evento.cliente_Nombre || '',
-            apellido: evento.cliente_Apellido || '',
-            email: evento.cliente_Email || '',
-            telefono: evento.cliente_Telefono || '',
-            direccion: evento.cliente_Direccion || '',
-            dpi: evento.cliente_DPI || '',
-            celular: '',
-            tipoCliente: 0,
-            fecha_Registro: '',
-            observacion01: '',
-            observacion02: '',
-            estado: 1,
-            username: '',
-            m_Username: '',
-            fecha_Hora: '',
-            m_Fecha_Hora: null,
-            consecutivo_Interno: 0,
-          } as ClienteModel;
+            this.clienteCompletoChange.emit(this.clienteSeleccionado);
 
-          this.clienteCompletoChange.emit(this.clienteSeleccionado);
+            // subscribe to lock state for this event
+            this.lockSub?.unsubscribe();
+            this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
+              console.log('[Documento] lock state changed for', evento.id, v);
+              this.isLocked = v;
+            });
+          }
 
-          // subscribe to lock state for this event
-          this.lockSub?.unsubscribe();
-          this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
-            console.log('[Documento] lock state changed for', evento.id, v);
-            this.isLocked = v;
-          });
+          //retraso de 1 segundo antes de ocultar la pantalla
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 1000);
+
+        } else {
+          alert('Evento no encontrado');
+          this.clienteSeleccionado = null;
+
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 1000);
         }
-
-        // 👇 retraso de 1 segundo antes de ocultar la pantalla
-        setTimeout(() => {
-          this.isLoading = false;
-        }, 1000);
-
-      } else {
-        alert('Evento no encontrado');
+      },
+      error: (err: any) => {
+        alert('Error al cargar evento');
         this.clienteSeleccionado = null;
 
         setTimeout(() => {
           this.isLoading = false;
         }, 1000);
-      }
-    },
-    error: (err: any) => {
-      alert('Error al cargar evento');
-      this.clienteSeleccionado = null;
-
-      setTimeout(() => {
-        this.isLoading = false;
-      }, 1000);
-    },
-  });
-}
+      },
+    });
+  }
 
 
   async cargarTransacciones(idEvento: number): Promise<void> {

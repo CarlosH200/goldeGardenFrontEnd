@@ -494,14 +494,15 @@ eliminarProducto(index: number) {
   const transaccion = this.transacciones[index];
   if (!transaccion) return;
 
+  // 🚫 Validación: documento bloqueado
   if (this.isLocked) {
     this.dialog.open(AlertGenericComponent, {
       width: '450px',
       data: {
         titulo: 'Documento bloqueado',
-        mensaje: 'No se puede eliminar la transacción porque el documento está bloqueado.',
+        mensaje: 'Debes desbloquear el documento para poder eliminar una transacción.',
         tipo: 'warning',
-        icon: 'warning',
+        icon: 'lock',
       },
     });
     return;
@@ -524,7 +525,6 @@ eliminarProducto(index: number) {
       return;
     }
 
-    // Si la transacción tiene un ID (fue guardada en la BD), eliminarla del servidor
     if (transaccion.id) {
       this.transaccionesService.eliminarTransaccion(
         transaccion.id,
@@ -533,12 +533,10 @@ eliminarProducto(index: number) {
         next: (res) => {
           if (res?.success) {
             this.transacciones.splice(index, 1);
-
             setTimeout(() => {
               this.actualizarTotal();
               this.cdr.detectChanges();
             });
-
             this.dialog.open(AlertGenericComponent, {
               width: '450px',
               data: {
@@ -564,9 +562,7 @@ eliminarProducto(index: number) {
         },
       });
     } else {
-      // Si no tiene ID, solo eliminar localmente
       this.transacciones.splice(index, 1);
-
       setTimeout(() => {
         this.actualizarTotal();
         this.cdr.detectChanges();

@@ -1,0 +1,186 @@
+/* =========================================================
+   PANTALLA CREAR CLIENTE
+   ========================================================= */
+
+.client-card {
+  background: var(--color-fondo);
+  border: 1px solid var(--color-fondoSecundario);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 100px;
+  box-shadow: 0 6px 14px var(--color-fondoSecundario, 0.06);
+}
+
+
+/* =========================================================
+   ENCABEZADO DE LA TARJETA
+   ========================================================= */
+
+.client-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-principal);
+}
+
+.client-card-header h5 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
+.client-card-header .material-icons {
+  font-size: 22px;
+  color: var(--color-texto-invertido) !important;
+}
+
+
+/* =========================================================
+   INPUTS Y TEXTAREAS
+   ========================================================= */
+
+.form-control {
+  border-radius: 6px;
+  border: 1.5px solid var(--color-texto-invertido);
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-shadow: none;
+  background-color: var(--color-fondoSecundario);
+  color: var(--color-texto) !important;
+}
+
+.form-control:focus {
+  border-color: var(--color-texto-invertido);
+  box-shadow: 0 0 6px var(--color-texto-invertido);
+  outline: none;
+  background-color: var(--color-Shadow);
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.form-control::placeholder {
+  color: var(--color-texto);
+  opacity: 0.5;
+}
+
+
+/* =========================================================
+   ETIQUETAS
+   ========================================================= */
+
+label {
+  font-weight: 600;
+  color: var(--color-texto);
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+
+/* =========================================================
+   SELECT TIPO CLIENTE
+   ========================================================= */
+
+.form-select {
+  border-radius: 6px;
+  width: 100%;
+  min-width: 120px;
+  max-width: 100%;
+  border: 1.5px solid var(--color-texto-invertido);
+  padding: 10px 12px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  background: var(--color-fondoSecundario);
+  color: var(--color-texto);
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--color-texto) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-texto) 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%;
+
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+
+  padding-right: 36px;
+}
+
+.form-select:focus {
+  border-color: #343a40;
+  box-shadow: 0 0 6px #343a40a1;
+  outline: none;
+}
+
+
+/* =========================================================
+   ESPACIADO DE LAS FILAS
+   ========================================================= */
+
+.row.g-3 > div {
+  margin-bottom: 15px;
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.buttonCancel {
+  background-color: red;
+  color: var(--color-texto-invertido);
+  border-color: transparent;
+}
+
+.buttonSave {
+  background-color: var(--color-principal);
+  color: var(--color-texto-invertido);
+  border-color: transparent;
+
+}
+
+
+/* =========================================================
+   ICONOS MATERIAL
+   ========================================================= */
+
+.material-icons {
+  vertical-align: middle;
+  user-select: none;
+  color: var(--color-texto-invertido) !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 575.98px) {
+
+  .row.g-3 {
+    flex-direction: column;
+  }
+
+  .row.g-3 > div {
+    margin-bottom: 20px;
+  }
+
+}

@@ -1,0 +1,426 @@
+<!-- =========================================================
+     BUSCAR CLIENTE EXISTENTE
+     ========================================================= -->
+
+<div class="client-card">
+
+  <!-- ENCABEZADO -->
+  <div class="client-card-header">
+
+    <span class="material-icons">
+      search
+    </span>
+
+    <h5>
+      Buscar Cliente
+    </h5>
+
+  </div>
+
+
+  <!-- =======================================================
+       BUSCADOR
+       ======================================================= -->
+
+  <div class="input-btn-group">
+
+    <input
+      type="text"
+      class="form-control"
+      [(ngModel)]="busquedaCliente"
+      name="busquedaCliente"
+      placeholder="Buscar por NIT, nombre, apellido..."
+      (input)="buscarClientes()"
+      autocomplete="off"
+    />
+
+    <button
+      type="button"
+      class="btn"
+      (click)="buscarClientes()"
+      title="Buscar cliente"
+    >
+
+      <span class="material-icons">
+        search
+      </span>
+
+    </button>
+
+  </div>
+
+
+  <!-- =======================================================
+       RESULTADOS DE BÚSQUEDA
+       ======================================================= -->
+
+  <div
+    class="search-results"
+    *ngIf="clientesEncontrados.length > 0"
+  >
+
+    <div
+      class="search-item"
+      *ngFor="let cliente of clientesEncontrados"
+      (click)="seleccionarCliente(cliente)"
+    >
+
+      <strong>
+        {{ cliente.nombre }}
+        {{ cliente.apellido }}
+      </strong>
+
+      <br>
+
+      <small>
+        NIT: {{ cliente.nit }}
+      </small>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     FORMULARIO DEL CLIENTE
+     
+     IMPORTANTE:
+     Tanto para crear un cliente nuevo como para seleccionar
+     uno existente, los datos se muestran AQUÍ.
+     ========================================================= -->
+
+<div class="containerNewClient">
+
+  <div class="client-card">
+
+
+    <!-- =======================================================
+         ENCABEZADO
+         ======================================================= -->
+
+    <div class="client-card-header">
+
+      <span class="material-icons">
+        person_add
+      </span>
+
+      <h5>
+        Cliente
+      </h5>
+
+    </div>
+
+
+
+    <!-- =======================================================
+         FORMULARIO
+         ======================================================= -->
+
+    <div class="row g-3">
+
+
+      <!-- =====================================================
+           NIT
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          NIT
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.nit"
+          name="nit"
+          type="text"
+          class="form-control"
+          placeholder="Ingrese NIT"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           NOMBRE
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          Nombre
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.nombre"
+          name="nombre"
+          type="text"
+          class="form-control"
+          placeholder="Ingrese nombre"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           APELLIDO
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          Apellido
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.apellido"
+          name="apellido"
+          type="text"
+          class="form-control"
+          placeholder="Ingrese apellido"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           EMAIL
+           ===================================================== -->
+
+      <div class="col-md-6">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.email"
+          name="email"
+          type="email"
+          class="form-control"
+          placeholder="correo@ejemplo.com"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           DPI
+           ===================================================== -->
+
+      <div class="col-md-6">
+
+        <label>
+          DPI
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.dpi"
+          name="dpi"
+          type="text"
+          class="form-control"
+          placeholder="Ingrese DPI"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           DIRECCIÓN
+           ===================================================== -->
+
+      <div class="col-md-12">
+
+        <label>
+          Dirección
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.direccion"
+          name="direccion"
+          type="text"
+          class="form-control"
+          placeholder="Ingrese dirección"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           TELÉFONO
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          Teléfono
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.telefono"
+          name="telefono"
+          type="text"
+          class="form-control"
+          placeholder="Teléfono"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           CELULAR
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          Celular
+        </label>
+
+        <input
+          [(ngModel)]="clienteForm.celular"
+          name="celular"
+          type="text"
+          class="form-control"
+          placeholder="Celular"
+        />
+
+      </div>
+
+
+
+      <!-- =====================================================
+           TIPO CLIENTE
+           ===================================================== -->
+
+      <div class="col-md-4">
+
+        <label>
+          Tipo Cliente
+        </label>
+
+        <select
+          [(ngModel)]="clienteForm.tipoCliente"
+          name="tipoCliente"
+          class="form-select"
+        >
+
+          <option [ngValue]="1">
+            Normal
+          </option>
+
+          <option [ngValue]="2">
+            Frecuente
+          </option>
+
+          <option [ngValue]="3">
+            Empresa
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           OBSERVACIÓN 01
+           ===================================================== -->
+
+      <div class="col-md-6">
+
+        <label>
+          Observación 01
+        </label>
+
+        <textarea
+          [(ngModel)]="clienteForm.observacion01"
+          name="observacion01"
+          class="form-control"
+          rows="3"
+          placeholder="Observación..."
+        ></textarea>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           OBSERVACIÓN 02
+           ===================================================== -->
+
+      <div class="col-md-6">
+
+        <label>
+          Observación 02
+        </label>
+
+        <textarea
+          [(ngModel)]="clienteForm.observacion02"
+          name="observacion02"
+          class="form-control"
+          rows="3"
+          placeholder="Observación..."
+        ></textarea>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =======================================================
+         BOTONES
+         ======================================================= -->
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+
+      <!-- CANCELAR -->
+
+      <button
+        type="button"
+        class="buttonCancel btn btn-secondary"
+        (click)="cancelarFormulario()"
+      >
+
+        <span class="material-icons">
+          cancel
+        </span>
+
+        Cancelar
+
+      </button>
+
+
+
+      <!-- GUARDAR -->
+
+      <button
+        type="button"
+        class="buttonSave btn btn-primary"
+        (click)="guardarCliente()"
+      >
+
+        <span class="material-icons">
+          save
+        </span>
+
+        Guardar Cliente
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

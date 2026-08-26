@@ -93,6 +93,8 @@
           </div>
         </div>
 
+        <!-- COMENTADO POR REDUNDANCIA -->
+         
         <!-- COLUMNA 3: RESUMEN DE PRODUCTOS
         <div class="col-12 col-md-4">
           <div class="summary-card p-3 rounded-3 h-100">
@@ -259,7 +261,7 @@
             <td>Q{{ item.precio.toFixed(2) }}</td>
             <td>Q{{ item.subtotal.toFixed(2) }}</td>
             <td>
-              <button class="buttonDelete" (click)="eliminarProducto(i)" [disabled]="isLocked">
+              <button class="buttonDelete" (click)="eliminarProducto(i)">
                 <i class="material-icons">delete</i>
               </button>
             </td>

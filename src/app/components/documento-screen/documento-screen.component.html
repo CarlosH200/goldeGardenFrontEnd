@@ -1,4 +1,3 @@
-
 <div *ngIf="isLoading" class="loading-overlay">
   <div class="spinner-container">
     <div class="logoLoadingEmpresa"></div>
@@ -6,104 +5,71 @@
   </div>
 </div>
 
-
 <div>
   <form class="event-form">
     <!-- CONTENEDOR SUPERIOR EN 3 SECCIONES HORIZONTALES -->
     <div class="doc-top-container mb-4">
       <div class="row g-3 align-items-stretch">
 
-        <!-- SECCIÓN 1: BUSCADOR POR ID -->
-        <div class="col-12 col-lg-3">
-          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
-            <div class="section-label mb-2 d-flex align-items-center gap-1">
-              <span class="material-icons fs-6 text-primary">search</span>
-              <span class="fw-bold text-uppercase small">Buscar Evento por ID</span>
-            </div>
-            <div class="input-group doc-search-group">
-              <span class="input-group-text border-end-0">
-                <span class="material-icons">badge</span>
-              </span>
-              <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado" class="form-control border-start-0 ps-0"
-                placeholder="ID Evento" (keyup.enter)="buscarEvento()">
-              <button type="button" class="btn btn-search-doc d-flex align-items-center px-3" (click)="buscarEvento()" title="Buscar Evento">
-                <span class="material-icons">search</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECCIÓN 2: ESTADO E INFORMACIÓN DEL EVENTO -->
-        <div class="col-12 col-lg-6">
-          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-between">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-              <div class="section-label d-flex align-items-center gap-1">
-                <span class="material-icons fs-6 text-primary">info</span>
-                <span class="fw-bold text-uppercase small">Información y Estado</span>
-                <span class="badge doc-event-badge ms-2" *ngIf="idEventoCreado">
-                  No. {{ idEventoCreado }}
-                </span>
-              </div>
-              <!-- SELECTOR DE ESTADO -->
-              <div class="select-wrapper" style="min-width: 170px;">
-                <select class="form-select doc-state-select py-1" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
-                  [disabled]="!modoEdicion">
-                  <option *ngFor="let estado of Estados" [value]="estado.id">
-                    {{ estado.descripcion }} ({{ estado.id }})
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <!-- AUDITORÍA DE EVENTO (CREACIÓN Y MODIFICACIÓN) -->
-            <div class="doc-audit-strip d-flex align-items-center justify-content-around flex-wrap gap-2 p-2 rounded-3">
-              <div class="audit-item d-flex align-items-center gap-1 small">
-                <span class="material-icons opacity-75 fs-6">calendar_today</span>
-                <span class="opacity-75">Creación:</span>
-                <span class="fw-semibold">{{ pFechaCreacion || '---' }}</span>
-                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioCreacion">👤 {{ pUsuarioCreacion }}</span>
-              </div>
-              <div class="audit-divider d-none d-sm-block"></div>
-              <div class="audit-item d-flex align-items-center gap-1 small">
-                <span class="material-icons opacity-75 fs-6">edit_calendar</span>
-                <span class="opacity-75">Modificación:</span>
-                <span class="fw-semibold">{{ pFechaModificacion || 'Sin cambios' }}</span>
-                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioModificacion">👤 {{ pUsuarioModificacion }}</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <!-- SECCIÓN 3: ACCIONES Y FUNCIONES -->
         <div class="col-12 col-lg-3">
-          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
+          <div
+            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center"
+          >
             <div class="section-label mb-2 d-flex align-items-center gap-1">
               <span class="material-icons fs-6 text-primary">touch_app</span>
               <span class="fw-bold text-uppercase small">Acciones</span>
             </div>
-            <div class="doc-actions-toolbar d-flex align-items-center gap-2 flex-wrap">
-
+            <div
+              class="doc-actions-toolbar d-flex align-items-center gap-2 flex-wrap"
+            >
               <!-- BOTÓN NUEVO EVENTO (SOLO ÍCONO INTUITIVO) -->
-              <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="habilitarModoCreacionEvento()" title="Crear Nuevo Evento">
+              <button
+                type="button"
+                class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
+                (click)="habilitarModoCreacionEvento()"
+                title="Crear Nuevo Evento"
+              >
                 <span class="material-icons fs-5">note_add</span>
               </button>
 
               <!-- BOTÓN GUARDAR CAMBIOS -->
-              <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" *ngIf="!modoConsulta" (click)="guardarEvento()" [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'">
+              <button
+                type="button"
+                class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
+                *ngIf="!modoConsulta"
+                (click)="guardarEvento()"
+                [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'"
+              >
                 <span class="material-icons fs-5">save</span>
               </button>
 
               <!-- BOTÓN IMPRIMIR -->
               <div class="position-relative">
-                <button type="button" class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3" (click)="toggleOpcionesImpresion()" title="Imprimir Documento">
+                <button
+                  type="button"
+                  class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
+                  (click)="toggleOpcionesImpresion()"
+                  title="Imprimir Documento"
+                >
                   <span class="material-icons fs-5">print</span>
                 </button>
-                <div class="impresion-opciones shadow-sm" *ngIf="mostrarOpcionesImpresion">
-                  <button type="button" class="dropdown-item" (click)="imprimirFormato(TipoDocumento.Cotizacion)">
+                <div
+                  class="impresion-opciones shadow-sm"
+                  *ngIf="mostrarOpcionesImpresion"
+                >
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    (click)="imprimirFormato(TipoDocumento.Cotizacion)"
+                  >
                     Cotización
                   </button>
-                  <button type="button" class="dropdown-item" (click)="imprimirFormato(TipoDocumento.Contrato)">
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    (click)="imprimirFormato(TipoDocumento.Contrato)"
+                  >
                     Contrato
                   </button>
                 </div>
@@ -113,46 +79,172 @@
               <!-- Indicador de bloqueo (checkbox) -->
               <div class="d-flex align-items-center gap-2">
                 <label class="form-check-label d-flex align-items-center gap-2">
-                  <input class="form-check-input" type="checkbox" [checked]="isLocked" (change)="onLockToggle($event)" />
-                  <span>{{ isLocked ? 'Bloqueado' : 'Desbloqueado' }}</span>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [checked]="isLocked"
+                    (change)="onLockToggle($event)"
+                  />
+                  <span>{{ isLocked ? "Bloqueado" : "Desbloqueado" }}</span>
                 </label>
               </div>
-
             </div>
           </div>
         </div>
 
+       
+
+        <!-- SECCIÓN 2: ESTADO E INFORMACIÓN DEL EVENTO -->
+        <div class="col-12 col-lg-6">
+          <div
+            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-between"
+          >
+            <div
+              class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
+            >
+              <div class="section-label d-flex align-items-center gap-1">
+                <span class="material-icons fs-6 text-primary">info</span>
+                <span class="fw-bold text-uppercase small"
+                  >Información y Estado</span
+                >
+                <span class="badge doc-event-badge ms-2" *ngIf="idEventoCreado">
+                  No. {{ idEventoCreado }}
+                </span>
+              </div>
+              <!-- SELECTOR DE ESTADO -->
+              <div class="select-wrapper" style="min-width: 170px">
+                <select
+                  class="form-select doc-state-select py-1"
+                  [(ngModel)]="pEstadoEvento"
+                  name="pEstadoEvento"
+                  [disabled]="!modoEdicion"
+                >
+                  <option *ngFor="let estado of Estados" [value]="estado.id">
+                    {{ estado.descripcion }} ({{ estado.id }})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- AUDITORÍA DE EVENTO (CREACIÓN Y MODIFICACIÓN) -->
+            <div
+              class="doc-audit-strip d-flex align-items-center justify-content-around flex-wrap gap-2 p-2 rounded-3"
+            >
+              <div class="audit-item d-flex align-items-center gap-1 small">
+                <span class="material-icons opacity-75 fs-6"
+                  >calendar_today</span
+                >
+                <span class="opacity-75">Creación:</span>
+                <span class="fw-semibold">{{ pFechaCreacion || "---" }}</span>
+                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioCreacion"
+                  >👤 {{ pUsuarioCreacion }}</span
+                >
+              </div>
+              <div class="audit-divider d-none d-sm-block"></div>
+              <div class="audit-item d-flex align-items-center gap-1 small">
+                <span class="material-icons opacity-75 fs-6"
+                  >edit_calendar</span
+                >
+                <span class="opacity-75">Modificación:</span>
+                <span class="fw-semibold">{{
+                  pFechaModificacion || "Sin cambios"
+                }}</span>
+                <span
+                  class="badge doc-user-badge ms-1"
+                  *ngIf="pUsuarioModificacion"
+                  >👤 {{ pUsuarioModificacion }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+ <!-- SECCIÓN 1: BUSCADOR POR ID -->
+        <div class="col-12 col-lg-3">
+          <div
+            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center"
+          >
+            <div class="section-label mb-2 d-flex align-items-center gap-1">
+              <span class="material-icons fs-6 text-primary">search</span>
+              <span class="fw-bold text-uppercase small"
+                >Buscar Evento por ID</span
+              >
+            </div>
+            <div class="input-group doc-search-group">
+              <span class="input-group-text border-end-0">
+                <span class="material-icons">badge</span>
+              </span>
+              <input
+                type="text"
+                [(ngModel)]="idEventoCreado"
+                name="idEventoCreado"
+                class="form-control border-start-0 ps-0"
+                placeholder="ID Evento"
+                (keyup.enter)="buscarEvento()"
+              />
+              <button
+                type="button"
+                class="btn btn-search-doc d-flex align-items-center px-3"
+                (click)="buscarEvento()"
+                title="Buscar Evento"
+              >
+                <span class="material-icons">search</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-
     <!-- Buscador de clientes -->
     <div class="input-btn-group mb-3">
-
-      <input type="text" [(ngModel)]="busquedaCliente" name="busquedaCliente" (keyup.enter)="buscarClientes()"
-        class="form-control" placeholder="Cliente..." />
+      <input
+        type="text"
+        [(ngModel)]="busquedaCliente"
+        name="busquedaCliente"
+        (keyup.enter)="buscarClientes()"
+        class="form-control"
+        placeholder="Cliente..."
+      />
 
       <button type="button" class="buttonCircle" (click)="buscarClientes()">
         <span class="material-icons">search</span>
       </button>
 
-      <button type="button" class="buttonCircle" (click)="showCreateClient()" *ngIf="dataCreateClient === 0">
+      <button
+        type="button"
+        class="buttonCircle"
+        (click)="showCreateClient()"
+        *ngIf="dataCreateClient === 0"
+      >
         <span class="material-icons">add_circle</span>
       </button>
 
-      <button type="button" class="buttonCircle buttonSave" (click)="guardarCliente()" *ngIf="dataCreateClient === 1">
+      <button
+        type="button"
+        class="buttonCircle buttonSave"
+        (click)="guardarCliente()"
+        *ngIf="dataCreateClient === 1"
+      >
         <span class="material-icons">save</span>
       </button>
 
-      <button type="button" class="buttonCircle buttonCancel" (click)="hideCreateClient()"
-        *ngIf="dataCreateClient === 1">
+      <button
+        type="button"
+        class="buttonCircle buttonCancel"
+        (click)="hideCreateClient()"
+        *ngIf="dataCreateClient === 1"
+      >
         <span class="material-icons">cancel</span>
       </button>
     </div>
 
     <!-- RESULTADOS SOLO PARA SELECCIONAR -->
     <div *ngIf="clientesEncontrados.length > 0" class="search-results">
-      <div *ngFor="let cliente of clientesEncontrados" (click)="seleccionarCliente(cliente)" class="search-item">
+      <div
+        *ngFor="let cliente of clientesEncontrados"
+        (click)="seleccionarCliente(cliente)"
+        class="search-item"
+      >
         {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.nit }}
       </div>
     </div>
@@ -160,28 +252,27 @@
     <!--CLIENTE SELECCIONADO -->
     <div *ngIf="clienteSeleccionado" class="selected-client mt-2">
       <div class="estiloscardResult card p-2 textResultStilyng">
-
         <!-- Nombre + Estado -->
         <div class="d-flex justify-content-between align-items-center">
-
           <strong>
-            Nombre: {{ clienteSeleccionado.nombre }} {{ clienteSeleccionado.apellido }}
+            Nombre: {{ clienteSeleccionado.nombre }}
+            {{ clienteSeleccionado.apellido }}
           </strong>
 
           <div class="d-flex align-items-center gap-2">
-
             <!-- texto -->
             <strong>
-              {{ clienteSeleccionado.estado == 1 ? 'Activo' : 'Inactivo' }}
+              {{ clienteSeleccionado.estado == 1 ? "Activo" : "Inactivo" }}
             </strong>
             <!-- circulito -->
-            <span class="estado-dot" [ngClass]="{
-            'activo': clienteSeleccionado.estado == 1,
-            'inactivo': clienteSeleccionado.estado == 2
-          }">
+            <span
+              class="estado-dot"
+              [ngClass]="{
+                activo: clienteSeleccionado.estado == 1,
+                inactivo: clienteSeleccionado.estado == 2,
+              }"
+            >
             </span>
-
-
           </div>
         </div>
 
@@ -190,7 +281,6 @@
         <div>Dirección: {{ clienteSeleccionado.direccion }}</div>
         <div>Tel: {{ clienteSeleccionado.telefono }}</div>
         <div>Email: {{ clienteSeleccionado.email }}</div>
-
       </div>
     </div>
 
@@ -205,47 +295,91 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label>NIT</label>
-            <input [(ngModel)]="clienteForm.nit" name="nit" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.nit"
+              name="nit"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-4">
             <label>Nombre</label>
-            <input [(ngModel)]="clienteForm.nombre" name="nombre" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.nombre"
+              name="nombre"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-4">
             <label>Apellido</label>
-            <input [(ngModel)]="clienteForm.apellido" name="apellido" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.apellido"
+              name="apellido"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-6">
             <label>Email</label>
-            <input [(ngModel)]="clienteForm.email" name="email" type="email" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.email"
+              name="email"
+              type="email"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-6">
             <label>DPI</label>
-            <input [(ngModel)]="clienteForm.dpi" name="dpi" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.dpi"
+              name="dpi"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-12">
             <label>Dirección</label>
-            <input [(ngModel)]="clienteForm.direccion" name="direccion" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.direccion"
+              name="direccion"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-4">
             <label>Teléfono</label>
-            <input [(ngModel)]="clienteForm.telefono" name="telefono" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.telefono"
+              name="telefono"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-4">
             <label>Celular</label>
-            <input [(ngModel)]="clienteForm.celular" name="celular" type="text" class="form-control" />
+            <input
+              [(ngModel)]="clienteForm.celular"
+              name="celular"
+              type="text"
+              class="form-control"
+            />
           </div>
 
           <div class="col-md-4">
             <label>Tipo Cliente</label>
-            <select [(ngModel)]="clienteForm.tipoCliente" name="tipoCliente" class="form-select">
+            <select
+              [(ngModel)]="clienteForm.tipoCliente"
+              name="tipoCliente"
+              class="form-select"
+            >
               <option value="1">Normal</option>
               <option value="2">Frecuente</option>
               <option value="3">Empresa</option>
@@ -254,14 +388,23 @@
 
           <div class="col-md-6">
             <label>Observación 01</label>
-            <textarea [(ngModel)]="clienteForm.observacion01" name="observacion01" class="form-control"
-              rows="2" [readonly]="modoConsulta"></textarea>
+            <textarea
+              [(ngModel)]="clienteForm.observacion01"
+              name="observacion01"
+              class="form-control"
+              rows="2"
+              [readonly]="modoConsulta"
+            ></textarea>
           </div>
 
           <div class="col-md-6">
             <label>Observación 02</label>
-            <textarea [(ngModel)]="clienteForm.observacion02" name="observacion02" class="form-control"
-              rows="2"></textarea>
+            <textarea
+              [(ngModel)]="clienteForm.observacion02"
+              name="observacion02"
+              class="form-control"
+              rows="2"
+            ></textarea>
           </div>
         </div>
       </div>
@@ -272,34 +415,70 @@
     <!-- Información del evento -->
     <div class="form-group mb-3">
       <label for="tituloEvento">Título Evento</label>
-      <input type="text" [(ngModel)]="pTituloEvento" name="pTituloEvento" class="form-control" required
-        [readonly]="modoConsulta" />
+      <input
+        type="text"
+        [(ngModel)]="pTituloEvento"
+        name="pTituloEvento"
+        class="form-control"
+        required
+        [readonly]="modoConsulta"
+      />
     </div>
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Descripcion</label>
-      <textarea name="pDescripcionEvento" [(ngModel)]="pDescripcionEvento" rows="5" class="form-control" [readonly]="modoConsulta"></textarea>
+      <textarea
+        name="pDescripcionEvento"
+        [(ngModel)]="pDescripcionEvento"
+        rows="5"
+        class="form-control"
+        [readonly]="modoConsulta"
+      ></textarea>
     </div>
     <div class="containerDates">
       <div class="row g-3">
         <div class="col-md-6">
           <label for="fechaEntrega">Fecha Entrega</label>
-          <input type="datetime-local" name="pFechaEntregaEvento" class="form-control" [(ngModel)]="pFechaEntregaEvento"
-          [readonly]="modoConsulta"  required />
+          <input
+            type="datetime-local"
+            name="pFechaEntregaEvento"
+            class="form-control"
+            [(ngModel)]="pFechaEntregaEvento"
+            [readonly]="modoConsulta"
+            required
+          />
         </div>
         <div class="col-md-6">
           <label for="fechaRecoger">Fecha Recoger</label>
-          <input type="datetime-local" name="pFechaRecogerEvento" class="form-control" [(ngModel)]="pFechaRecogerEvento"
-            [readonly]="modoConsulta" required />
+          <input
+            type="datetime-local"
+            name="pFechaRecogerEvento"
+            class="form-control"
+            [(ngModel)]="pFechaRecogerEvento"
+            [readonly]="modoConsulta"
+            required
+          />
         </div>
         <div class="col-md-6">
           <label for="fechaInicio">Fecha Inicio</label>
-          <input type="datetime-local" name="pFechaInicioEvento" class="form-control" [(ngModel)]="pFechaInicioEvento"
-            [readonly]="modoConsulta"  required />
+          <input
+            type="datetime-local"
+            name="pFechaInicioEvento"
+            class="form-control"
+            [(ngModel)]="pFechaInicioEvento"
+            [readonly]="modoConsulta"
+            required
+          />
         </div>
         <div class="col-md-6">
           <label for="fechaFin">Fecha Fin</label>
-          <input type="datetime-local" name="pFechaFinEvento" class="form-control" [(ngModel)]="pFechaFinEvento"
-            [readonly]="modoConsulta" required />
+          <input
+            type="datetime-local"
+            name="pFechaFinEvento"
+            class="form-control"
+            [(ngModel)]="pFechaFinEvento"
+            [readonly]="modoConsulta"
+            required
+          />
         </div>
       </div>
     </div>
@@ -307,7 +486,13 @@
     <div class="row mt-3">
       <div class="col-md-6 mb-3">
         <label for="ubicacion">Ubicación</label>
-        <select class="form-select" [(ngModel)]="pUbicacionEvento" name="tipoEvento" [disabled]="modoConsulta" required>
+        <select
+          class="form-select"
+          [(ngModel)]="pUbicacionEvento"
+          name="tipoEvento"
+          [disabled]="modoConsulta"
+          required
+        >
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let ubicacion of ubicaciones" [value]="ubicacion.id">
             ({{ ubicacion.id }}) {{ ubicacion.descripcion }}
@@ -316,9 +501,18 @@
       </div>
       <div class="col-md-6 mb-3">
         <label for="organizador">Organizador</label>
-        <select class="form-select" [(ngModel)]="pOrganizadorEvento" name="pOrganizadorEvento" [disabled]="modoConsulta" required>
+        <select
+          class="form-select"
+          [(ngModel)]="pOrganizadorEvento"
+          name="pOrganizadorEvento"
+          [disabled]="modoConsulta"
+          required
+        >
           <option value="" disabled selected>Selecciona una opción</option>
-          <option *ngFor="let organizador of Organizadores" [value]="organizador.id">
+          <option
+            *ngFor="let organizador of Organizadores"
+            [value]="organizador.id"
+          >
             ({{ organizador.id }}) {{ organizador.descripcion }}
           </option>
         </select>
@@ -326,7 +520,13 @@
 
       <div class="col-md-6 mb-3">
         <label for="tipoEvento">Tipo Evento</label>
-        <select class="form-select" [(ngModel)]="pTipoEvento" name="pTipoEvento" [disabled]="modoConsulta" required>
+        <select
+          class="form-select"
+          [(ngModel)]="pTipoEvento"
+          name="pTipoEvento"
+          [disabled]="modoConsulta"
+          required
+        >
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let tEvento of tipoEvento" [value]="tEvento.id">
             ({{ tEvento.id }}) {{ tEvento.descripcion }}
@@ -336,7 +536,13 @@
 
       <div class="col-md-6 mb-3">
         <label for="capacidadEvento">Capacidad Evento</label>
-        <select class="form-select" [(ngModel)]="pCapacidadEvento" name="pCapacidadEvento" [disabled]="modoConsulta" required>
+        <select
+          class="form-select"
+          [(ngModel)]="pCapacidadEvento"
+          name="pCapacidadEvento"
+          [disabled]="modoConsulta"
+          required
+        >
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let capacidad of Capacidades" [value]="capacidad.id">
             <!-- ({{ capacidad.id }})  -->
@@ -348,11 +554,22 @@
 
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Detalles Adicionales</label>
-      <textarea name="pDetallesEvento" [(ngModel)]="pDetallesEvento" rows="5" class="form-control" [readonly]="modoConsulta"></textarea>
+      <textarea
+        name="pDetallesEvento"
+        [(ngModel)]="pDetallesEvento"
+        rows="5"
+        class="form-control"
+        [readonly]="modoConsulta"
+      ></textarea>
     </div>
 
-    <button class="btn btn-dark w-100 fw-bold" *ngIf="!modoConsulta" (click)="guardarEvento()" type="submit">
-      {{ idEventoCreado ? 'GUARDAR CAMBIOS EN EVENTO' : 'GUARDAR EVENTO' }}
+    <button
+      class="btn btn-dark w-100 fw-bold"
+      *ngIf="!modoConsulta"
+      (click)="guardarEvento()"
+      type="submit"
+    >
+      {{ idEventoCreado ? "GUARDAR CAMBIOS EN EVENTO" : "GUARDAR EVENTO" }}
     </button>
   </form>
 </div>

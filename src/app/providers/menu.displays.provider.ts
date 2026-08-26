@@ -4,6 +4,7 @@ import { MenuDisplayModel } from '../models/menuDisplaysModel';
 // Importa los componentes que vas a mostrar
 import { EventComponent } from '../components/evento_screen/event.component';
 import { EventCalendarComponent } from '../components/event-calendar/event-calendar.component';
+import { CreateClientComponent } from '../components/create-client/create-client.component';
 
 
 @Injectable({
@@ -29,7 +30,7 @@ export class MenuDisplayProvider {
     {
       id: 3,
       nombre: 'Clientes',
-      component: EventCalendarComponent,
+      component: CreateClientComponent,
       enabled: false,
       icon: 'group_add'
     },

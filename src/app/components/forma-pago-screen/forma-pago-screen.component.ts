@@ -475,38 +475,39 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
 
 
 
-eliminarPago(index: number) {
-  const pago = this.pagos[index];
-  if (!pago) return;
+  eliminarPago(index: number) {
+    const pago = this.pagos[index];
+    if (!pago) return;
 
-  if (this.isLocked) {
-    this.dialog.open(AlertGenericComponent, {
+    if (this.isLocked) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Documento bloqueado',
+          mensaje: 'Debes desbloquear el documento para poder eliminar una transacción.',
+          tipo: 'warning',
+          icon: 'lock',
+        },
+      });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
       width: '450px',
       data: {
-        titulo: 'Documento bloqueado',
-        mensaje: 'No se puede eliminar un pago porque el documento está bloqueado.',
+        titulo: 'Confirmación',
+        mensaje: '¿Está seguro de eliminar este pago?',
         tipo: 'warning',
         icon: 'warning',
+        mostrarBotones: true,
       },
     });
-    return;
-  }
 
-  // Abrir diálogo de confirmación
-  const dialogRef = this.dialog.open(AlertGenericComponent, {
-    width: '450px',
-    data: {
-      titulo: 'Confirmación',
-      mensaje: '¿Está seguro de eliminar este pago?',
-      tipo: 'warning',
-      icon: 'warning',
-      mostrarBotones: true
-    },
-  });
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado !== 'confirmar' && resultado !== true) {
+        return;
+      }
 
-  dialogRef.afterClosed().subscribe((resultado) => {
-    if (resultado === 'confirmar' || resultado === true) {
-      // Si el pago tiene un ID (fue guardado en la BD), cambiar su estado en el servidor
       if (pago.id) {
         this.pagosService.cambiarEstadoPago(pago.id, 2).subscribe({
           next: (res) => {
@@ -549,9 +550,8 @@ eliminarPago(index: number) {
           this.documentLockService.unlock(this.idEvento);
         }
       }
-    }
-  });
-}
+    });
+  }
 
 
   limpiar() {

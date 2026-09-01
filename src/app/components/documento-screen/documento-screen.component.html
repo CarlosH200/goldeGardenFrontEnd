@@ -438,47 +438,110 @@
       <div class="row g-3">
         <div class="col-md-6">
           <label for="fechaEntrega">Fecha Entrega</label>
-          <input
-            type="datetime-local"
-            name="pFechaEntregaEvento"
-            class="form-control"
-            [(ngModel)]="pFechaEntregaEvento"
-            [readonly]="modoConsulta"
-            required
-          />
+          <div class="date-input-shell">
+            <input
+              id="fechaEntrega"
+              type="datetime-local"
+              name="pFechaEntregaEvento"
+              class="form-control modern-datetime-input"
+              [(ngModel)]="pFechaEntregaEvento"
+              [readonly]="modoConsulta"
+              [disabled]="modoConsulta"
+              required
+            />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('entrega')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para entrega">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </button>
+            <div *ngIf="datePickerState.entrega" class="date-picker-popover">
+              <input type="date" class="form-control" [(ngModel)]="datePickerTemp.entrega" name="dateEntregaPicker" />
+              <input type="time" class="form-control" [(ngModel)]="timePickerTemp.entrega" name="timeEntregaPicker" />
+              <div class="date-picker-actions">
+                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('entrega')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('entrega')">Cancelar</button>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="col-md-6">
           <label for="fechaRecoger">Fecha Recoger</label>
-          <input
-            type="datetime-local"
-            name="pFechaRecogerEvento"
-            class="form-control"
-            [(ngModel)]="pFechaRecogerEvento"
-            [readonly]="modoConsulta"
-            required
-          />
+          <div class="date-input-shell">
+            <input
+              id="fechaRecoger"
+              type="datetime-local"
+              name="pFechaRecogerEvento"
+              class="form-control modern-datetime-input"
+              [(ngModel)]="pFechaRecogerEvento"
+              [readonly]="modoConsulta"
+              [disabled]="modoConsulta"
+              required
+            />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('recoger')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para recoger">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </button>
+            <div *ngIf="datePickerState.recoger" class="date-picker-popover">
+              <input type="date" class="form-control" [(ngModel)]="datePickerTemp.recoger" name="dateRecogerPicker" />
+              <input type="time" class="form-control" [(ngModel)]="timePickerTemp.recoger" name="timeRecogerPicker" />
+              <div class="date-picker-actions">
+                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('recoger')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('recoger')">Cancelar</button>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="col-md-6">
           <label for="fechaInicio">Fecha Inicio</label>
-          <input
-            type="datetime-local"
-            name="pFechaInicioEvento"
-            class="form-control"
-            [(ngModel)]="pFechaInicioEvento"
-            [readonly]="modoConsulta"
-            required
-          />
+          <div class="date-input-shell">
+            <input
+              id="fechaInicio"
+              type="datetime-local"
+              name="pFechaInicioEvento"
+              class="form-control modern-datetime-input"
+              [(ngModel)]="pFechaInicioEvento"
+              [readonly]="modoConsulta"
+              [disabled]="modoConsulta"
+              required
+            />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('inicio')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para inicio">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </button>
+            <div *ngIf="datePickerState.inicio" class="date-picker-popover">
+              <input type="date" class="form-control" [(ngModel)]="datePickerTemp.inicio" name="dateInicioPicker" />
+              <input type="time" class="form-control" [(ngModel)]="timePickerTemp.inicio" name="timeInicioPicker" />
+              <div class="date-picker-actions">
+                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('inicio')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('inicio')">Cancelar</button>
+              </div>
+            </div>
+          </div>
         </div>
+
         <div class="col-md-6">
           <label for="fechaFin">Fecha Fin</label>
-          <input
-            type="datetime-local"
-            name="pFechaFinEvento"
-            class="form-control"
-            [(ngModel)]="pFechaFinEvento"
-            [readonly]="modoConsulta"
-            required
-          />
+          <div class="date-input-shell">
+            <input
+              id="fechaFin"
+              type="datetime-local"
+              name="pFechaFinEvento"
+              class="form-control modern-datetime-input"
+              [(ngModel)]="pFechaFinEvento"
+              [readonly]="modoConsulta"
+              [disabled]="modoConsulta"
+              required
+            />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('fin')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para fin">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </button>
+            <div *ngIf="datePickerState.fin" class="date-picker-popover">
+              <input type="date" class="form-control" [(ngModel)]="datePickerTemp.fin" name="dateFinPicker" />
+              <input type="time" class="form-control" [(ngModel)]="timePickerTemp.fin" name="timeFinPicker" />
+              <div class="date-picker-actions">
+                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('fin')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('fin')">Cancelar</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

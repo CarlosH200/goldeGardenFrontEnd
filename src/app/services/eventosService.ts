@@ -29,4 +29,19 @@ export class EventosService {
   obtenerEventos(): Observable<{ success: boolean, data: EventosModel[] }> {
     return this.http.get<{ success: boolean, data: EventosModel[] }>(this.apiUrl);
   }
+
+  // Método específico para bloquear/desbloquear evento
+  bloquearEvento(id: number, bloqueado: boolean): Observable<EventoResponse> {
+    return this.http.patch<EventoResponse>(`${this.apiUrl}/${id}/bloquear`, { bloqueado });
+  }
+
+  // Método para actualizar solo campos de impresión
+  actualizarImpresion(id: number, impreso: boolean, impresiones: number): Observable<EventoResponse> {
+    return this.http.patch<EventoResponse>(`${this.apiUrl}/${id}`, { impreso, impresiones });
+  }
+
+  // Método para actualizar solo el estado bloqueado
+  actualizarBloqueado(id: number, bloqueado: boolean): Observable<EventoResponse> {
+    return this.http.patch<EventoResponse>(`${this.apiUrl}/${id}`, { bloqueado });
+  }
 }

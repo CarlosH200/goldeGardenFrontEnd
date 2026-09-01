@@ -365,6 +365,81 @@ label {
   color: #212529;
 }
 
+input[type="datetime-local"].modern-datetime-input {
+  min-height: 52px;
+  padding: 0.8rem 2.8rem 0.8rem 0.95rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-Shadow);
+  background-color: var(--color-fondoSecundario);
+  color: var(--color-texto);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 10px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+input[type="datetime-local"].modern-datetime-input:focus {
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 0.2rem rgba(6, 91, 50, 0.15);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.date-input-shell {
+  position: relative;
+}
+
+.calendar-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--color-principal);
+  cursor: pointer;
+  opacity: 0.9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.calendar-btn:hover {
+  background: rgba(6, 91, 50, 0.08);
+}
+
+.calendar-btn .material-symbols-outlined {
+  font-size: 22px;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.date-picker-popover {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--color-fondo);
+  border: 1px solid var(--color-Shadow);
+  border-radius: 12px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.date-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.date-picker-popover .form-control {
+  min-height: 42px;
+}
+
 /* Margen entre filas */
 .row.g-3 > div {
   margin-bottom: 15px;

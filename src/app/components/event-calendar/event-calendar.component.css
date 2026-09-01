@@ -912,6 +912,10 @@
   color: #dc2626;
 }
 
+.ec-client-info {
+  min-height: 42px;
+}
+
 /* ================================================================
    RESPONSIVE
    ================================================================ */
@@ -1029,6 +1033,15 @@
 
   .ec-card-meta {
     gap: 8px;
+  }
+
+  .ec-card-header-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ec-estado-badge {
+    align-self: flex-start;
   }
 
   .ec-meta-item {

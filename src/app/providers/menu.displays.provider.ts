@@ -34,7 +34,7 @@ export class MenuDisplayProvider {
       enabled: false,
       icon: 'group_add'
     },
- 
+
   ];
 
   getMenu(): MenuDisplayModel[] {

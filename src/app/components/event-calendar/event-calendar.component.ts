@@ -5,8 +5,10 @@ import { ThemeService } from '../../services/theme.service';
 import { EventosService } from '../../services/eventosService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { PagosService } from '../../services/pagosService';
+import { ClientesService } from '../../services/cliente.service';
 import { EventosModel } from '../../models/eventosModel';
 import { PagoModel } from '../../models/pagoModel';
+import { ClienteModel } from '../../models/clienteModel';
 
 interface CalendarDay {
   date: Date;
@@ -38,9 +40,12 @@ export class EventCalendarComponent implements OnInit {
   filteredEventos: EventosModel[] = [];
   searchQuery: string = '';
   loading: boolean = false;
+  loadError: string = '';
 
   // ========== DETAIL PANEL ==========
   selectedEvent: EventosModel | null = null;
+  detailCliente: ClienteModel | null = null;
+  detailClienteLoading: boolean = false;
   detailTransacciones: any[] = [];
   detailPagos: PagoModel[] = [];
   detailLoading: boolean = false;
@@ -57,7 +62,8 @@ export class EventCalendarComponent implements OnInit {
     public theme: ThemeService,
     private eventosService: EventosService,
     private transaccionesService: TransaccionesService,
-    private pagosService: PagosService
+    private pagosService: PagosService,
+    private clientesService: ClientesService
   ) {}
 
   ngOnInit(): void {
@@ -67,17 +73,26 @@ export class EventCalendarComponent implements OnInit {
   // ========== DATA LOADING ==========
   loadEventos(): void {
     this.loading = true;
+    this.loadError = '';
     this.eventosService.obtenerEventos().subscribe({
-      next: (res) => {
-        if (res?.success && Array.isArray(res.data)) {
-          this.eventos = res.data.filter(e => e.estado === 1);
+      next: (res: any) => {
+        const data = Array.isArray(res) ? res : res?.data;
+        if (Array.isArray(data)) {
+          this.eventos = data.filter((e: EventosModel) => [1, 3].includes(Number(e.estado)));
           this.filteredEventos = [...this.eventos];
           this.buildCalendar();
+        } else {
+          this.eventos = [];
+          this.filteredEventos = [];
+          this.loadError = 'La API no devolvió una lista de eventos válida.';
         }
         this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar eventos:', err);
+        this.loadError = err.status === 405
+          ? 'La API de eventos no permite GET. Debe habilitarse el método de consulta en el backend.'
+          : 'No fue posible cargar los eventos. Verifica que la API esté disponible.';
         this.loading = false;
       }
     });
@@ -297,8 +312,44 @@ export class EventCalendarComponent implements OnInit {
     this.selectedEvent = evento;
     this.showDetail = true;
     this.detailLoading = true;
+    this.detailCliente = null;
+    this.detailClienteLoading = Boolean(evento.id_cliente);
     this.detailTransacciones = [];
     this.detailPagos = [];
+
+    if (evento.id_cliente) {
+      const eventData = evento as any;
+      const clienteIncluido = eventData.cliente_Nombre || eventData.Cliente_Nombre;
+
+      if (clienteIncluido) {
+        this.detailCliente = {
+          id: Number(evento.id_cliente),
+          nombre: clienteIncluido,
+          apellido: eventData.cliente_Apellido || eventData.Cliente_Apellido || '',
+          nit: eventData.cliente_NIT || eventData.Cliente_NIT || '',
+          email: eventData.cliente_Email || eventData.Cliente_Email || '',
+          telefono: eventData.cliente_Telefono || eventData.Cliente_Telefono || '',
+          celular: '',
+          dpi: eventData.cliente_DPI || eventData.Cliente_DPI || '',
+          direccion: eventData.cliente_Direccion || eventData.Cliente_Direccion || ''
+        } as ClienteModel;
+        this.detailClienteLoading = false;
+      }
+
+      this.clientesService.buscarClientes(String(evento.id_cliente)).subscribe({
+        next: (res) => {
+          if (!this.detailCliente) {
+            const clientes = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+            this.detailCliente = clientes.find((cliente: ClienteModel) => cliente.id === evento.id_cliente) ?? clientes[0] ?? null;
+          }
+          this.detailClienteLoading = false;
+        },
+        error: (err) => {
+          console.error('Error al cargar el cliente del evento:', err);
+          this.detailClienteLoading = false;
+        }
+      });
+    }
 
     // Cargar transacciones
     this.transaccionesService.buscarTransaccionesEvento(evento.id).subscribe({
@@ -341,6 +392,8 @@ export class EventCalendarComponent implements OnInit {
   closeDetail(): void {
     this.showDetail = false;
     this.selectedEvent = null;
+    this.detailCliente = null;
+    this.detailClienteLoading = false;
   }
 
   // ========== COMPUTED VALUES ==========
@@ -353,7 +406,7 @@ export class EventCalendarComponent implements OnInit {
   }
 
   get saldoPendiente(): number {
-    return this.totalTransacciones - this.totalPagado;
+    return Math.max(0, this.totalTransacciones - this.totalPagado);
   }
 
   getEventColor(evento: EventosModel): string {

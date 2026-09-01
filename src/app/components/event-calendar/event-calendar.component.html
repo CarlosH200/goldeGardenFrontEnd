@@ -35,6 +35,12 @@
     <span>Cargando eventos...</span>
   </div>
 
+  <div class="ec-load-error" *ngIf="!loading && loadError">
+    <span class="material-symbols-outlined">error</span>
+    <span>{{ loadError }}</span>
+    <button class="btn-today" type="button" (click)="loadEventos()">Reintentar</button>
+  </div>
+
   <!-- ===================================================== -->
   <!-- LAYOUT: CONTENIDO + DETALLE                            -->
   <!-- ===================================================== -->
@@ -314,45 +320,45 @@
               Datos del Cliente
             </div>
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////  DESCOMENTAR CUANDO YA SE TENGA AL CLIENTE SELECCIONADO ///////////
-/////////////////////////////////////////////////////////////////////////////
-
-            <!-- <div class="ec-client-info">
-              <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Nombre">
+            <div class="ec-client-info" *ngIf="detailCliente; else clientState">
+              <div class="ec-detail-field">
                 <span class="ec-field-label">Nombre</span>
                 <span class="ec-field-value">
-                  {{ selectedEvent?.cliente_Nombre }} {{ selectedEvent?.cliente_Apellido }}
+                  {{ detailCliente.nombre }} {{ detailCliente.apellido }}
                 </span>
               </div>
 
               <div class="ec-detail-row">
-                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Telefono">
+                <div class="ec-detail-field" *ngIf="detailCliente.telefono || detailCliente.celular">
                   <span class="ec-field-label">Teléfono</span>
-                  <span class="ec-field-value">{{ selectedEvent?.cliente_Telefono }}</span>
+                  <span class="ec-field-value">{{ detailCliente.telefono || detailCliente.celular }}</span>
                 </div>
-                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Email">
+                <div class="ec-detail-field" *ngIf="detailCliente.email">
                   <span class="ec-field-label">Email</span>
-                  <span class="ec-field-value">{{ selectedEvent?.cliente_Email }}</span>
+                  <span class="ec-field-value">{{ detailCliente.email }}</span>
                 </div>
               </div>
 
               <div class="ec-detail-row">
-                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_NIT">
+                <div class="ec-detail-field" *ngIf="detailCliente.nit">
                   <span class="ec-field-label">NIT</span>
-                  <span class="ec-field-value">{{ selectedEvent?.cliente_NIT }}</span>
+                  <span class="ec-field-value">{{ detailCliente.nit }}</span>
                 </div>
-                <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_DPI">
+                <div class="ec-detail-field" *ngIf="detailCliente.dpi">
                   <span class="ec-field-label">DPI</span>
-                  <span class="ec-field-value">{{ selectedEvent?.cliente_DPI }}</span>
+                  <span class="ec-field-value">{{ detailCliente.dpi }}</span>
                 </div>
               </div>
 
-              <div class="ec-detail-field" *ngIf="selectedEvent?.cliente_Direccion">
+              <div class="ec-detail-field" *ngIf="detailCliente.direccion">
                 <span class="ec-field-label">Dirección</span>
-                <span class="ec-field-value">{{ selectedEvent?.cliente_Direccion }}</span>
+                <span class="ec-field-value">{{ detailCliente.direccion }}</span>
               </div>
-            </div> -->
+            </div>
+            <ng-template #clientState>
+              <div class="ec-empty-small" *ngIf="detailClienteLoading">Cargando datos del cliente...</div>
+              <div class="ec-empty-small" *ngIf="!detailClienteLoading">No se encontraron datos del cliente.</div>
+            </ng-template>
 
           </div>
 
@@ -423,7 +429,7 @@
                     <td>{{ p.forma_Pago || 'N/A' }}</td>
                     <td class="text-right">{{ formatCurrency(p.monto_Pagado) }}</td>
                     <td>{{ formatDate(p.fecha_Pago) }}</td>
-                    <td>{{ p.referencia || '—' }}</td>
+                    <td>{{ p.referencia || 'N/A' }}</td>
                   </tr>
                 </tbody>
                 <tfoot>

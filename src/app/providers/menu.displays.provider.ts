@@ -34,6 +34,13 @@ export class MenuDisplayProvider {
       enabled: false,
       icon: 'group_add'
     },
+    {
+      id: 4,
+      nombre: 'Inventario',
+      component: EventCalendarComponent, // Cambia esto al componente de configuración real si existe
+      enabled: false,
+      icon: 'inventory_2'
+    }
 
   ];
 

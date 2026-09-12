@@ -3,18 +3,40 @@ import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { ESTILOS_GLOBALES, PALETA_COLORES } from '../helpers/estilos';
 
 export function generarContratoTemplate(data: any): TDocumentDefinitions {
+  // Configurar paleta en base a la empresa seleccionada o valores por defecto
+  const primario = data.empresa?.colorPrincipal || '#1a2e1a';
+  const secundario = data.empresa?.colorSecundario || '#c5a059';
+  const textoOscuro = data.empresa?.colorTextoOscuro || '#222222';
+  const textoClaro = data.empresa?.colorTextoClaro || '#777777';
+  const fondoGris = '#f9f9f9';
+  const lineas = '#e0e0e0';
+
+  // Generar estilos en base a la paleta actual
+  const estilos = {
+    headerEmpresa: { fontSize: 18, bold: true, color: primario, margin: [0, 0, 0, 2] as [number, number, number, number] },
+    subHeaderEmpresa: { fontSize: 9, bold: true, color: secundario, letterSpacing: 1 },
+    datosEmpresa: { fontSize: 8, color: textoClaro, margin: [0, 2, 0, 0] as [number, number, number, number] },
+    tituloDocumento: { fontSize: 14, bold: true, color: primario, alignment: 'center' as const, margin: [0, 15, 0, 5] as [number, number, number, number] },
+    instrucciones: { fontSize: 8, italic: true, color: textoOscuro, margin: [0, 5, 0, 15] as [number, number, number, number] },
+    textoCuerpo: { fontSize: 9.5, color: textoOscuro, leadingLines: 1.25, alignment: 'justify' as const },
+    seccionTitulo: { fontSize: 11, bold: true, color: primario, margin: [0, 15, 0, 8] as [number, number, number, number] },
+    tablaEncabezado: { fontSize: 9, bold: true, color: '#ffffff', fillColor: primario, margin: [0, 4, 0, 4] as [number, number, number, number] },
+    tablaTexto: { fontSize: 9, color: textoOscuro, margin: [0, 3, 0, 3] as [number, number, number, number] },
+    reglamentoTexto: { fontSize: 9, color: textoOscuro, margin: [0, 0, 0, 6] as [number, number, number, number], leadingLines: 1.2, alignment: 'justify' as const },
+    firmaTexto: { fontSize: 9, bold: true, color: textoOscuro, alignment: 'center' as const }
+  };
+
   return {
     pageSize: 'LETTER',
-    pageMargins: [45, 45, 45, 50], // Márgenes limpios para aprovechar el espacio
-    styles: ESTILOS_GLOBALES,
+    pageMargins: [45, 45, 45, 50],
+    styles: estilos,
     
-    // Pie de página dinámico (Página X de Y)
     footer: (currentPage: number, pageCount: number) => {
       return {
         text: `Página ${currentPage} de ${pageCount}`,
         alignment: 'center',
         fontSize: 8,
-        color: PALETA_COLORES.textoClaro,
+        color: textoClaro,
         margin: [0, 20, 0, 0]
       };
     },
@@ -27,7 +49,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
             width: 'auto',
             stack: [
               ...(data.logo ? [{ image: data.logo, width: 100, margin: [0, 0, 0, 10] as [number, number, number, number] }] : []),
-              { text: 'GOLDEN GARDEN', style: 'headerEmpresa' },
+              { text: data.empresa?.nombre || 'GOLDEN GARDEN', style: 'headerEmpresa' },
               { text: 'JARDÍN DE EVENTOS', style: 'subHeaderEmpresa' },
               { text: data.empresa?.direccion || '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango', style: 'datosEmpresa' },
               { text: `Teléfono: ${data.empresa?.telefono || '32861562'}`, style: 'datosEmpresa' },
@@ -46,7 +68,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
       },
 
       // Línea divisoria elegante
-      { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 522, y2: 10, lineWidth: 1, lineColor: PALETA_COLORES.secundario }] },
+      { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 522, y2: 10, lineWidth: 1, lineColor: secundario }] },
 
       // TÍTULO E INSTRUCCIONES
       { text: 'CONTRATO DE ARRENDAMIENTO Y REGLAMENTO INTERNO', style: 'tituloDocumento' },
@@ -59,7 +81,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
           }]]
         },
         layout: 'noBorders',
-        fillColor: PALETA_COLORES.fondoGris
+        fillColor: fondoGris
       },
 
       // INTRODUCCIÓN LEGAL
@@ -71,7 +93,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
           { text: `${data.mes || '__________________'}`, bold: true },
           { text: ` de 20${data.anio || '__'} , comparecen por una parte el/la arrendante quien se identifica como ` },
           { text: `${data.representante || '____________________________________________'}`, bold: true },
-          { text: ` en representación administrativa de Golden Garden (denominado en adelante como "El Arrendador") y por la otra parte el cliente cuyos datos de identificación civil se detallan a continuación (denominado en adelante como "El Arrendatario"):` }
+          { text: ` en representación administrativa de ${data.empresa?.nombre || 'Golden Garden'} (denominado en adelante como "El Arrendador") y por la otra parte el cliente cuyos datos de identificación civil se detallan a continuación (denominado en adelante como "El Arrendatario"):` }
         ],
         style: 'textoCuerpo',
         margin: [0, 5, 0, 10]
@@ -114,10 +136,10 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
           ]
         },
         layout: {
-          hLineWidth: (i) => i === 0 || i === 5 ? 1 : 0.5,
+          hLineWidth: (i: any) => i === 0 || i === 5 ? 1 : 0.5,
           vLineWidth: () => 0.5,
-          hLineColor: () => PALETA_COLORES.lineas,
-          vLineColor: () => PALETA_COLORES.lineas
+          hLineColor: () => lineas,
+          vLineColor: () => lineas
         }
       },
 
@@ -148,8 +170,8 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
         layout: {
           hLineWidth: () => 0.5,
           vLineWidth: () => 0.5,
-          hLineColor: () => PALETA_COLORES.primario,
-          vLineColor: () => PALETA_COLORES.primario
+          hLineColor: () => primario,
+          vLineColor: () => primario
         }
       },
 
@@ -182,8 +204,8 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
       },
 
       // SOPORTE Y CIERRE
-      { text: '\nSOPORTE Y ATENCIÓN DIRECTA:', bold: true, color: PALETA_COLORES.primario, fontSize: 10, margin: [0, 15, 0, 4] },
-      { text: 'Ante cualquier duda, requerimiento logístico o eventualidad técnica durante el evento, por favor diríjase de inmediato al personal de Golden Garden asignado en las instalaciones, o comuníquese con prioridad al teléfono corporativo 32861562.', style: 'textoCuerpo' },
+      { text: '\nSOPORTE Y ATENCIÓN DIRECTA:', bold: true, color: primario, fontSize: 10, margin: [0, 15, 0, 4] },
+      { text: `Ante cualquier duda, requerimiento logístico o eventualidad técnica durante el evento, por favor diríjase de inmediato al personal de ${data.empresa?.nombre || 'Golden Garden'} asignado en las instalaciones, o comuníquese con prioridad al teléfono corporativo ${data.empresa?.telefono || '32861562'}.`, style: 'textoCuerpo' },
 
       { text: '\nEn señal de plena conformidad y aceptación de cada una de las cláusulas y normas aquí descritas, ambas partes firman el presente acuerdo extendido en dos ejemplares de igual validez.\n\n', style: 'textoCuerpo', margin: [0, 10, 0, 40] },
 
@@ -193,7 +215,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
           {
             stack: [
               { canvas: [{ type: 'line', x1: 20, y1: 0, x2: 180, y2: 0, lineWidth: 1, lineColor: PALETA_COLORES.textoOscuro }] },
-              { text: '\nPor Golden Garden\nEl Arrendador', style: 'firmaTexto' }
+              { text: `\nPor ${data.empresa?.nombre || 'Golden Garden'}\nEl Arrendador`, style: 'firmaTexto' }
             ],
             width: '*'
           },

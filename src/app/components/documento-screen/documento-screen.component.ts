@@ -7,7 +7,7 @@ import { OrganizadorService } from '../../services/organizadorService';
 import { OrganizadorModel } from '../../models/organizadorModel';
 import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
-import { FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms'; 
 import { ThemeService } from '../../services/theme.service';
 import { EstadoService } from '../../services/estadoService';
 import { EstadosModel } from '../../models/estadoModel';
@@ -37,6 +37,8 @@ import { PdfService } from '../../pdf/pdf.service';
 import { DocumentLockService } from '../../services/document-lock.service';
 import { TipoDocumento } from '../../pdf/enums/tipo-documento.enum';
 import { DocumentoPDF } from '../../pdf/interfaces/documento.interface';
+import { EmpresaModel } from '../../models/empresaModel';
+import { EmpresaService } from '../../services/empresa.service';
 
 @Component({
   selector: 'app-documento-screen',
@@ -173,8 +175,13 @@ export class DocumentoScreenComponent implements OnChanges {
   Organizadores: OrganizadorModel[] = [];
   // Arreglo para almacenar las capacidades de la API getCapacidades
   Capacidades: CapacidadesModel[] = [];
-  // Arreglo para almacenar lso estados del API getEstados
+  // Arreglo para almacenar los estados del API getEstados
   Estados: EstadosModel[] = [];
+
+  // Variables para la gestión de impresión multiempresa temporal
+  empresasImpresion: EmpresaModel[] = [];
+  empresaImpresionId: number = 1; // Por defecto Golden Garden
+  tipoDocumentoImpresion: TipoDocumento = TipoDocumento.Cotizacion;
 
   constructor(
     private eventosService: EventosService,
@@ -191,6 +198,7 @@ export class DocumentoScreenComponent implements OnChanges {
     private documentLockService: DocumentLockService,
     //NUEVO SERVICE
     private clientesService: ClientesService,
+    private empresaService: EmpresaService
   ) { }
 
   isLocked: boolean = false;
@@ -204,6 +212,9 @@ export class DocumentoScreenComponent implements OnChanges {
     this.getOrganizador();
     this.getCapacidades();
     this.getEstados();
+    
+    // Cargar empresas estáticas temporalmente
+    this.empresasImpresion = this.empresaService.obtenerEmpresas();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -255,9 +266,9 @@ export class DocumentoScreenComponent implements OnChanges {
     this.mostrarOpcionesImpresion = !this.mostrarOpcionesImpresion;
   }
 
-  async obtenerLogoDataUrl(): Promise<string | null> {
+  async obtenerLogoDataUrl(logoPath: string): Promise<string | null> {
     try {
-      const response = await fetch('assets/goldengarden.png');
+      const response = await fetch(logoPath);
       const blob = await response.blob();
       return await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -321,7 +332,11 @@ export class DocumentoScreenComponent implements OnChanges {
 
     this.mostrarOpcionesImpresion = false;
 
-    const logoDataUrl = await this.obtenerLogoDataUrl();
+    // Obtener la empresa seleccionada
+    const empresaSeleccionada = this.empresaService.obtenerEmpresaPorId(Number(this.empresaImpresionId)) || this.empresasImpresion[0];
+
+    // Cargar el logo de la empresa seleccionada
+    const logoDataUrl = await this.obtenerLogoDataUrl(empresaSeleccionada.logoUrl);
 
     const fechaInicio = this.pFechaInicioEvento
       ? new Date(this.pFechaInicioEvento)
@@ -489,13 +504,7 @@ export class DocumentoScreenComponent implements OnChanges {
       montoTotal,
       montoAnticipo: montoAnticipo.toFixed(2),
       montoSaldo: montoSaldo.toFixed(2),
-      empresa: {
-        nombre: 'Golden Garden',
-        direccion:
-          '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango',
-        telefono: '32861562',
-        redes: 'Facebook: golden gardeen jardin de eventos',
-      },
+      empresa: empresaSeleccionada, // Pasando la empresa seleccionada dinámicamente
       cliente: this.clienteSeleccionado,
       evento: {
         id: this.idEventoCreado,

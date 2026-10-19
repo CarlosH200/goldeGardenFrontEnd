@@ -284,6 +284,27 @@ export class DocumentoScreenComponent implements OnChanges {
     }
   }
 
+// FUNCION PARA CAMBIAR EL ESTADO DE CONSUMIDOR FINAL
+  esConsumidorFinal = false;
+
+cambiarConsumidorFinal(event: Event): void {
+  const marcado = (event.target as HTMLInputElement).checked;
+
+  this.esConsumidorFinal = marcado;
+
+  if (marcado) {
+    this.clienteForm.nit = 'C/F';
+    this.clienteForm.nombre = 'CONSUMIDOR';
+    this.clienteForm.apellido = 'FINAL';
+    this.clienteForm.direccion = 'CIUDAD';
+  } else {
+    this.clienteForm.nit = '';
+    this.clienteForm.nombre = '';
+    this.clienteForm.apellido = '';
+    this.clienteForm.direccion = '';
+  }
+}
+
   obtenerDescripcionUbicacion(idUbicacion: number | string): string {
     const ubicacion = this.ubicaciones.find((u) => u.id === Number(idUbicacion));
     return ubicacion?.descripcion || 'N/A';

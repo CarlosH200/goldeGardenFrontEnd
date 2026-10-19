@@ -13,71 +13,66 @@
 
         <!-- SECCIÓN 3: ACCIONES Y FUNCIONES -->
         <div class="col-12 col-lg-3">
-          <div
-            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center"
-          >
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
             <div class="section-label mb-2 d-flex align-items-center gap-1">
               <span class="material-icons fs-6 text-primary">touch_app</span>
               <span class="fw-bold text-uppercase small">Acciones</span>
             </div>
-            <div
-              class="doc-actions-toolbar d-flex align-items-center gap-2 flex-wrap"
-            >
+            <div class="doc-actions-toolbar d-flex align-items-center gap-2 flex-wrap">
               <!-- BOTÓN NUEVO EVENTO (SOLO ÍCONO INTUITIVO) -->
-              <button
-                type="button"
+              <button type="button"
                 class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
-                (click)="habilitarModoCreacionEvento()"
-                title="Crear Nuevo Evento"
-              >
+                (click)="habilitarModoCreacionEvento()" title="Crear Nuevo Evento">
                 <span class="material-icons fs-5">note_add</span>
               </button>
 
               <!-- BOTÓN GUARDAR CAMBIOS -->
-              <button
-                type="button"
+              <button type="button"
                 class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
-                *ngIf="!modoConsulta"
-                (click)="guardarEvento()"
-                [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'"
-              >
+                *ngIf="!modoConsulta" (click)="guardarEvento()"
+                [title]="idEventoCreado ? 'Guardar Cambios' : 'Guardar Evento'">
                 <span class="material-icons fs-5">save</span>
               </button>
 
               <!-- BOTÓN IMPRIMIR -->
               <div class="position-relative">
-                <button
-                  type="button"
+                <button type="button"
                   class="btn btn-action-primary d-flex align-items-center justify-content-center p-2 rounded-3"
-                  (click)="toggleOpcionesImpresion()"
-                  title="Imprimir Documento"
-                >
+                  (click)="toggleOpcionesImpresion()" title="Imprimir Documento">
                   <span class="material-icons fs-5">print</span>
                 </button>
                 <!-- MODAL EMERGENTE DE IMPRESIÓN -->
-                <div *ngIf="mostrarOpcionesImpresion" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;" (click)="mostrarOpcionesImpresion = false">
-                  <div class="shadow-lg p-4 rounded-4" style="min-width: 320px; background: white; position: relative;" (click)="$event.stopPropagation()">
-                    
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close" (click)="mostrarOpcionesImpresion = false"></button>
+                <div *ngIf="mostrarOpcionesImpresion"
+                  style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center;"
+                  (click)="mostrarOpcionesImpresion = false">
+                  <div class="shadow-lg p-4 rounded-4" style="min-width: 320px; background: white; position: relative;"
+                    (click)="$event.stopPropagation()">
+
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"
+                      (click)="mostrarOpcionesImpresion = false"></button>
 
                     <h5 class="mb-4 text-primary fw-bold border-bottom pb-2 d-flex align-items-center gap-2">
                       <span class="material-icons">print</span>
                       Opciones de Impresión
                     </h5>
-                    
+
                     <div class="mb-4">
                       <label class="form-label text-muted mb-2 fw-bold">Seleccionar Empresa</label>
                       <select class="form-select" [(ngModel)]="empresaImpresionId" name="empresaImpresionId">
                         <option *ngFor="let emp of empresasImpresion" [value]="emp.id">{{ emp.nombre }}</option>
                       </select>
                     </div>
-                    
+
                     <div class="d-flex flex-column gap-3 mt-2">
-                      <button type="button" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-2" (click)="imprimirFormato(TipoDocumento.Cotizacion)">
+                      <button type="button"
+                        class="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-2"
+                        (click)="imprimirFormato(TipoDocumento.Cotizacion)">
                         <span class="material-icons">receipt_long</span>
                         Generar Cotización
                       </button>
-                      <button type="button" class="btn btn-success d-flex align-items-center justify-content-center gap-2 py-2" (click)="imprimirFormato(TipoDocumento.Contrato)">
+                      <button type="button"
+                        class="btn btn-success d-flex align-items-center justify-content-center gap-2 py-2"
+                        (click)="imprimirFormato(TipoDocumento.Contrato)">
                         <span class="material-icons">gavel</span>
                         Generar Contrato
                       </button>
@@ -91,12 +86,8 @@
               <!-- Indicador de bloqueo (checkbox) -->
               <div class="d-flex align-items-center gap-2">
                 <label class="form-check-label d-flex align-items-center gap-2">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [checked]="isLocked"
-                    (change)="onLockToggle($event)"
-                  />
+                  <input class="form-check-input" type="checkbox" [checked]="isLocked"
+                    (change)="onLockToggle($event)" />
                   <span>{{ isLocked ? "Bloqueado" : "Desbloqueado" }}</span>
                 </label>
               </div>
@@ -104,33 +95,23 @@
           </div>
         </div>
 
-       
+
 
         <!-- SECCIÓN 2: ESTADO E INFORMACIÓN DEL EVENTO -->
         <div class="col-12 col-lg-6">
-          <div
-            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-between"
-          >
-            <div
-              class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
-            >
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
               <div class="section-label d-flex align-items-center gap-1">
                 <span class="material-icons fs-6 text-primary">info</span>
-                <span class="fw-bold text-uppercase small"
-                  >Información y Estado</span
-                >
+                <span class="fw-bold text-uppercase small">Información y Estado</span>
                 <span class="badge doc-event-badge ms-2" *ngIf="idEventoCreado">
                   No. {{ idEventoCreado }}
                 </span>
               </div>
               <!-- SELECTOR DE ESTADO -->
               <div class="select-wrapper" style="min-width: 170px">
-                <select
-                  class="form-select doc-state-select py-1"
-                  [(ngModel)]="pEstadoEvento"
-                  name="pEstadoEvento"
-                  [disabled]="!modoEdicion"
-                >
+                <select class="form-select doc-state-select py-1" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
+                  [disabled]="!modoEdicion">
                   <option *ngFor="let estado of Estados" [value]="estado.id">
                     {{ estado.descripcion }} ({{ estado.id }})
                   </option>
@@ -139,66 +120,41 @@
             </div>
 
             <!-- AUDITORÍA DE EVENTO (CREACIÓN Y MODIFICACIÓN) -->
-            <div
-              class="doc-audit-strip d-flex align-items-center justify-content-around flex-wrap gap-2 p-2 rounded-3"
-            >
+            <div class="doc-audit-strip d-flex align-items-center justify-content-around flex-wrap gap-2 p-2 rounded-3">
               <div class="audit-item d-flex align-items-center gap-1 small">
-                <span class="material-icons opacity-75 fs-6"
-                  >calendar_today</span
-                >
+                <span class="material-icons opacity-75 fs-6">calendar_today</span>
                 <span class="opacity-75">Creación:</span>
                 <span class="fw-semibold">{{ pFechaCreacion || "---" }}</span>
-                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioCreacion"
-                  >👤 {{ pUsuarioCreacion }}</span
-                >
+                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioCreacion">👤 {{ pUsuarioCreacion }}</span>
               </div>
               <div class="audit-divider d-none d-sm-block"></div>
               <div class="audit-item d-flex align-items-center gap-1 small">
-                <span class="material-icons opacity-75 fs-6"
-                  >edit_calendar</span
-                >
+                <span class="material-icons opacity-75 fs-6">edit_calendar</span>
                 <span class="opacity-75">Modificación:</span>
                 <span class="fw-semibold">{{
                   pFechaModificacion || "Sin cambios"
-                }}</span>
-                <span
-                  class="badge doc-user-badge ms-1"
-                  *ngIf="pUsuarioModificacion"
-                  >👤 {{ pUsuarioModificacion }}</span
-                >
+                  }}</span>
+                <span class="badge doc-user-badge ms-1" *ngIf="pUsuarioModificacion">👤 {{ pUsuarioModificacion
+                  }}</span>
               </div>
             </div>
           </div>
         </div>
- <!-- SECCIÓN 1: BUSCADOR POR ID -->
+        <!-- SECCIÓN 1: BUSCADOR POR ID -->
         <div class="col-12 col-lg-3">
-          <div
-            class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center"
-          >
+          <div class="doc-section-card h-100 p-3 rounded-4 shadow-sm d-flex flex-column justify-content-center">
             <div class="section-label mb-2 d-flex align-items-center gap-1">
               <span class="material-icons fs-6 text-primary">search</span>
-              <span class="fw-bold text-uppercase small"
-                >Buscar Evento por ID</span
-              >
+              <span class="fw-bold text-uppercase small">Buscar Evento por ID</span>
             </div>
             <div class="input-group doc-search-group">
               <span class="input-group-text border-end-0">
                 <span class="material-icons">badge</span>
               </span>
-              <input
-                type="text"
-                [(ngModel)]="idEventoCreado"
-                name="idEventoCreado"
-                class="form-control border-start-0 ps-0"
-                placeholder="ID Evento"
-                (keyup.enter)="buscarEvento()"
-              />
-              <button
-                type="button"
-                class="btn btn-search-doc d-flex align-items-center px-3"
-                (click)="buscarEvento()"
-                title="Buscar Evento"
-              >
+              <input type="text" [(ngModel)]="idEventoCreado" name="idEventoCreado"
+                class="form-control border-start-0 ps-0" placeholder="ID Evento" (keyup.enter)="buscarEvento()" />
+              <button type="button" class="btn btn-search-doc d-flex align-items-center px-3" (click)="buscarEvento()"
+                title="Buscar Evento">
                 <span class="material-icons">search</span>
               </button>
             </div>
@@ -209,54 +165,30 @@
 
     <!-- Buscador de clientes -->
     <div class="input-btn-group mb-3">
-      <input
-        type="text"
-        [(ngModel)]="busquedaCliente"
-        name="busquedaCliente"
-        (keyup.enter)="buscarClientes()"
-        class="form-control"
-        placeholder="Cliente..."
-      />
+      <input type="text" [(ngModel)]="busquedaCliente" name="busquedaCliente" (keyup.enter)="buscarClientes()"
+        class="form-control" placeholder="Cliente..." />
 
       <button type="button" class="buttonCircle" (click)="buscarClientes()">
         <span class="material-icons">search</span>
       </button>
 
-      <button
-        type="button"
-        class="buttonCircle"
-        (click)="showCreateClient()"
-        *ngIf="dataCreateClient === 0"
-      >
+      <button type="button" class="buttonCircle" (click)="showCreateClient()" *ngIf="dataCreateClient === 0">
         <span class="material-icons">add_circle</span>
       </button>
 
-      <button
-        type="button"
-        class="buttonCircle buttonSave"
-        (click)="guardarCliente()"
-        *ngIf="dataCreateClient === 1"
-      >
+      <button type="button" class="buttonCircle buttonSave" (click)="guardarCliente()" *ngIf="dataCreateClient === 1">
         <span class="material-icons">save</span>
       </button>
 
-      <button
-        type="button"
-        class="buttonCircle buttonCancel"
-        (click)="hideCreateClient()"
-        *ngIf="dataCreateClient === 1"
-      >
+      <button type="button" class="buttonCircle buttonCancel" (click)="hideCreateClient()"
+        *ngIf="dataCreateClient === 1">
         <span class="material-icons">cancel</span>
       </button>
     </div>
 
     <!-- RESULTADOS SOLO PARA SELECCIONAR -->
     <div *ngIf="clientesEncontrados.length > 0" class="search-results">
-      <div
-        *ngFor="let cliente of clientesEncontrados"
-        (click)="seleccionarCliente(cliente)"
-        class="search-item"
-      >
+      <div *ngFor="let cliente of clientesEncontrados" (click)="seleccionarCliente(cliente)" class="search-item">
         {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.nit }}
       </div>
     </div>
@@ -277,13 +209,10 @@
               {{ clienteSeleccionado.estado == 1 ? "Activo" : "Inactivo" }}
             </strong>
             <!-- circulito -->
-            <span
-              class="estado-dot"
-              [ngClass]="{
+            <span class="estado-dot" [ngClass]="{
                 activo: clienteSeleccionado.estado == 1,
                 inactivo: clienteSeleccionado.estado == 2,
-              }"
-            >
+              }">
             </span>
           </div>
         </div>
@@ -306,92 +235,60 @@
 
         <div class="row g-3">
           <div class="col-md-4">
-            <label>NIT</label>
-            <input
-              [(ngModel)]="clienteForm.nit"
-              name="nit"
-              type="text"
-              class="form-control"
-            />
+            <label for="nit" class="form-label">NIT</label>
+
+            <input [(ngModel)]="clienteForm.nit" name="nit" id="nit" type="text" class="form-control" />
+
+            <div class="form-check form-switch mt-2 d-flex align-items-center gap-2">
+              <input type="checkbox" id="clienteCF" class="form-check-input mt-0" role="switch"
+                [checked]="esConsumidorFinal" (change)="cambiarConsumidorFinal($event)" />
+
+              <label class="form-check-label mb-0" for="clienteCF">
+                Consumidor final (C/F)
+              </label>
+            </div>
           </div>
+
+
 
           <div class="col-md-4">
             <label>Nombre</label>
-            <input
-              [(ngModel)]="clienteForm.nombre"
-              name="nombre"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.nombre" name="nombre" type="text" class="form-control" />
           </div>
 
           <div class="col-md-4">
             <label>Apellido</label>
-            <input
-              [(ngModel)]="clienteForm.apellido"
-              name="apellido"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.apellido" name="apellido" type="text" class="form-control" />
           </div>
 
           <div class="col-md-6">
             <label>Email</label>
-            <input
-              [(ngModel)]="clienteForm.email"
-              name="email"
-              type="email"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.email" name="email" type="email" class="form-control" />
           </div>
 
           <div class="col-md-6">
             <label>DPI</label>
-            <input
-              [(ngModel)]="clienteForm.dpi"
-              name="dpi"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.dpi" name="dpi" type="text" class="form-control" />
           </div>
 
           <div class="col-md-12">
             <label>Dirección</label>
-            <input
-              [(ngModel)]="clienteForm.direccion"
-              name="direccion"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.direccion" name="direccion" type="text" class="form-control" />
           </div>
 
           <div class="col-md-4">
             <label>Teléfono</label>
-            <input
-              [(ngModel)]="clienteForm.telefono"
-              name="telefono"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.telefono" name="telefono" type="text" class="form-control" />
           </div>
 
           <div class="col-md-4">
             <label>Celular</label>
-            <input
-              [(ngModel)]="clienteForm.celular"
-              name="celular"
-              type="text"
-              class="form-control"
-            />
+            <input [(ngModel)]="clienteForm.celular" name="celular" type="text" class="form-control" />
           </div>
 
           <div class="col-md-4">
             <label>Tipo Cliente</label>
-            <select
-              [(ngModel)]="clienteForm.tipoCliente"
-              name="tipoCliente"
-              class="form-select"
-            >
+            <select [(ngModel)]="clienteForm.tipoCliente" name="tipoCliente" class="form-select">
               <option value="1">Normal</option>
               <option value="2">Frecuente</option>
               <option value="3">Empresa</option>
@@ -400,23 +297,14 @@
 
           <div class="col-md-6">
             <label>Observación 01</label>
-            <textarea
-              [(ngModel)]="clienteForm.observacion01"
-              name="observacion01"
-              class="form-control"
-              rows="2"
-              [readonly]="modoConsulta"
-            ></textarea>
+            <textarea [(ngModel)]="clienteForm.observacion01" name="observacion01" class="form-control" rows="2"
+              [readonly]="modoConsulta"></textarea>
           </div>
 
           <div class="col-md-6">
             <label>Observación 02</label>
-            <textarea
-              [(ngModel)]="clienteForm.observacion02"
-              name="observacion02"
-              class="form-control"
-              rows="2"
-            ></textarea>
+            <textarea [(ngModel)]="clienteForm.observacion02" name="observacion02" class="form-control"
+              rows="2"></textarea>
           </div>
         </div>
       </div>
@@ -427,49 +315,34 @@
     <!-- Información del evento -->
     <div class="form-group mb-3">
       <label for="tituloEvento">Título Evento</label>
-      <input
-        type="text"
-        [(ngModel)]="pTituloEvento"
-        name="pTituloEvento"
-        class="form-control"
-        required
-        [readonly]="modoConsulta"
-      />
+      <input type="text" [(ngModel)]="pTituloEvento" name="pTituloEvento" class="form-control" required
+        [readonly]="modoConsulta" />
     </div>
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Descripcion</label>
-      <textarea
-        name="pDescripcionEvento"
-        [(ngModel)]="pDescripcionEvento"
-        rows="5"
-        class="form-control"
-        [readonly]="modoConsulta"
-      ></textarea>
+      <textarea name="pDescripcionEvento" [(ngModel)]="pDescripcionEvento" rows="5" class="form-control"
+        [readonly]="modoConsulta"></textarea>
     </div>
     <div class="containerDates">
       <div class="row g-3">
         <div class="col-md-6">
           <label for="fechaEntrega">Fecha Entrega</label>
           <div class="date-input-shell">
-            <input
-              id="fechaEntrega"
-              type="datetime-local"
-              name="pFechaEntregaEvento"
-              class="form-control modern-datetime-input"
-              [(ngModel)]="pFechaEntregaEvento"
-              [readonly]="modoConsulta"
-              [disabled]="modoConsulta"
-              required
-            />
-            <button type="button" class="calendar-btn" (click)="toggleDatePicker('entrega')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para entrega">
+            <input id="fechaEntrega" type="datetime-local" name="pFechaEntregaEvento"
+              class="form-control modern-datetime-input" [(ngModel)]="pFechaEntregaEvento" [readonly]="modoConsulta"
+              [disabled]="modoConsulta" required />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('entrega')" [disabled]="modoConsulta"
+              aria-label="Abrir selector de fecha para entrega">
               <span class="material-symbols-outlined">calendar_month</span>
             </button>
             <div *ngIf="datePickerState.entrega" class="date-picker-popover">
               <input type="date" class="form-control" [(ngModel)]="datePickerTemp.entrega" name="dateEntregaPicker" />
               <input type="time" class="form-control" [(ngModel)]="timePickerTemp.entrega" name="timeEntregaPicker" />
               <div class="date-picker-actions">
-                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('entrega')">Aceptar</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('entrega')">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-success"
+                  (click)="aceptarDatePicker('entrega')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  (click)="cancelarDatePicker('entrega')">Cancelar</button>
               </div>
             </div>
           </div>
@@ -478,25 +351,21 @@
         <div class="col-md-6">
           <label for="fechaRecoger">Fecha Recoger</label>
           <div class="date-input-shell">
-            <input
-              id="fechaRecoger"
-              type="datetime-local"
-              name="pFechaRecogerEvento"
-              class="form-control modern-datetime-input"
-              [(ngModel)]="pFechaRecogerEvento"
-              [readonly]="modoConsulta"
-              [disabled]="modoConsulta"
-              required
-            />
-            <button type="button" class="calendar-btn" (click)="toggleDatePicker('recoger')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para recoger">
+            <input id="fechaRecoger" type="datetime-local" name="pFechaRecogerEvento"
+              class="form-control modern-datetime-input" [(ngModel)]="pFechaRecogerEvento" [readonly]="modoConsulta"
+              [disabled]="modoConsulta" required />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('recoger')" [disabled]="modoConsulta"
+              aria-label="Abrir selector de fecha para recoger">
               <span class="material-symbols-outlined">calendar_month</span>
             </button>
             <div *ngIf="datePickerState.recoger" class="date-picker-popover">
               <input type="date" class="form-control" [(ngModel)]="datePickerTemp.recoger" name="dateRecogerPicker" />
               <input type="time" class="form-control" [(ngModel)]="timePickerTemp.recoger" name="timeRecogerPicker" />
               <div class="date-picker-actions">
-                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('recoger')">Aceptar</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('recoger')">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-success"
+                  (click)="aceptarDatePicker('recoger')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  (click)="cancelarDatePicker('recoger')">Cancelar</button>
               </div>
             </div>
           </div>
@@ -505,25 +374,21 @@
         <div class="col-md-6">
           <label for="fechaInicio">Fecha Inicio</label>
           <div class="date-input-shell">
-            <input
-              id="fechaInicio"
-              type="datetime-local"
-              name="pFechaInicioEvento"
-              class="form-control modern-datetime-input"
-              [(ngModel)]="pFechaInicioEvento"
-              [readonly]="modoConsulta"
-              [disabled]="modoConsulta"
-              required
-            />
-            <button type="button" class="calendar-btn" (click)="toggleDatePicker('inicio')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para inicio">
+            <input id="fechaInicio" type="datetime-local" name="pFechaInicioEvento"
+              class="form-control modern-datetime-input" [(ngModel)]="pFechaInicioEvento" [readonly]="modoConsulta"
+              [disabled]="modoConsulta" required />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('inicio')" [disabled]="modoConsulta"
+              aria-label="Abrir selector de fecha para inicio">
               <span class="material-symbols-outlined">calendar_month</span>
             </button>
             <div *ngIf="datePickerState.inicio" class="date-picker-popover">
               <input type="date" class="form-control" [(ngModel)]="datePickerTemp.inicio" name="dateInicioPicker" />
               <input type="time" class="form-control" [(ngModel)]="timePickerTemp.inicio" name="timeInicioPicker" />
               <div class="date-picker-actions">
-                <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('inicio')">Aceptar</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('inicio')">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-success"
+                  (click)="aceptarDatePicker('inicio')">Aceptar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  (click)="cancelarDatePicker('inicio')">Cancelar</button>
               </div>
             </div>
           </div>
@@ -532,17 +397,10 @@
         <div class="col-md-6">
           <label for="fechaFin">Fecha Fin</label>
           <div class="date-input-shell">
-            <input
-              id="fechaFin"
-              type="datetime-local"
-              name="pFechaFinEvento"
-              class="form-control modern-datetime-input"
-              [(ngModel)]="pFechaFinEvento"
-              [readonly]="modoConsulta"
-              [disabled]="modoConsulta"
-              required
-            />
-            <button type="button" class="calendar-btn" (click)="toggleDatePicker('fin')" [disabled]="modoConsulta" aria-label="Abrir selector de fecha para fin">
+            <input id="fechaFin" type="datetime-local" name="pFechaFinEvento" class="form-control modern-datetime-input"
+              [(ngModel)]="pFechaFinEvento" [readonly]="modoConsulta" [disabled]="modoConsulta" required />
+            <button type="button" class="calendar-btn" (click)="toggleDatePicker('fin')" [disabled]="modoConsulta"
+              aria-label="Abrir selector de fecha para fin">
               <span class="material-symbols-outlined">calendar_month</span>
             </button>
             <div *ngIf="datePickerState.fin" class="date-picker-popover">
@@ -550,7 +408,8 @@
               <input type="time" class="form-control" [(ngModel)]="timePickerTemp.fin" name="timeFinPicker" />
               <div class="date-picker-actions">
                 <button type="button" class="btn btn-sm btn-success" (click)="aceptarDatePicker('fin')">Aceptar</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelarDatePicker('fin')">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                  (click)="cancelarDatePicker('fin')">Cancelar</button>
               </div>
             </div>
           </div>
@@ -561,13 +420,7 @@
     <div class="row mt-3">
       <div class="col-md-6 mb-3">
         <label for="ubicacion">Ubicación</label>
-        <select
-          class="form-select"
-          [(ngModel)]="pUbicacionEvento"
-          name="tipoEvento"
-          [disabled]="modoConsulta"
-          required
-        >
+        <select class="form-select" [(ngModel)]="pUbicacionEvento" name="tipoEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let ubicacion of ubicaciones" [value]="ubicacion.id">
             ({{ ubicacion.id }}) {{ ubicacion.descripcion }}
@@ -576,18 +429,10 @@
       </div>
       <div class="col-md-6 mb-3">
         <label for="organizador">Organizador</label>
-        <select
-          class="form-select"
-          [(ngModel)]="pOrganizadorEvento"
-          name="pOrganizadorEvento"
-          [disabled]="modoConsulta"
-          required
-        >
+        <select class="form-select" [(ngModel)]="pOrganizadorEvento" name="pOrganizadorEvento" [disabled]="modoConsulta"
+          required>
           <option value="" disabled selected>Selecciona una opción</option>
-          <option
-            *ngFor="let organizador of Organizadores"
-            [value]="organizador.id"
-          >
+          <option *ngFor="let organizador of Organizadores" [value]="organizador.id">
             ({{ organizador.id }}) {{ organizador.descripcion }}
           </option>
         </select>
@@ -595,13 +440,7 @@
 
       <div class="col-md-6 mb-3">
         <label for="tipoEvento">Tipo Evento</label>
-        <select
-          class="form-select"
-          [(ngModel)]="pTipoEvento"
-          name="pTipoEvento"
-          [disabled]="modoConsulta"
-          required
-        >
+        <select class="form-select" [(ngModel)]="pTipoEvento" name="pTipoEvento" [disabled]="modoConsulta" required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let tEvento of tipoEvento" [value]="tEvento.id">
             ({{ tEvento.id }}) {{ tEvento.descripcion }}
@@ -611,13 +450,8 @@
 
       <div class="col-md-6 mb-3">
         <label for="capacidadEvento">Capacidad Evento</label>
-        <select
-          class="form-select"
-          [(ngModel)]="pCapacidadEvento"
-          name="pCapacidadEvento"
-          [disabled]="modoConsulta"
-          required
-        >
+        <select class="form-select" [(ngModel)]="pCapacidadEvento" name="pCapacidadEvento" [disabled]="modoConsulta"
+          required>
           <option value="" disabled selected>Selecciona una opción</option>
           <option *ngFor="let capacidad of Capacidades" [value]="capacidad.id">
             <!-- ({{ capacidad.id }})  -->
@@ -629,21 +463,11 @@
 
     <div class="form-group mb-3">
       <label for="detallesAdicionales">Detalles Adicionales</label>
-      <textarea
-        name="pDetallesEvento"
-        [(ngModel)]="pDetallesEvento"
-        rows="5"
-        class="form-control"
-        [readonly]="modoConsulta"
-      ></textarea>
+      <textarea name="pDetallesEvento" [(ngModel)]="pDetallesEvento" rows="5" class="form-control"
+        [readonly]="modoConsulta"></textarea>
     </div>
 
-    <button
-      class="btn btn-dark w-100 fw-bold"
-      *ngIf="!modoConsulta"
-      (click)="guardarEvento()"
-      type="submit"
-    >
+    <button class="btn btn-dark w-100 fw-bold" *ngIf="!modoConsulta" (click)="guardarEvento()" type="submit">
       {{ idEventoCreado ? "GUARDAR CAMBIOS EN EVENTO" : "GUARDAR EVENTO" }}
     </button>
   </form>

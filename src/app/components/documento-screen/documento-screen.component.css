@@ -109,6 +109,28 @@
 }
 
 
+/* ESTILOS DE INPUT SELECT PARA CF */
+/* Switch C/F desmarcado */
+#clienteCF {
+  background-color: #adb5bd;
+  border-color: #6c757d;
+  cursor: pointer;
+}
+
+/* Switch C/F marcado */
+#clienteCF:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+/* Efecto al pasar el mouse */
+#clienteCF:hover {
+  border-color: #495057;
+}
+/* ESTILOS DE INPUT SELECT PARA CF */
+
+
+
 .search-results {
   position: absolute;
   width: 100%;

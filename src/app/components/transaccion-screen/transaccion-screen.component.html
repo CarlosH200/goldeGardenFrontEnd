@@ -238,7 +238,6 @@
           <tr>
             <th>CODIGO</th>
             <th>Descripción</th>
-            <th>Observación</th>
             <th>Cantidad</th>
             <th>Precio</th>
             <th>Subtotal</th>
@@ -251,11 +250,13 @@
             <td>{{ item.id ? ('P' + item.id) : ('P' + (i + 1)) }}</td>
             <td>
               <strong>{{ item.descripcion }}</strong>
-            </td>
-            <td>
-              <small class="detalle-extra" *ngIf="item.observacion">
-                {{ item.observacion }}
-              </small>
+
+              <!-- Observación que viene del producto (tbl_productos.observacion_1) -->
+              <div
+                *ngFor="let bullet of parsearBullets(item.observacionProducto)"
+                class="bullet-producto small mt-1">
+                {{ bullet }}
+              </div>
             </td>
             <td>{{ item.cantidad }}</td>
             <td>Q{{ item.precio.toFixed(2) }}</td>

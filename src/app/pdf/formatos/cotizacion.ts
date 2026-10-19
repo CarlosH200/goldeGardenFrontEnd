@@ -1,41 +1,70 @@
 import { DocumentoPDF } from "../interfaces/documento.interface";
 
+/** Convierte '* cosa 1 * cosa 2' en ['• cosa 1', '• cosa 2'] */
+function parsearBullets(texto: string | undefined | null): string[] {
+  if (!texto || !texto.trim()) return [];
+  if (/^cantidad:\s*\d+/i.test(texto.trim())) return [];
+
+  if (texto.includes('*')) {
+    return texto
+      .split('*')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0)
+      .map((s: string) => `• ${s}`);
+  }
+
+  return [`• ${texto.trim()}`];
+}
+
 export function CotizacionPDF(documento: DocumentoPDF) {
   const fechaInicio = documento.evento?.fechaInicio
     ? new Date(documento.evento.fechaInicio).toLocaleDateString('es-GT', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
     : '';
 
   const fechaFin = documento.evento?.fechaFin
     ? new Date(documento.evento.fechaFin).toLocaleDateString('es-GT', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
     : '';
 
   const fecha = fechaInicio || fechaFin || '';
 
   const items = documento.productos?.length
-    ? documento.productos.map((item: any, index: number) => [
-        { text: item.id ?? index + 1, style: 'tableCell' },
-        { text: item.descripcion || item.nombre || 'Artículo', style: 'tableCell' },
-        { text: item.cantidad?.toString() ?? '1', style: 'tableCell', alignment: 'center' as const },
-        { text: item.precio?.toFixed?.(2) ?? item.precio ?? '0.00', style: 'tableCell', alignment: 'right' as const },
-        { text: item.total?.toFixed?.(2) ?? item.monto?.toFixed?.(2) ?? '0.00', style: 'tableCell', alignment: 'right' as const },
-      ])
+    ? documento.productos.map((item: any, index: number) => {
+        const bullets = parsearBullets(item.observacionProducto);
+        const tieneExtra = item.observacion || bullets.length > 0;
+
+        // Celda de descripción: nombre en bold + viñetas del producto
+        const descripcionStack: any[] = [
+          { text: item.descripcion || item.nombre || 'Artículo', bold: true, fontSize: 9 },
+        ];
+        bullets.forEach((b: string) => {
+          descripcionStack.push({ text: b, fontSize: 8, color: '#333333', margin: [4, 2, 0, 0] });
+        });
+
+        return [
+          { text: item.id ?? index + 1, style: 'tableCell' },
+          { stack: descripcionStack, style: 'tableCell' },
+          { text: item.cantidad?.toString() ?? '1', style: 'tableCell', alignment: 'center' as const },
+          { text: item.precio?.toFixed?.(2) ?? item.precio ?? '0.00', style: 'tableCell', alignment: 'right' as const },
+          { text: item.total?.toFixed?.(2) ?? item.monto?.toFixed?.(2) ?? '0.00', style: 'tableCell', alignment: 'right' as const },
+        ];
+      })
     : [
-        [
-          { text: 'No hay productos cargados para esta cotización.', colSpan: 5, style: 'tableCell', alignment: 'center' as const },
-          {},
-          {},
-          {},
-          {},
-        ],
-      ];
+      [
+        { text: 'No hay productos cargados para esta cotización.', colSpan: 5, style: 'tableCell', alignment: 'center' as const },
+        {},
+        {},
+        {},
+        {},
+      ],
+    ];
 
   return {
     pageSize: 'LETTER',
@@ -134,8 +163,8 @@ export function CotizacionPDF(documento: DocumentoPDF) {
               widths: ['*', 80],
               body: [
                 [{ text: 'Subtotal', style: 'summaryLabel' }, { text: `Q ${documento.subtotal?.toFixed?.(2) ?? '0.00'}`, style: 'summaryValue', alignment: 'right' as const }],
-                [{ text: 'Descuento', style: 'summaryLabel' }, { text: `Q ${documento.descuento?.toFixed?.(2) ?? '0.00'}`, style: 'summaryValue', alignment: 'right' as const }],
-                [{ text: 'IVA', style: 'summaryLabel' }, { text: `Q ${documento.iva?.toFixed?.(2) ?? '0.00'}`, style: 'summaryValue', alignment: 'right' as const }],
+                // [{ text: 'Descuento', style: 'summaryLabel' }, { text: `Q ${documento.descuento?.toFixed?.(2) ?? '0.00'}`, style: 'summaryValue', alignment: 'right' as const }],
+                // [{ text: 'IVA', style: 'summaryLabel' }, { text: `Q ${documento.iva?.toFixed?.(2) ?? '0.00'}`, style: 'summaryValue', alignment: 'right' as const }],
                 [{ text: 'Total', style: 'summaryTotal' }, { text: `Q ${documento.total?.toFixed?.(2) ?? '0.00'}`, style: 'summaryTotal', alignment: 'right' as const }],
               ],
             },
@@ -145,7 +174,7 @@ export function CotizacionPDF(documento: DocumentoPDF) {
         margin: [0, 12, 0, 0],
       },
       { text: 'Condiciones de pago', style: 'sectionHeader', margin: [0, 14, 0, 4] },
-      { text: 'El 50% del total se abonará como anticipo para reservar la fecha. El saldo restante se liquidará el día del evento. Esta cotización es válida por 7 días.', style: 'normalText' },
+      { text: 'El 50% del total se abonará como anticipo para reservar la fecha. El saldo restante se liquidará el día del evento. Esta cotización es válida por 30 días y esta sujeta a cambios sin previo aviso.', style: 'normalText' },
       { text: `Cotización generada por ${documento.empresa?.nombre || 'Golden Garden'}.`, style: 'notaTexto', margin: [0, 8, 0, 0] },
     ],
     styles: {

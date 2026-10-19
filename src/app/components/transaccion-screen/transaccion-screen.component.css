@@ -385,6 +385,19 @@ td {
   resize: none;
 }
 
+.detalle-extra {
+  color: var(--color-textoClaro, #666);
+  font-size: 0.85rem;
+}
+
+.bullet-producto {
+  color: var(--color-texto);
+  font-size: 0.82rem;
+  padding-left: 6px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
 @media (max-width: 768px) {
 
   .contenido-principal {

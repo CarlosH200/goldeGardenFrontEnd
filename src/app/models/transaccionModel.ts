@@ -32,4 +32,6 @@ export interface TransaccionModel {
   observacion_02: string;
 
   cantidad: number;
+
+  observacion_1?: string;
 }

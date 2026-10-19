@@ -7,7 +7,7 @@ import { OrganizadorService } from '../../services/organizadorService';
 import { OrganizadorModel } from '../../models/organizadorModel';
 import { CapacidadesService } from '../../services/capacidadesService';
 import { CapacidadesModel } from '../../models/capacidadesModel';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
 import { EstadoService } from '../../services/estadoService';
 import { EstadosModel } from '../../models/estadoModel';
@@ -24,6 +24,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
+import { ProductosService } from '../../services/productos.service';
 import { firstValueFrom, Subscription } from 'rxjs';
 import {
   Component,
@@ -198,7 +199,8 @@ export class DocumentoScreenComponent implements OnChanges {
     private documentLockService: DocumentLockService,
     //NUEVO SERVICE
     private clientesService: ClientesService,
-    private empresaService: EmpresaService
+    private empresaService: EmpresaService,
+    private productosService: ProductosService
   ) { }
 
   isLocked: boolean = false;
@@ -212,7 +214,7 @@ export class DocumentoScreenComponent implements OnChanges {
     this.getOrganizador();
     this.getCapacidades();
     this.getEstados();
-    
+
     // Cargar empresas estáticas temporalmente
     this.empresasImpresion = this.empresaService.obtenerEmpresas();
   }
@@ -376,11 +378,7 @@ export class DocumentoScreenComponent implements OnChanges {
     // Antes de imprimir, persistir cambios del documento y actualizar estado de bloqueo
     if (this.idEventoCreado) {
       try {
-        console.log('=== Iniciando actualización de estado de impresión ===');
-        console.log('ID Evento:', this.idEventoCreado);
-        console.log('Impresiones actuales:', this.pimpresiones);
-
-        console.log('Obteniendo datos completos del evento para actualizar...');
+  
         const evtRes = await firstValueFrom(this.eventosService.obtenerEvento(this.idEventoCreado));
         if (!evtRes?.success || !evtRes.data) {
           throw new Error('No se pudo obtener el evento actual');
@@ -407,28 +405,15 @@ export class DocumentoScreenComponent implements OnChanges {
           bloqueado: true
         };
 
-        console.log('Actualizando datos e impresión del evento...');
         const updateResponse = await firstValueFrom(
           this.eventosService.actualizarEvento(this.idEventoCreado, bodyEventoUpdate)
         );
-        console.log('Respuesta actualización:', updateResponse);
 
         if (!updateResponse?.success) {
           console.warn('Servidor no confirmó actualización:', updateResponse);
         }
 
-        // Actualizar estado local
-        console.log('Paso 5: Actualizando estado local...');
-        this.pImpreso = true;
-        this.pBloqueado = true;
-        this.pimpresiones++;
-        this.isLocked = true;
-        this.modoConsulta = true;
-        this.modoEdicion = false;
-        this.documentLockService.lock(this.idEventoCreado);
-
-        console.log('✅ Documento bloqueado exitosamente');
-        console.log('=== Fin de actualización de impresión ===');
+ 
 
       } catch (err: any) {
         console.error('❌ Error crítico al actualizar estado de impresión:', err);
@@ -439,15 +424,7 @@ export class DocumentoScreenComponent implements OnChanges {
           stack: err?.stack
         });
 
-        // FALLBACK: Actualizar localmente aunque haya error
-        console.log('Aplicando cambios locales como fallback...');
-        this.pImpreso = true;
-        this.pBloqueado = true;
-        this.pimpresiones++;
-        this.isLocked = true;
-        this.modoConsulta = true;
-        this.modoEdicion = false;
-        this.documentLockService.lock(this.idEventoCreado);
+
 
         this.dialog.open(AlertGenericComponent, {
           width: '450px',
@@ -577,7 +554,6 @@ export class DocumentoScreenComponent implements OnChanges {
       }
 
       try {
-        console.log('Desbloqueando documento:', idEvento);
 
         // Obtener el evento actual para enviarlo completo y evitar el error 500 por campos nulos
         const evtRes = await firstValueFrom(this.eventosService.obtenerEvento(idEvento));
@@ -590,7 +566,6 @@ export class DocumentoScreenComponent implements OnChanges {
           this.eventosService.actualizarEvento(idEvento, updatedEvent)
         );
 
-        console.log('Respuesta de desbloqueo:', response);
 
         if (response?.success) {
           this.pBloqueado = false;
@@ -598,7 +573,6 @@ export class DocumentoScreenComponent implements OnChanges {
           this.modoConsulta = false;
           this.modoEdicion = true;
           this.documentLockService.unlock(idEvento);
-          console.log('✅ Documento desbloqueado exitosamente:', idEvento);
 
           this.dialog.open(AlertGenericComponent, {
             width: '450px',
@@ -678,8 +652,7 @@ export class DocumentoScreenComponent implements OnChanges {
       }
 
       try {
-        console.log('Desbloqueando documento via toggle:', idEvento);
-        
+
         const evtRes = await firstValueFrom(this.eventosService.obtenerEvento(idEvento));
         if (!evtRes?.success || !evtRes.data) {
           throw new Error('No se pudo obtener el evento actual');
@@ -697,7 +670,6 @@ export class DocumentoScreenComponent implements OnChanges {
           this.modoConsulta = false;
           this.modoEdicion = true;
           checkbox.checked = false;
-          console.log('✅ Documento desbloqueado via toggle');
         } else {
           throw new Error('Servidor no confirmó desbloqueo');
         }
@@ -716,7 +688,6 @@ export class DocumentoScreenComponent implements OnChanges {
 
   private async bloquearDocumentoDirecto(checkbox: HTMLInputElement, idEvento: number): Promise<void> {
     try {
-      console.log('Bloqueando documento via toggle:', idEvento);
 
       const evtRes = await firstValueFrom(this.eventosService.obtenerEvento(idEvento));
       if (!evtRes?.success || !evtRes.data) {
@@ -734,7 +705,6 @@ export class DocumentoScreenComponent implements OnChanges {
         this.pBloqueado = true;
         this.modoConsulta = true;
         this.modoEdicion = false;
-        console.log('✅ Documento bloqueado via toggle');
       } else {
         throw new Error('Servidor no confirmó bloqueo');
       }
@@ -1008,7 +978,6 @@ export class DocumentoScreenComponent implements OnChanges {
             // subscribe to lock state for this event
             this.lockSub?.unsubscribe();
             this.lockSub = this.documentLockService.isLocked$(evento.id).subscribe((v) => {
-              console.log('[Documento] lock state changed for', evento.id, v);
               this.isLocked = v;
             });
           }
@@ -1051,14 +1020,55 @@ export class DocumentoScreenComponent implements OnChanges {
       );
 
       if (res?.success && Array.isArray(res.data)) {
+
+        // Obtener catálogo de productos para asegurar observacion_1
+        let mapProductos = new Map<number, any>();
+        let mapPorNombre = new Map<string, any>();
+        try {
+          const prodRes: any = await firstValueFrom(this.productosService.buscarProductos(''));
+          if (prodRes?.success && Array.isArray(prodRes.data)) {
+            prodRes.data.forEach((p: any) => {
+              mapProductos.set(p.id, p);
+              if (p.descripcion) {
+                mapPorNombre.set(p.descripcion.trim().toUpperCase(), p);
+              }
+            });
+          }
+        } catch (prodErr) {
+          console.warn('No se pudo cargar productos para enriquecer cotización', prodErr);
+        }
+
         this.transacciones = res.data.map((t: any) => {
           const cantidad = Number(t.cantidad) || 1;
           const monto = Number(t.monto) || 0;
+          const prodMatch =
+            mapProductos.get(t.id_producto) ||
+            mapPorNombre.get((t.descripcion || t.nombre || '').trim().toUpperCase());
+
+          let obsFromProd = '';
+          if (prodMatch) {
+            for (const key of Object.keys(prodMatch)) {
+              if (key.toLowerCase().includes('observacion') && prodMatch[key]) {
+                obsFromProd = prodMatch[key];
+                break;
+              }
+            }
+          }
+
+          const obsProd =
+            obsFromProd ||
+            prodMatch?.observacion_1 ||
+            prodMatch?.Observacion_1 ||
+            t.observacion_1 ||
+            '';
 
           return {
             id: t.id_producto || t.id || null,
-            descripcion: t.descripcion || t.observacion_01 || 'Artículo',
-            nombre: t.observacion_01 || t.descripcion || 'Artículo',
+            id_producto: t.id_producto,
+            descripcion: t.descripcion || t.observacion_01 || prodMatch?.descripcion || 'Artículo',
+            nombre: t.observacion_01 || t.descripcion || prodMatch?.descripcion || 'Artículo',
+            observacion: t.observacion_01 || '',
+            observacionProducto: obsProd,
             cantidad,
             precio: cantidad ? monto / cantidad : monto,
             total: monto,
@@ -1389,21 +1399,19 @@ export class DocumentoScreenComponent implements OnChanges {
       return;
     }
 
-    //LIMPIEZA de datos para BIGINT (evita error nvarchar -> bigint)
+    // LIMPIEZA DE DATOS
     const nitRaw = (this.clienteForm.nit ?? '').trim();
-    const nitLimpio = /^c\s*\/?\s*f$/i.test(nitRaw)
-      ? 'C/F'
-      : nitRaw.replace(/\D/g, '');
+    const nitLimpio = nitRaw;
 
     const telLimpio = (this.clienteForm.telefono ?? '').replace(/\D/g, '');
     const celLimpio = (this.clienteForm.celular ?? '').replace(/\D/g, '');
 
-    // VALIDACION PARA EVITAR ENVIAR NIT VACIO
+    // VALIDACIÓN PARA EVITAR ENVIAR NIT VACÍO
     if (!nitLimpio) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
-          titulo: 'Datos el NIT debe ser numérico.',
+          titulo: 'Datos el NIT contiene datos invalidos.',
           mensaje: 'NIT Actual: ' + this.clienteForm.nit,
           tipo: 'warning',
           icon: 'warning',
@@ -1437,6 +1445,11 @@ export class DocumentoScreenComponent implements OnChanges {
     // ==========================================================
     // CONSUMO DE SERVICIO CREAR CLIENTE (api crear cliente)
     // ==========================================================
+
+console.log('NIT ingresado:', this.clienteForm.nit);
+console.log('NIT enviado al API:', body.nit);
+
+
     this.clientesService.insertCliente(body).subscribe({
       next: (res) => {
         if (res?.success) {

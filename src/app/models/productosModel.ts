@@ -31,4 +31,6 @@ export interface ProductoModel {
   m_Fecha_Hora: string | null;
 
   consecutivo_Interno: number;
+
+  observacion_1?: string;
 }

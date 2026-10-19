@@ -149,6 +149,8 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
           stock: p.cantidad,
 
           ultimoCosto: p.ultimo_Costo,
+
+          observacionProducto: p.observacion_1 || '',
         }));
 
         this.mostrarDropdown = true;
@@ -195,6 +197,8 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
             stock: p.cantidad,
 
             ultimoCosto: p.ultimo_Costo,
+
+            observacionProducto: p.observacion_1 || '',
           };
 
           this.mostrarDropdown = false;
@@ -336,7 +340,8 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
 
       observacion_01: this.detalleProducto,
 
-      observacion_02: `Cantidad: ${this.cantidad}`,
+      // Guarda los bullets del producto para mostrarlos en la vista y formatos PDF
+      observacion_02: this.productoEncontrado.observacionProducto || '',
 
       cantidad: this.cantidad,
     };
@@ -368,6 +373,10 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
               cantidad: this.cantidad,
 
               detalle: this.detalleProducto,
+
+              observacion: this.detalleProducto,
+
+              observacionProducto: this.productoEncontrado.observacionProducto || '',
 
               subtotal,
 
@@ -401,7 +410,7 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
               detalles: [
                 {
                   etiqueta: 'Producto',
-                  valor: body.observacion_01,
+                  valor: body.descripcion,
                 },
                 {
                   etiqueta: 'Monto',
@@ -447,31 +456,110 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
         next: (res) => {
 
           if (res?.success) {
+            console.log('TRANSACCIONES RAW RES.DATA:', res.data);
 
-            this.transacciones = res.data
-              .map((t: any) => {
-                const cantidad = Number(t.cantidad) || 1;
-                const monto = Number(t.monto) || 0;
+            const rawItems = res.data;
 
-                return {
-                  id: t.id || t.id_producto || null,
-                  descripcion: t.descripcion || t.nombre || 'Descripción no disponible',
-                  observacion: t.observacion_01 || '',
-                  cantidad,
-                  precio: cantidad ? monto / cantidad : monto,
-                  subtotal: monto,
-                };
-              })
-              .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
+            // Consultar catálogo de productos para cruzar observacion_1 garantizado
+            this.productosService.buscarProductos('').subscribe({
+              next: (prodRes) => {
+                const mapProductos = new Map<number, any>();
+                const mapPorNombre = new Map<string, any>();
 
-            // console.log(
-            //   'TRANSACCIONES CARGADAS:',
-            //   this.transacciones
-            // );
+                if (prodRes?.success && Array.isArray(prodRes.data)) {
+                  prodRes.data.forEach((p: any) => {
+                    mapProductos.set(p.id, p);
+                    if (p.descripcion) {
+                      mapPorNombre.set(p.descripcion.trim().toUpperCase(), p);
+                    }
+                  });
+                }
 
-            this.actualizarTotal();
-            // actualizar estado de pagos y bloqueo
-            this.checkPaymentsAndLock();
+                console.log('%c======================================================', 'color: yellow; font-size: 16px; font-weight: bold;');
+                console.log('%c🔍 DIAGNÓSTICO DE PRODUCTOS Y VIÑETAS', 'color: #00ff00; font-size: 18px; font-weight: bold;');
+                console.log('📦 Total productos en catálogo:', prodRes?.data?.length);
+                console.log('📦 Total transacciones en evento:', rawItems?.length);
+
+                this.transacciones = rawItems
+                  .map((t: any) => {
+                    const cantidad = Number(t.cantidad) || 1;
+                    const monto = Number(t.monto) || 0;
+                    const idProd = Number(t.id_producto);
+                    const prodMatch =
+                      mapProductos.get(idProd) ||
+                      mapPorNombre.get((t.descripcion || t.nombre || '').trim().toUpperCase());
+
+                    // Buscar en prodMatch cualquier propiedad de observación (insensible a mayúsculas/minúsculas o nombres alternos)
+                    let obsFromProd = '';
+                    if (prodMatch) {
+                      for (const key of Object.keys(prodMatch)) {
+                        if (key.toLowerCase().includes('observacion') && prodMatch[key]) {
+                          obsFromProd = prodMatch[key];
+                          break;
+                        }
+                      }
+                    }
+
+                    const obsProd =
+                      obsFromProd ||
+                      prodMatch?.observacion_1 ||
+                      prodMatch?.Observacion_1 ||
+                      prodMatch?.observacion1 ||
+                      t.observacion_1 ||
+                      '';
+
+                    console.log('   Objeto completo en catálogo prodMatch:', prodMatch);
+                    if (idProd === 10) {
+                      console.log('%c🔍 DISCOTECA MOVIL KEYS:', 'color: orange; font-weight: bold;', Object.keys(prodMatch || {}));
+                      console.log('%c🔍 DISCOTECA MOVIL JSON:', 'color: orange;', JSON.stringify(prodMatch));
+                    }
+
+                    console.log(`%c👉 Producto: [${t.descripcion}] | ID_Producto: ${idProd}`, 'color: cyan; font-weight: bold;');
+                    console.log('   Encontrado en Catálogo?:', prodMatch ? 'SÍ' : 'NO');
+                    console.log('   Observación 1 obtenida:', obsProd ? obsProd : '(VACÍA / NULL)');
+
+                    return {
+                      id: t.id || t.id_producto || null,
+                      id_producto: t.id_producto,
+                      descripcion: t.descripcion || t.nombre || prodMatch?.descripcion || 'Descripción no disponible',
+                      observacion: t.observacion_01 || '',
+                      observacionProducto: obsProd,
+                      cantidad,
+                      precio: cantidad ? monto / cantidad : monto,
+                      subtotal: monto,
+                    };
+                  })
+                  .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
+
+                console.log('%c======================================================', 'color: yellow; font-size: 16px; font-weight: bold;');
+
+                this.actualizarTotal();
+                this.checkPaymentsAndLock();
+                this.cdr.detectChanges();
+              },
+              error: () => {
+                this.transacciones = rawItems
+                  .map((t: any) => {
+                    const cantidad = Number(t.cantidad) || 1;
+                    const monto = Number(t.monto) || 0;
+                    return {
+                      id: t.id || t.id_producto || null,
+                      id_producto: t.id_producto,
+                      descripcion: t.descripcion || t.nombre || 'Descripción no disponible',
+                      observacion: t.observacion_01 || '',
+                      observacionProducto: t.observacion_1 || t.observacion_02 || '',
+                      cantidad,
+                      precio: cantidad ? monto / cantidad : monto,
+                      subtotal: monto,
+                    };
+                  })
+                  .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
+
+                this.actualizarTotal();
+                this.checkPaymentsAndLock();
+                this.cdr.detectChanges();
+              }
+            });
           }
         },
 
@@ -656,5 +744,25 @@ eliminarProducto(index: number) {
       (acc, item) => acc + Number(item.cantidad),
       0,
     );
+  }
+
+  // ==========================================================
+  // PARSEAR BULLETS  (* cosa 1 * cosa 2  →  ['• cosa 1', '• cosa 2'])
+  // ==========================================================
+  parsearBullets(texto: string | undefined | null): string[] {
+    if (!texto || !texto.trim()) return [];
+    // Si viene del formato anterior "Cantidad: X", ignorarlo
+    if (/^cantidad:\s*\d+/i.test(texto.trim())) return [];
+    
+    // Si contiene '*', dividir por '*'
+    if (texto.includes('*')) {
+      return texto
+        .split('*')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => `• ${s}`);
+    }
+
+    return [`• ${texto.trim()}`];
   }
 }

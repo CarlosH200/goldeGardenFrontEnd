@@ -2,6 +2,22 @@
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { ESTILOS_GLOBALES, PALETA_COLORES } from '../helpers/estilos';
 
+/** Convierte '* cosa 1 * cosa 2' en ['• cosa 1', '• cosa 2'] */
+function parsearBullets(texto: string | undefined | null): string[] {
+  if (!texto || !texto.trim()) return [];
+  if (/^cantidad:\s*\d+/i.test(texto.trim())) return [];
+
+  if (texto.includes('*')) {
+    return texto
+      .split('*')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0)
+      .map((s: string) => `• ${s}`);
+  }
+
+  return [`• ${texto.trim()}`];
+}
+
 export function generarContratoTemplate(data: any): TDocumentDefinitions {
   // Configurar paleta en base a la empresa seleccionada o valores por defecto
   const primario = data.empresa?.colorPrincipal || '#1a2e1a';
@@ -174,6 +190,43 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
           vLineColor: () => primario
         }
       },
+
+      // DETALLE DE SERVICIOS CONTRATADOS (si hay productos/transacciones)
+      ...(data.productos?.length ? [
+        { text: 'DETALLE DE SERVICIOS CONTRATADOS', style: 'seccionTitulo', margin: [0, 10, 0, 6] as [number, number, number, number] },
+        {
+          table: {
+            widths: ['*', 80],
+            body: [
+              [
+                { text: 'Descripción del Servicio', style: 'tablaEncabezado', alignment: 'left' },
+                { text: 'Monto (Q.)', style: 'tablaEncabezado', alignment: 'right' }
+              ],
+              ...data.productos.map((item: any) => {
+                const bullets = parsearBullets(item.observacionProducto);
+                // Celda de descripción: nombre en bold + viñetas del producto
+                const descripcionStack: any[] = [
+                  { text: item.descripcion || item.nombre || 'Artículo', bold: true, fontSize: 9 },
+                ];
+                bullets.forEach((b: string) => {
+                  descripcionStack.push({ text: b, fontSize: 8, color: '#333333', margin: [6, 2, 0, 0] });
+                });
+                return [
+                  { stack: descripcionStack, style: 'tablaTexto' },
+                  { text: item.total?.toFixed?.(2) ?? item.monto?.toFixed?.(2) ?? '0.00', style: 'tablaTexto', alignment: 'right' }
+                ];
+              })
+            ]
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => lineas,
+            vLineColor: () => lineas
+          },
+          margin: [0, 0, 0, 10] as [number, number, number, number]
+        }
+      ] : []),
 
       // CLÁUSULAS ADICIONALES DE LA SECCIÓN I
       {

@@ -12,11 +12,11 @@ export class EmpresaService {
       id: 1,
       nombre: 'Golden Garden',
       direccion: '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango',
-      telefono: '32861562',
-      redes: 'Facebook: golden gardeen jardin de eventos',
+      telefono: '+502 5277 4798',
+      redes: 'Facebook: Golden Garden Jardin de Eventos',
       logoUrl: 'assets/goldengarden.png',
       colorPrincipal: '#1f3a1f',   // Verde bosque profundo
-      colorSecundario: '#2f4f4f',  // Verde oscuro
+      colorSecundario: '#fbc02d',  // Verde oscuro
       colorTextoOscuro: '#333333', 
       colorTextoClaro: '#5d5d5d'
     },

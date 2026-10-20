@@ -11,15 +11,11 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-create-client',
   standalone: true,
-  imports: [
-    FormsModule,
-    CommonModule
-  ],
+  imports: [FormsModule, CommonModule],
   templateUrl: './create-client.component.html',
-  styleUrl: './create-client.component.css'
+  styleUrl: './create-client.component.css',
 })
 export class CreateClientComponent {
-
   // ==========================================================
   // BUSQUEDA DE CLIENTES
   // ==========================================================
@@ -30,13 +26,13 @@ export class CreateClientComponent {
 
   clienteSeleccionado: ClienteModel | null = null;
 
+  esConsumidorFinal: boolean = false;
 
   // ==========================================================
   // FORMULARIO DE CLIENTE
   // ==========================================================
 
   clienteForm: Partial<ClienteModel> = {
-
     nit: '',
     nombre: '',
     apellido: '',
@@ -54,18 +50,32 @@ export class CreateClientComponent {
     estado: 1,
 
     fecha_Registro: new Date().toLocaleDateString(),
-
   };
 
+  cambiarConsumidorFinal(event: Event): void {
+    const marcado = (event.target as HTMLInputElement).checked;
+
+    this.esConsumidorFinal = marcado;
+
+    if (marcado) {
+      this.clienteForm.nit = 'C/F';
+      this.clienteForm.nombre = 'CONSUMIDOR';
+      this.clienteForm.apellido = 'FINAL';
+      this.clienteForm.direccion = 'CIUDAD';
+    } else {
+      this.clienteForm.nit = '';
+      this.clienteForm.nombre = '';
+      this.clienteForm.apellido = '';
+      this.clienteForm.direccion = '';
+    }
+  }
 
   // ==========================================================
   // EVENTO PARA DEVOLVER CLIENTE SELECCIONADO
   // ==========================================================
 
   @Output()
-  clienteCompletoChange =
-    new EventEmitter<ClienteModel>();
-
+  clienteCompletoChange = new EventEmitter<ClienteModel>();
 
   // ==========================================================
   // CONSTRUCTOR
@@ -74,77 +84,47 @@ export class CreateClientComponent {
   constructor(
     private clientesService: ClientesService,
     private authService: AuthService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {}
-
 
   // ==========================================================
   // BUSCAR CLIENTES
   // ==========================================================
 
   buscarClientes(): void {
-
     this.clienteSeleccionado = null;
 
-    if (
-      !this.busquedaCliente ||
-      this.busquedaCliente.trim() === ''
-    ) {
-
+    if (!this.busquedaCliente || this.busquedaCliente.trim() === '') {
       this.clientesEncontrados = [];
 
       return;
     }
 
-
-    this.clientesService
-      .buscarClientes(
-        this.busquedaCliente.trim()
-      )
-      .subscribe({
-
-        next: (res) => {
-
-          if (res?.success) {
-
-            this.clientesEncontrados =
-              res.data ?? [];
-
-          } else {
-
-            this.clientesEncontrados = [];
-
-          }
-
-        },
-
-        error: (err) => {
-
-          console.error(
-            'Error al buscar clientes:',
-            err
-          );
-
+    this.clientesService.buscarClientes(this.busquedaCliente.trim()).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.clientesEncontrados = res.data ?? [];
+        } else {
           this.clientesEncontrados = [];
-
         }
+      },
 
-      });
+      error: (err) => {
+        console.error('Error al buscar clientes:', err);
 
+        this.clientesEncontrados = [];
+      },
+    });
   }
-
 
   // ==========================================================
   // SELECCIONAR CLIENTE
   // ==========================================================
 
-  seleccionarCliente(
-    cliente: ClienteModel
-  ): void {
-
+  seleccionarCliente(cliente: ClienteModel): void {
+    this.esConsumidorFinal = /^c\s*\/?\s*f$/i.test((cliente.nit ?? '').trim());
     // Guardar cliente seleccionado
     this.clienteSeleccionado = cliente;
-
 
     // ========================================================
     // CARGAR TODA LA INFORMACIÓN DEL CLIENTE
@@ -152,81 +132,55 @@ export class CreateClientComponent {
     // ========================================================
 
     this.clienteForm = {
+      nit: cliente.nit ?? '',
 
-      nit:
-        cliente.nit ?? '',
+      nombre: cliente.nombre ?? '',
 
-      nombre:
-        cliente.nombre ?? '',
+      apellido: cliente.apellido ?? '',
 
-      apellido:
-        cliente.apellido ?? '',
+      email: cliente.email ?? '',
 
-      email:
-        cliente.email ?? '',
+      dpi: cliente.dpi ?? '',
 
-      dpi:
-        cliente.dpi ?? '',
+      direccion: cliente.direccion ?? '',
 
-      direccion:
-        cliente.direccion ?? '',
+      telefono: cliente.telefono ?? '',
 
-      telefono:
-        cliente.telefono ?? '',
+      celular: cliente.celular ?? '',
 
-      celular:
-        cliente.celular ?? '',
+      tipoCliente: cliente.tipoCliente ?? 1,
 
-      tipoCliente:
-        cliente.tipoCliente ?? 1,
+      observacion01: cliente.observacion01 ?? '',
 
-      observacion01:
-        cliente.observacion01 ?? '',
+      observacion02: cliente.observacion02 ?? '',
 
-      observacion02:
-        cliente.observacion02 ?? '',
+      estado: cliente.estado ?? 1,
 
-      estado:
-        cliente.estado ?? 1,
-
-      fecha_Registro:
-        cliente.fecha_Registro ??
-        new Date().toLocaleDateString(),
-
+      fecha_Registro: cliente.fecha_Registro ?? new Date().toLocaleDateString(),
     };
-
 
     // Ocultar resultados
     this.clientesEncontrados = [];
 
-
     // Limpiar campo de búsqueda
     this.busquedaCliente = '';
 
-
     // Emitir cliente seleccionado
-    this.clienteCompletoChange.emit(
-      cliente
-    );
-
+    this.clienteCompletoChange.emit(cliente);
   }
-
 
   // ==========================================================
   // CANCELAR / LIMPIAR FORMULARIO
   // ==========================================================
 
   cancelarFormulario(): void {
-
     this.clientesEncontrados = [];
 
     this.busquedaCliente = '';
 
     this.clienteSeleccionado = null;
 
-
     this.clienteForm = {
-
       nit: '',
       nombre: '',
       apellido: '',
@@ -243,713 +197,415 @@ export class CreateClientComponent {
 
       estado: 1,
 
-      fecha_Registro:
-        new Date().toLocaleDateString(),
-
+      fecha_Registro: new Date().toLocaleDateString(),
     };
 
+    this.esConsumidorFinal = false;
   }
-
 
   // ==========================================================
   // GUARDAR CLIENTE
   // ==========================================================
 
   guardarCliente(): void {
-
-
     // ========================================================
     // VALIDAR NIT
     // ========================================================
 
-    if (
-      !this.clienteForm.nit ||
-      this.clienteForm.nit.trim() === ''
-    ) {
+    if (!this.clienteForm.nit || this.clienteForm.nit.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+        data: {
+          titulo: 'Datos incompletos',
 
-          width: '450px',
+          mensaje: 'El NIT es obligatorio y debe contener caracteres válidos.',
 
-          data: {
+          tipo: 'warning',
 
-            titulo:
-              'Datos incompletos',
+          icon: 'warning',
 
-            mensaje:
-              'El NIT es obligatorio y debe contener caracteres válidos.',
+          detalles: [
+            {
+              etiqueta: 'NIT Actual',
 
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'NIT Actual',
-
-                valor:
-                  this.clienteForm.nit
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.nit,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // VALIDAR TELÉFONO / CELULAR
     // ========================================================
 
     if (
-
-      (
-        !this.clienteForm.telefono ||
-        this.clienteForm.telefono.trim() === ''
-      )
-
-      &&
-
-      (
-        !this.clienteForm.celular ||
-        this.clienteForm.celular.trim() === ''
-      )
-
+      (!this.clienteForm.telefono || this.clienteForm.telefono.trim() === '') &&
+      (!this.clienteForm.celular || this.clienteForm.celular.trim() === '')
     ) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+        data: {
+          titulo: 'Datos incompletos',
 
-          width: '450px',
+          mensaje:
+            'El Teléfono o Celular es obligatorio y debe contener caracteres válidos.',
 
-          data: {
+          tipo: 'warning',
 
-            titulo:
-              'Datos incompletos',
+          icon: 'warning',
 
-            mensaje:
-              'El Teléfono o Celular es obligatorio y debe contener caracteres válidos.',
+          detalles: [
+            {
+              etiqueta: 'Teléfono Actual',
 
-            tipo:
-              'warning',
+              valor: this.clienteForm.telefono,
+            },
 
-            icon:
-              'warning',
+            {
+              etiqueta: 'Celular Actual',
 
-            detalles: [
-
-              {
-                etiqueta:
-                  'Teléfono Actual',
-
-                valor:
-                  this.clienteForm.telefono
-              },
-
-              {
-                etiqueta:
-                  'Celular Actual',
-
-                valor:
-                  this.clienteForm.celular
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.celular,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // VALIDAR NOMBRE
     // ========================================================
 
-    if (
+    if (!this.clienteForm.nombre || this.clienteForm.nombre.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      !this.clienteForm.nombre ||
-      this.clienteForm.nombre.trim() === ''
+        data: {
+          titulo: 'Datos incompletos',
 
-    ) {
+          mensaje:
+            'El Nombre es obligatorio y debe contener caracteres válidos.',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+          tipo: 'warning',
 
-          width: '450px',
+          icon: 'warning',
 
-          data: {
+          detalles: [
+            {
+              etiqueta: 'Nombre Actual',
 
-            titulo:
-              'Datos incompletos',
-
-            mensaje:
-              'El Nombre es obligatorio y debe contener caracteres válidos.',
-
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'Nombre Actual',
-
-                valor:
-                  this.clienteForm.nombre
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.nombre,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // VALIDAR APELLIDO
     // ========================================================
 
-    if (
+    if (!this.clienteForm.apellido || this.clienteForm.apellido.trim() === '') {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      !this.clienteForm.apellido ||
-      this.clienteForm.apellido.trim() === ''
+        data: {
+          titulo: 'Datos incompletos',
 
-    ) {
+          mensaje:
+            'El Apellido es obligatorio y debe contener caracteres válidos.',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+          tipo: 'warning',
 
-          width: '450px',
+          icon: 'warning',
 
-          data: {
+          detalles: [
+            {
+              etiqueta: 'Apellido Actual',
 
-            titulo:
-              'Datos incompletos',
-
-            mensaje:
-              'El Apellido es obligatorio y debe contener caracteres válidos.',
-
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'Apellido Actual',
-
-                valor:
-                  this.clienteForm.apellido
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.apellido,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // VALIDAR DIRECCIÓN
     // ========================================================
 
     if (
-
       !this.clienteForm.direccion ||
       this.clienteForm.direccion.trim() === ''
-
     ) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+        data: {
+          titulo: 'Datos incompletos',
 
-          width: '450px',
+          mensaje:
+            'La Dirección es obligatoria y debe contener caracteres válidos.',
 
-          data: {
+          tipo: 'warning',
 
-            titulo:
-              'Datos incompletos',
+          icon: 'warning',
 
-            mensaje:
-              'La Dirección es obligatoria y debe contener caracteres válidos.',
+          detalles: [
+            {
+              etiqueta: 'Dirección Actual',
 
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'Dirección Actual',
-
-                valor:
-                  this.clienteForm.direccion
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.direccion,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // VALIDAR TIPO CLIENTE
     // ========================================================
 
-    if (
+    if (!this.clienteForm.tipoCliente || this.clienteForm.tipoCliente <= 0) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      !this.clienteForm.tipoCliente ||
-      this.clienteForm.tipoCliente <= 0
+        data: {
+          titulo: 'Datos incompletos',
 
-    ) {
+          mensaje: 'Debe seleccionar un Tipo Cliente válido.',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+          tipo: 'warning',
 
-          width: '450px',
+          icon: 'warning',
 
-          data: {
+          detalles: [
+            {
+              etiqueta: 'Tipo Cliente Actual',
 
-            titulo:
-              'Datos incompletos',
-
-            mensaje:
-              'Debe seleccionar un Tipo Cliente válido.',
-
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'Tipo Cliente Actual',
-
-                valor:
-                  this.clienteForm.tipoCliente
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.tipoCliente,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // LIMPIAR DATOS
     // ========================================================
 
-    const nitRaw =
-      (
-        this.clienteForm.nit ?? ''
-      ).trim();
+    const nitRaw = (this.clienteForm.nit ?? '').trim();
 
+    const nitLimpio = /^c\s*\/?\s*f$/i.test(nitRaw)
+      ? 'C/F'
+      : nitRaw.replace(/\D/g, '');
 
-    const nitLimpio =
-      /^c\s*\/?\s*f$/i.test(nitRaw)
+    const telLimpio = (this.clienteForm.telefono ?? '').replace(/\D/g, '');
 
-        ? 'C/F'
-
-        : nitRaw.replace(
-            /\D/g,
-            ''
-          );
-
-
-    const telLimpio =
-      (
-        this.clienteForm.telefono ?? ''
-      ).replace(
-        /\D/g,
-        ''
-      );
-
-
-    const celLimpio =
-      (
-        this.clienteForm.celular ?? ''
-      ).replace(
-        /\D/g,
-        ''
-      );
-
+    const celLimpio = (this.clienteForm.celular ?? '').replace(/\D/g, '');
 
     // ========================================================
     // VALIDAR NIT LIMPIO
     // ========================================================
 
     if (!nitLimpio) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
 
-      this.dialog.open(
-        AlertGenericComponent,
-        {
+        data: {
+          titulo: 'Datos',
 
-          width: '450px',
+          mensaje: 'El NIT debe ser numérico.',
 
-          data: {
+          tipo: 'warning',
 
-            titulo:
-              'Datos',
+          icon: 'warning',
 
-            mensaje:
-              'El NIT debe ser numérico.',
+          detalles: [
+            {
+              etiqueta: 'NIT Actual',
 
-            tipo:
-              'warning',
-
-            icon:
-              'warning',
-
-            detalles: [
-
-              {
-                etiqueta:
-                  'NIT Actual',
-
-                valor:
-                  this.clienteForm.nit
-              }
-
-            ],
-
-          },
-
-        }
-      );
+              valor: this.clienteForm.nit,
+            },
+          ],
+        },
+      });
 
       return;
-
     }
-
 
     // ========================================================
     // BODY PARA API
     // ========================================================
 
     const body: ClienteCreateRequest = {
+      nit: nitLimpio,
 
-      nit:
-        nitLimpio,
+      nombre: (this.clienteForm.nombre ?? '').trim(),
 
-      nombre:
-        (
-          this.clienteForm.nombre ?? ''
-        ).trim(),
+      apellido: (this.clienteForm.apellido ?? '').trim(),
 
-      apellido:
-        (
-          this.clienteForm.apellido ?? ''
-        ).trim(),
+      email: (this.clienteForm.email ?? 'correo@generico.com').trim(),
 
-      email:
-        (
-          this.clienteForm.email ??
-          'correo@generico.com'
-        ).trim(),
+      dpi: (this.clienteForm.dpi ?? '0000000000000').trim(),
 
-      dpi:
-        (
-          this.clienteForm.dpi ??
-          '0000000000000'
-        ).trim(),
+      direccion: (this.clienteForm.direccion ?? '').trim(),
 
-      direccion:
-        (
-          this.clienteForm.direccion ?? ''
-        ).trim(),
+      telefono: telLimpio || '00000000',
 
-      telefono:
-        telLimpio ||
-        '00000000',
+      celular: celLimpio || '00000000',
 
-      celular:
-        celLimpio ||
-        '00000000',
+      tipoCliente: Number(this.clienteForm.tipoCliente ?? 1),
 
-      tipoCliente:
-        Number(
-          this.clienteForm.tipoCliente ?? 1
-        ),
+      observacion01: (this.clienteForm.observacion01 ?? '').trim(),
 
-      observacion01:
-        (
-          this.clienteForm.observacion01 ?? ''
-        ).trim(),
+      observacion02: (this.clienteForm.observacion02 ?? '').trim(),
 
-      observacion02:
-        (
-          this.clienteForm.observacion02 ?? ''
-        ).trim(),
-
-      username:
-        this.authService.getUsername(),
-
+      username: this.authService.getUsername(),
     };
-
 
     // ========================================================
     // INSERTAR CLIENTE
     // ========================================================
 
-    this.clientesService
-      .insertCliente(body)
-      .subscribe({
+    this.clientesService.insertCliente(body).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
 
-        next: (res) => {
+            data: {
+              titulo: 'Cliente Creado Correctamente',
 
-          if (res?.success) {
+              mensaje:
+                res.mensaje || 'Los datos del cliente han sido almacenados.',
 
-            this.dialog.open(
-              AlertGenericComponent,
-              {
+              tipo: 'success',
 
-                width: '450px',
+              icon: 'check_circle',
 
-                data: {
+              detalles: [
+                {
+                  etiqueta: 'NIT',
 
-                  titulo:
-                    'Cliente Creado Correctamente',
-
-                  mensaje:
-                    res.mensaje ||
-                    'Los datos del cliente han sido almacenados.',
-
-                  tipo:
-                    'success',
-
-                  icon:
-                    'check_circle',
-
-                  detalles: [
-
-                    {
-                      etiqueta:
-                        'NIT',
-
-                      valor:
-                        this.clienteForm.nit
-                    },
-
-                    {
-                      etiqueta:
-                        'Nombre',
-
-                      valor:
-                        `${this.clienteForm.nombre} ${this.clienteForm.apellido}`
-                    },
-
-                    {
-                      etiqueta:
-                        'Correo',
-
-                      valor:
-                        this.clienteForm.email
-                    },
-
-                    {
-                      etiqueta:
-                        'Telefono',
-
-                      valor:
-                        `${this.clienteForm.telefono} / ${this.clienteForm.celular}`
-                    },
-
-                    {
-                      etiqueta:
-                        'Estado',
-
-                      valor:
-                        this.clienteForm.estado
-                    },
-
-                    {
-                      etiqueta:
-                        'Fecha Creación',
-
-                      valor:
-                        this.clienteForm.fecha_Registro
-                    }
-
-                  ],
-
+                  valor: this.clienteForm.nit,
                 },
 
-              }
-            );
+                {
+                  etiqueta: 'Nombre',
 
+                  valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}`,
+                },
 
-            // Limpiar formulario
-            this.cancelarFormulario();
+                {
+                  etiqueta: 'Correo',
 
+                  valor: this.clienteForm.email,
+                },
 
-          } else {
+                {
+                  etiqueta: 'Telefono',
 
-            alert(
-              res?.mensaje ||
-              'No se pudo guardar el cliente'
-            );
+                  valor: `${this.clienteForm.telefono} / ${this.clienteForm.celular}`,
+                },
 
-          }
+                {
+                  etiqueta: 'Estado',
 
-        },
+                  valor: this.clienteForm.estado,
+                },
 
+                {
+                  etiqueta: 'Fecha Creación',
 
-        // ====================================================
-        // ERROR API
-        // ====================================================
+                  valor: this.clienteForm.fecha_Registro,
+                },
+              ],
+            },
+          });
 
-        error: (err) => {
+          // Limpiar formulario
+          this.cancelarFormulario();
+        } else {
+          alert(res?.mensaje || 'No se pudo guardar el cliente');
+        }
+      },
 
-          console.error(
-            'Error API:',
-            err
-          );
+      // ====================================================
+      // ERROR API
+      // ====================================================
 
+      error: (err) => {
+        console.error('Error API:', err);
 
-          const msg =
-            err?.error?.mensaje ||
-            'Error al conectar con el servidor';
+        const msg = err?.error?.mensaje || 'Error al conectar con el servidor';
 
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
 
-          this.dialog.open(
-            AlertGenericComponent,
-            {
+          data: {
+            titulo: 'Error al Crear Cliente',
 
-              width: '450px',
+            mensaje: typeof msg === 'string' ? msg : 'Error sin descripción.',
 
-              data: {
+            tipo: 'error',
 
-                titulo:
-                  'Error al Crear Cliente',
+            icon: 'error',
 
-                mensaje:
-                  typeof msg === 'string'
-                    ? msg
-                    : 'Error sin descripción.',
+            detalles: [
+              {
+                etiqueta: 'NIT',
 
-                tipo:
-                  'error',
-
-                icon:
-                  'error',
-
-                detalles: [
-
-                  {
-                    etiqueta:
-                      'NIT',
-
-                    valor:
-                      this.clienteForm.nit
-                  },
-
-                  {
-                    etiqueta:
-                      'Nombre',
-
-                    valor:
-                      `${this.clienteForm.nombre} ${this.clienteForm.apellido}`
-                  },
-
-                  {
-                    etiqueta:
-                      'Correo',
-
-                    valor:
-                      this.clienteForm.email
-                  },
-
-                  {
-                    etiqueta:
-                      'Telefono',
-
-                    valor:
-                      `${this.clienteForm.telefono} / ${this.clienteForm.celular}`
-                  },
-
-                  {
-                    etiqueta:
-                      'Estado',
-
-                    valor:
-                      this.clienteForm.estado
-                  },
-
-                  {
-                    etiqueta:
-                      'Fecha Creación',
-
-                    valor:
-                      this.clienteForm.fecha_Registro
-                  }
-
-                ],
-
+                valor: this.clienteForm.nit,
               },
 
-            }
-          );
+              {
+                etiqueta: 'Nombre',
 
-        }
+                valor: `${this.clienteForm.nombre} ${this.clienteForm.apellido}`,
+              },
 
-      });
+              {
+                etiqueta: 'Correo',
 
+                valor: this.clienteForm.email,
+              },
+
+              {
+                etiqueta: 'Telefono',
+
+                valor: `${this.clienteForm.telefono} / ${this.clienteForm.celular}`,
+              },
+
+              {
+                etiqueta: 'Estado',
+
+                valor: this.clienteForm.estado,
+              },
+
+              {
+                etiqueta: 'Fecha Creación',
+
+                valor: this.clienteForm.fecha_Registro,
+              },
+            ],
+          },
+        });
+      },
+    });
   }
-
 }

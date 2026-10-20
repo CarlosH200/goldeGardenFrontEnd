@@ -1,5 +1,3 @@
-
-
 /* bloque de codigo de estilos de pantalla de carga */
 /* bloque de codigo de estilos de pantalla de carga */
 
@@ -12,7 +10,7 @@
   padding: 0 !important;
   align-items: center;
   justify-content: center;
-  background-image: var(--theme-image-url) !important; 
+  background-image: var(--theme-image-url) !important;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -86,10 +84,8 @@
   margin: 0;
 }
 
-
 /* bloque de codigo de estilos de pantalla de carga */
 /* bloque de codigo de estilos de pantalla de carga */
-
 
 /* Títulos dentro del formulario numero de evento */
 .event-form h2 {
@@ -98,7 +94,7 @@
   color: var(--color-texto);
 }
 
-.textColor{
+.textColor {
   color: var(--color-texto-invertido) !important;
 }
 
@@ -107,7 +103,6 @@
   color: var(--color-texto);
   margin-bottom: 20px;
 }
-
 
 /* ESTILOS DE INPUT SELECT PARA CF */
 /* Switch C/F desmarcado */
@@ -128,8 +123,6 @@
   border-color: #495057;
 }
 /* ESTILOS DE INPUT SELECT PARA CF */
-
-
 
 .search-results {
   position: absolute;
@@ -153,7 +146,6 @@
   background-color: var(--color-secundario);
   color: var(--color-texto-invertido);
 }
-
 
 /* input buscador con botón */
 /* ===== Grupo input + botón ===== */
@@ -188,7 +180,6 @@
 }
 
 /* input buscador con boton */
-
 
 /* APARTADO DE ESTILOS CONTAINER PARA CREAR CLIENTE */
 .client-card {
@@ -394,8 +385,13 @@ input[type="datetime-local"].modern-datetime-input {
   border: 1.5px solid var(--color-Shadow);
   background-color: var(--color-fondoSecundario);
   color: var(--color-texto);
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 10px rgba(15, 23, 42, 0.04);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 2px 10px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
 }
 
 input[type="datetime-local"].modern-datetime-input:focus {
@@ -433,7 +429,11 @@ input[type="datetime-local"].modern-datetime-input:focus {
 .calendar-btn .material-symbols-outlined {
   font-size: 22px;
   line-height: 1;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 .date-picker-popover {
@@ -494,7 +494,6 @@ input[type="datetime-local"].modern-datetime-input:focus {
   align-items: center;
   justify-content: center;
 }
-
 
 .NewEventButton {
   white-space: nowrap;
@@ -594,7 +593,6 @@ input[type="datetime-local"].modern-datetime-input:focus {
 }
 /* FIN ESTILOS METODOLOGIA ESTADO CLIENTE SELECCIONADO  */
 
-
 /* Responsive */
 @media (max-width: 575.98px) {
   .input-btn-group {
@@ -646,7 +644,9 @@ body.dark-theme .doc-section-card {
   border-radius: 10px;
   border: 1.5px solid var(--color-Shadow);
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .doc-search-group:focus-within {
@@ -674,7 +674,9 @@ body.dark-theme .doc-section-card {
   color: var(--color-texto-invertido) !important;
   border: none !important;
   height: 40px;
-  transition: filter 0.2s ease, transform 0.1s ease;
+  transition:
+    filter 0.2s ease,
+    transform 0.1s ease;
 }
 
 .btn-search-doc:hover {
@@ -748,7 +750,10 @@ body.dark-theme .doc-section-card {
   border-radius: 10px !important;
   font-size: 0.88rem;
   letter-spacing: 0.3px;
-  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
@@ -769,7 +774,10 @@ body.dark-theme .doc-section-card {
   color: var(--color-texto-invertido) !important;
   border: none !important;
   border-radius: 10px !important;
-  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 

@@ -3,27 +3,18 @@
      ========================================================= -->
 
 <div class="client-card">
-
   <!-- ENCABEZADO -->
   <div class="client-card-header">
+    <span class="material-icons"> search </span>
 
-    <span class="material-icons">
-      search
-    </span>
-
-    <h5>
-      Buscar Cliente
-    </h5>
-
+    <h5>Buscar Cliente</h5>
   </div>
-
 
   <!-- =======================================================
        BUSCADOR
        ======================================================= -->
 
   <div class="input-btn-group">
-
     <input
       type="text"
       class="form-control"
@@ -40,49 +31,31 @@
       (click)="buscarClientes()"
       title="Buscar cliente"
     >
-
-      <span class="material-icons">
-        search
-      </span>
-
+      <span class="material-icons"> search </span>
     </button>
-
   </div>
-
 
   <!-- =======================================================
        RESULTADOS DE BÚSQUEDA
        ======================================================= -->
 
-  <div
-    class="search-results"
-    *ngIf="clientesEncontrados.length > 0"
-  >
-
+  <div class="search-results" *ngIf="clientesEncontrados.length > 0">
     <div
       class="search-item"
       *ngFor="let cliente of clientesEncontrados"
       (click)="seleccionarCliente(cliente)"
     >
-
       <strong>
         {{ cliente.nombre }}
         {{ cliente.apellido }}
       </strong>
 
-      <br>
+      <br />
 
-      <small>
-        NIT: {{ cliente.nit }}
-      </small>
-
+      <small> NIT: {{ cliente.nit }} </small>
     </div>
-
   </div>
-
 </div>
-
-
 
 <!-- =========================================================
      FORMULARIO DEL CLIENTE
@@ -93,66 +66,61 @@
      ========================================================= -->
 
 <div class="containerNewClient">
-
   <div class="client-card">
-
-
     <!-- =======================================================
          ENCABEZADO
          ======================================================= -->
 
     <div class="client-card-header">
+      <span class="material-icons"> person_add </span>
 
-      <span class="material-icons">
-        person_add
-      </span>
-
-      <h5>
-        Cliente
-      </h5>
-
+      <h5>Cliente</h5>
     </div>
-
-
 
     <!-- =======================================================
          FORMULARIO
          ======================================================= -->
 
     <div class="row g-3">
-
-
       <!-- =====================================================
            NIT
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          NIT
-        </label>
+        <label for="nit" class="form-label">NIT</label>
 
         <input
           [(ngModel)]="clienteForm.nit"
           name="nit"
+          id="nit"
           type="text"
           class="form-control"
-          placeholder="Ingrese NIT"
         />
 
+        <div
+          class="form-check form-switch mt-2 d-flex align-items-center gap-2"
+        >
+          <input
+            type="checkbox"
+            id="clienteCF"
+            class="form-check-input mt-0"
+            role="switch"
+            [checked]="esConsumidorFinal"
+            (change)="cambiarConsumidorFinal($event)"
+          />
+
+          <label class="form-check-label mb-0" for="clienteCF">
+            Consumidor final (C/F)
+          </label>
+        </div>
       </div>
-
-
 
       <!-- =====================================================
            NOMBRE
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          Nombre
-        </label>
+        <label> Nombre </label>
 
         <input
           [(ngModel)]="clienteForm.nombre"
@@ -161,20 +129,14 @@
           class="form-control"
           placeholder="Ingrese nombre"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            APELLIDO
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          Apellido
-        </label>
+        <label> Apellido </label>
 
         <input
           [(ngModel)]="clienteForm.apellido"
@@ -183,20 +145,14 @@
           class="form-control"
           placeholder="Ingrese apellido"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            EMAIL
            ===================================================== -->
 
       <div class="col-md-6">
-
-        <label>
-          Email
-        </label>
+        <label> Email </label>
 
         <input
           [(ngModel)]="clienteForm.email"
@@ -205,20 +161,14 @@
           class="form-control"
           placeholder="correo@ejemplo.com"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            DPI
            ===================================================== -->
 
       <div class="col-md-6">
-
-        <label>
-          DPI
-        </label>
+        <label> DPI </label>
 
         <input
           [(ngModel)]="clienteForm.dpi"
@@ -227,20 +177,14 @@
           class="form-control"
           placeholder="Ingrese DPI"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            DIRECCIÓN
            ===================================================== -->
 
       <div class="col-md-12">
-
-        <label>
-          Dirección
-        </label>
+        <label> Dirección </label>
 
         <input
           [(ngModel)]="clienteForm.direccion"
@@ -249,20 +193,14 @@
           class="form-control"
           placeholder="Ingrese dirección"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            TELÉFONO
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          Teléfono
-        </label>
+        <label> Teléfono </label>
 
         <input
           [(ngModel)]="clienteForm.telefono"
@@ -271,20 +209,14 @@
           class="form-control"
           placeholder="Teléfono"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            CELULAR
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          Celular
-        </label>
+        <label> Celular </label>
 
         <input
           [(ngModel)]="clienteForm.celular"
@@ -293,54 +225,34 @@
           class="form-control"
           placeholder="Celular"
         />
-
       </div>
-
-
 
       <!-- =====================================================
            TIPO CLIENTE
            ===================================================== -->
 
       <div class="col-md-4">
-
-        <label>
-          Tipo Cliente
-        </label>
+        <label> Tipo Cliente </label>
 
         <select
           [(ngModel)]="clienteForm.tipoCliente"
           name="tipoCliente"
           class="form-select"
         >
+          <option [ngValue]="1">Normal</option>
 
-          <option [ngValue]="1">
-            Normal
-          </option>
+          <option [ngValue]="2">Frecuente</option>
 
-          <option [ngValue]="2">
-            Frecuente
-          </option>
-
-          <option [ngValue]="3">
-            Empresa
-          </option>
-
+          <option [ngValue]="3">Empresa</option>
         </select>
-
       </div>
-
-
 
       <!-- =====================================================
            OBSERVACIÓN 01
            ===================================================== -->
 
       <div class="col-md-6">
-
-        <label>
-          Observación 01
-        </label>
+        <label> Observación 01 </label>
 
         <textarea
           [(ngModel)]="clienteForm.observacion01"
@@ -349,20 +261,14 @@
           rows="3"
           placeholder="Observación..."
         ></textarea>
-
       </div>
-
-
 
       <!-- =====================================================
            OBSERVACIÓN 02
            ===================================================== -->
 
       <div class="col-md-6">
-
-        <label>
-          Observación 02
-        </label>
+        <label> Observación 02 </label>
 
         <textarea
           [(ngModel)]="clienteForm.observacion02"
@@ -371,20 +277,14 @@
           rows="3"
           placeholder="Observación..."
         ></textarea>
-
       </div>
-
     </div>
-
-
 
     <!-- =======================================================
          BOTONES
          ======================================================= -->
 
     <div class="d-flex justify-content-end gap-2 mt-4">
-
-
       <!-- CANCELAR -->
 
       <button
@@ -392,16 +292,10 @@
         class="buttonCancel btn btn-secondary"
         (click)="cancelarFormulario()"
       >
-
-        <span class="material-icons">
-          cancel
-        </span>
+        <span class="material-icons"> cancel </span>
 
         Cancelar
-
       </button>
-
-
 
       <!-- GUARDAR -->
 
@@ -410,17 +304,10 @@
         class="buttonSave btn btn-primary"
         (click)="guardarCliente()"
       >
-
-        <span class="material-icons">
-          save
-        </span>
+        <span class="material-icons"> save </span>
 
         Guardar Cliente
-
       </button>
-
     </div>
-
   </div>
-
 </div>

@@ -17,14 +17,14 @@ export class MenuDisplayProvider {
       id: 1,
       nombre: 'Eventos',
       component: EventComponent,
-      enabled: false,
+      enabled: true,
       icon: 'event_available'
     },
     {
       id: 2,
       nombre: 'Calendario Eventos',
       component: EventCalendarComponent,
-      enabled: true,
+      enabled: false,
       icon: 'calendar_month'
     },
     {

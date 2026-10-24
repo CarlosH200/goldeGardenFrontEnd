@@ -254,6 +254,9 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
   // ==========================================================
   // AGREGAR PRODUCTO
   // ==========================================================
+  // ==========================================================
+  // AGREGAR PRODUCTO
+  // ==========================================================
   agregarProducto() {
     if (!this.productoEncontrado) {
       this.dialog.open(AlertGenericComponent, {
@@ -317,7 +320,9 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
       return;
     }
 
-    const subtotal = this.productoEncontrado.precio * this.cantidad;
+    // Calcular el subtotal usando el precio actual (modificado o el original del API)
+    const precioUnitario = Number(this.productoEncontrado.precio) || 0;
+    const subtotal = precioUnitario * this.cantidad;
 
     // ==========================================================
     // BODY API
@@ -346,8 +351,6 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
       cantidad: this.cantidad,
     };
 
-    // // console.log('BODY TRANSACCION:', body);
-
     // ==========================================================
     // INSERTAR EN API
     // ==========================================================
@@ -363,24 +366,17 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
 
           if (existe) {
             existe.cantidad += this.cantidad;
-
+            existe.precio = precioUnitario; // Actualizar por si cambió el precio
             existe.subtotal = existe.cantidad * existe.precio;
           } else {
             this.transacciones.push({
-
               ...this.productoEncontrado,
-
+              precio: precioUnitario,
               cantidad: this.cantidad,
-
               detalle: this.detalleProducto,
-
               observacion: this.detalleProducto,
-
               observacionProducto: this.productoEncontrado.observacionProducto || '',
-
               subtotal,
-
-
             });
           }
 

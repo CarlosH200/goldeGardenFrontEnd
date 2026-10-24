@@ -1,3 +1,34 @@
+
+/* BLOQUE DE ESTILOS PARA EL COMPONENTE DE MONTO (PRECIO VENTA) EN TRANSACCIONES */
+/* Ancho y alineación del grupo de inputs */
+.precio-input-group {
+  width: 140px;
+  margin-left: auto;
+}
+
+/* Tamaño de la letra para el símbolo Q */
+.symbol-q {
+  font-size: 20px;
+}
+
+/* Forzar fondo blanco limpio en el input del precio */
+.custom-input-precio {
+  background-color: #ffffff !important;
+}
+
+/* Ocultar las flechitas de incremento/decremento en Chrome, Safari, Edge y Opera */
+input.sin-flechas::-webkit-outer-spin-button,
+input.sin-flechas::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Ocultar las flechitas en Firefox */
+input.sin-flechas {
+  appearance: textfield;
+}
+/* /* BLOQUE DE ESTILOS PARA EL COMPONENTE DE MONTO (PRECIO VENTA) EN TRANSACCIONES */ */
+
 .transaccion-container {
   width: 100%;
   margin: auto;

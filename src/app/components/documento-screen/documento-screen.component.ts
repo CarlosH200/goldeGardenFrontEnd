@@ -906,7 +906,7 @@ cambiarConsumidorFinal(event: Event): void {
   // ==========================================================
   // CARGAR EVENTO POR ID (CON CLIENTE)
   // ==========================================================
-  cargarEventoPorId(id: number | null): void {
+cargarEventoPorId(id: number | null): void {
     if (!id) return;
 
     this.isLoading = true; // 👈 activar pantalla de carga
@@ -1009,7 +1009,17 @@ cambiarConsumidorFinal(event: Event): void {
           }, 1000);
 
         } else {
-          alert('Evento no encontrado');
+          // 🛑 Diálogo cuando el servidor responde pero el evento no existe
+          this.dialog.open(AlertGenericComponent, {
+            width: '450px',
+            data: {
+              titulo: 'Evento no encontrado',
+              mensaje: 'El evento especificado no existe o no fue encontrado en el sistema.',
+              tipo: 'warning',
+              icon: 'warning',
+            },
+          });
+
           this.clienteSeleccionado = null;
 
           setTimeout(() => {
@@ -1018,7 +1028,17 @@ cambiarConsumidorFinal(event: Event): void {
         }
       },
       error: (err: any) => {
-        alert('Error al cargar evento');
+        //Diálogo cuando ocurre un error de red o la API falla
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Error',
+            mensaje: 'El evento no existe o ocurrió un problema al intentar cargarlo.',
+            tipo: 'error',
+            icon: 'error',
+          },
+        });
+
         this.clienteSeleccionado = null;
 
         setTimeout(() => {

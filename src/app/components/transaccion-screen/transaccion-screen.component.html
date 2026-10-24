@@ -92,29 +92,6 @@
             </div>
           </div>
         </div>
-
-        <!-- COMENTADO POR REDUNDANCIA -->
-         
-        <!-- COLUMNA 3: RESUMEN DE PRODUCTOS
-        <div class="col-12 col-md-4">
-          <div class="summary-card p-3 rounded-3 h-100">
-            <div class="summary-card-title mb-2 d-flex align-items-center gap-1">
-              <span class="material-icons fs-6 text-primary">inventory_2</span>
-              <span class="fw-bold small text-uppercase">Productos en Documento</span>
-            </div>
-            <div class="summary-card-body small overflow-auto" style="max-height: 120px;">
-              <div *ngIf="transacciones.length === 0" class="opacity-75 fst-italic py-2 text-center">
-                No hay productos añadidos
-              </div>
-              <div *ngFor="let item of transacciones" class="d-flex justify-content-between align-items-center py-1 border-bottom">
-                <span class="text-truncate me-2" style="max-width: 130px;">{{ item.nombre_Producto || item.descripcion || 'Producto' }}</span>
-                <span class="badge summary-item-qty me-2">x{{ item.cantidad }}</span>
-                <span class="fw-semibold">Q{{ (item.subtotal || (item.cantidad * item.precio_Unitario) || 0).toFixed(2) }}</span>
-              </div>
-            </div>
-          </div> -->
-        <!-- </div> -->
-
       </div>
     </div>
   </div>
@@ -166,9 +143,20 @@
           </small>
         </div>
 
-        <span class="precio-tag">
-          Q{{ productoEncontrado.precio.toFixed(2) }}
-        </span>
+        <!-- BLOQUE QUE CONTIENE EL MONTO VARIABLE O FIJO POR PRODUCTO EL SELECCIONARLO EN TRANSACCION, PENDIENTE PARAMETRIZARLO
+         PARA QUE SE PUEDA CONFIGURAR EN EL BACKEND SI ES FIJO O VARIABLE, POR EL MOMENTO SE DEJA FIJO -->
+        <div class="precio-edit-container text-end">
+          <label class="small text-muted d-block fw-semibold">Precio Venta:</label>
+          <div class="input-group precio-input-group">
+            <span class="input-group-text fw-bold symbol-q">Q</span>
+            <input 
+              type="number" 
+              class="form-control text-end fw-bold fs-5 sin-flechas custom-input-precio" 
+              [(ngModel)]="productoEncontrado.precio" 
+              min="0" 
+              step="0.01" />
+          </div>
+        </div>
       </div>
 
       <div class="cantidad-row">

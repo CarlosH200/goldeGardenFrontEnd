@@ -9,6 +9,8 @@ import { ClientesService } from '../../services/cliente.service';
 import { EventosModel } from '../../models/eventosModel';
 import { PagoModel } from '../../models/pagoModel';
 import { ClienteModel } from '../../models/clienteModel';
+import { EstadoService } from '../../services/estadoService';
+import { EstadosModel } from '../../models/estadoModel';
 
 interface CalendarDay {
   date: Date;
@@ -35,10 +37,17 @@ export class EventCalendarComponent implements OnInit {
   calendarDays: CalendarDay[] = [];
   weekDayNames: string[] = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-  // ========== DATA ==========
+  // ========== DATA & FILTERS ==========
   eventos: EventosModel[] = [];
   filteredEventos: EventosModel[] = [];
   searchQuery: string = '';
+  selectedEstado: number | null = 4; // Por defecto 4 (Confirmados)
+  estadosList: EstadosModel[] = [
+    { id: 1, descripcion: 'Activo' } as any,
+    { id: 2, descripcion: 'Cancelado' } as any,
+    { id: 3, descripcion: 'Completado' } as any,
+    { id: 4, descripcion: 'Confirmado' } as any,
+  ];
   loading: boolean = false;
   loadError: string = '';
 
@@ -63,23 +72,115 @@ export class EventCalendarComponent implements OnInit {
     private eventosService: EventosService,
     private transaccionesService: TransaccionesService,
     private pagosService: PagosService,
-    private clientesService: ClientesService
+    private clientesService: ClientesService,
+    private estadoService: EstadoService
   ) {}
 
   ngOnInit(): void {
+    this.loadEstados();
     this.loadEventos();
+  }
+
+  // ========== ESTADOS LOADING ==========
+  loadEstados(): void {
+    this.estadoService.getEstados().subscribe({
+      next: (data: any) => {
+        const raw = Array.isArray(data) ? data : (data?.data || []);
+        if (Array.isArray(raw) && raw.length > 0) {
+          this.estadosList = raw.map((item: any) => ({
+            ...item,
+            id: Number(item.id ?? item.Id),
+            descripcion: item.descripcion ?? item.Descripcion ?? `Estado ${item.id ?? item.Id}`
+          }));
+
+          // Garantizar que el estado 4 esté disponible
+          if (!this.estadosList.some(e => e.id === 4)) {
+            this.estadosList.push({ id: 4, descripcion: 'Confirmado' } as any);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar lista de estados:', err);
+      }
+    });
+  }
+
+  // Normalizar datos por si vienen en PascalCase o camelCase
+  private normalizeEvent(e: any): EventosModel {
+    return {
+      id: Number(e.id ?? e.Id ?? 0),
+      titulo: e.titulo ?? e.Titulo ?? 'Sin título',
+      descripcion: e.descripcion ?? e.Descripcion ?? '',
+      fecha_Ini: e.fecha_Ini ?? e.Fecha_Ini ?? '',
+      fecha_Fin: e.fecha_Fin ?? e.Fecha_Fin ?? '',
+      fecha_Entrega: e.fecha_Entrega ?? e.Fecha_Entrega ?? '',
+      fecha_Recepcion: e.fecha_Recepcion ?? e.Fecha_Recepcion ?? '',
+      ubicacion: Number(e.ubicacion ?? e.Ubicacion ?? 0),
+      organizador: Number(e.organizador ?? e.Organizador ?? 0),
+      tipo_Evento: Number(e.tipo_Evento ?? e.Tipo_Evento ?? 0),
+      capacidad_Evento: Number(e.capacidad_Evento ?? e.Capacidad_Evento ?? 0),
+      Observacion: e.Observacion ?? e.observacion ?? '',
+      url_Evento: e.url_Evento ?? e.Url_Evento ?? '',
+      estado: Number(e.estado ?? e.Estado ?? 0),
+      username: e.username ?? e.Username ?? '',
+      m_Username: e.m_Username ?? e.M_Username ?? '',
+      fecha_Hora: e.fecha_Hora ?? e.Fecha_Hora ?? '',
+      m_Fecha_Hora: e.m_Fecha_Hora ?? e.M_Fecha_Hora ?? null,
+      consecutivo_Interno: Number(e.consecutivo_Interno ?? e.Consecutivo_Interno ?? 0),
+      bloqueado: Boolean(e.bloqueado ?? e.BLOQUEADO ?? false),
+      impreso: Boolean(e.impreso ?? e.IMPRESO ?? false),
+      impresiones: Number(e.impresiones ?? e.IMPRESIONES ?? 0),
+      id_cliente: Number(e.id_cliente ?? e.Id_Cliente ?? e.idCliente ?? 0),
+      ubicacion_Nombre: e.ubicacion_Nombre ?? e.Ubicacion_Nombre ?? '',
+      organizador_Nombre: e.organizador_Nombre ?? e.Organizador_Nombre ?? '',
+      tipo_Evento_Descripcion: e.tipo_Evento_Descripcion ?? e.Tipo_Evento_Descripcion ?? '',
+      estado_Descripcion: e.estado_Descripcion ?? e.Estado_Descripcion ?? ''
+    };
+  }
+
+  // Parsear fechas evitando desfasajes de zona horaria
+  private parseDate(dateStr: string | Date): Date | null {
+    if (!dateStr) return null;
+    if (dateStr instanceof Date) return dateStr;
+    const str = dateStr.toString().trim();
+    const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    }
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
   }
 
   // ========== DATA LOADING ==========
   loadEventos(): void {
     this.loading = true;
     this.loadError = '';
-    this.eventosService.obtenerEventos().subscribe({
+
+    const estadoParam = (this.selectedEstado === null || this.selectedEstado === undefined || isNaN(Number(this.selectedEstado)))
+      ? null
+      : Number(this.selectedEstado);
+
+    this.eventosService.obtenerEventos(estadoParam).subscribe({
       next: (res: any) => {
-        const data = Array.isArray(res) ? res : res?.data;
-        if (Array.isArray(data)) {
-          this.eventos = data.filter((e: EventosModel) => [1, 3].includes(Number(e.estado)));
-          this.filteredEventos = [...this.eventos];
+        const raw = Array.isArray(res) ? res : (res?.data || []);
+        if (Array.isArray(raw)) {
+          this.eventos = raw.map(e => this.normalizeEvent(e));
+          this.onSearchChange();
+
+          // Si el mes actual no contiene eventos pero la lista sí tiene eventos, enfocar el calendario en la fecha del evento
+          if (this.eventos.length > 0) {
+            const hasInCurrentMonth = this.eventos.some(e => {
+              const d = this.parseDate(e.fecha_Ini);
+              return d && d.getFullYear() === this.currentDate.getFullYear() && d.getMonth() === this.currentDate.getMonth();
+            });
+            if (!hasInCurrentMonth) {
+              const firstDate = this.parseDate(this.eventos[0].fecha_Ini);
+              if (firstDate) {
+                this.currentDate = new Date(firstDate);
+              }
+            }
+          }
+
           this.buildCalendar();
         } else {
           this.eventos = [];
@@ -96,6 +197,15 @@ export class EventCalendarComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  onEstadoFilterChange(val?: any): void {
+    if (val === 'null' || val === null || val === undefined || val === '') {
+      this.selectedEstado = null;
+    } else {
+      this.selectedEstado = Number(val);
+    }
+    this.loadEventos();
   }
 
   // ========== LIST SEARCH ==========
@@ -193,7 +303,8 @@ export class EventCalendarComponent implements OnInit {
 
   getEventsForDate(date: Date): EventosModel[] {
     return this.eventos.filter(e => {
-      const eventDate = new Date(e.fecha_Ini);
+      const eventDate = this.parseDate(e.fecha_Ini);
+      if (!eventDate) return false;
       return eventDate.getFullYear() === date.getFullYear() &&
              eventDate.getMonth() === date.getMonth() &&
              eventDate.getDate() === date.getDate();
@@ -284,7 +395,7 @@ export class EventCalendarComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
-    const d = new Date(dateStr);
+    const d = this.parseDate(dateStr) || new Date(dateStr);
     return d.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
@@ -422,6 +533,7 @@ export class EventCalendarComponent implements OnInit {
       case 1: return 'estado-activo';
       case 2: return 'estado-cancelado';
       case 3: return 'estado-completado';
+      case 4: return 'estado-confirmado';
       default: return 'estado-activo';
     }
   }

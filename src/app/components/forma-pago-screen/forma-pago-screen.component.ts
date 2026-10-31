@@ -250,35 +250,34 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       next: (response) => {
         this.tiposMovimiento = response;
 
-        // DEFAULT: ANTICIPO (recomendado negocio)
+        // Asignar ANTICIPO por defecto o el primero disponible
         const anticipo = this.tiposMovimiento.find(
-          (x) => x.descripcion === 'ANTICIPO',
+          (x) => x.descripcion?.toUpperCase() === 'ANTICIPO'
         );
-
         this.tipoMovimientoSeleccionado = (
           anticipo?.id ??
           this.tiposMovimiento[0]?.id ??
           ''
         ).toString();
       },
-
       error: (error) => {
         console.error('Error cargando tipos de movimiento', error);
       },
     });
   }
 
-  cargarFormasPago(): void {
+ cargarFormasPago(): void {
     this.formaPagoService.getFormasPago().subscribe({
       next: (response) => {
         this.formasPago = response;
 
-        // DEFAULT: primera forma activa
-        this.formaPagoSeleccionada = (this.formasPago[0]?.id ?? '').toString();
+        // Seleccionar la primera forma de pago activa por defecto
+        if (this.formasPago.length > 0) {
+          this.formaPagoSeleccionada = this.formasPago[0].id.toString();
+        }
       },
-
       error: (error) => {
-        console.error('Error cargando formas de pago', error);
+        console.error('Error formas de pago', error);
       },
     });
   }

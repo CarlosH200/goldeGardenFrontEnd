@@ -19,8 +19,18 @@
       </button>
     </li>
 
-    <!-- Botón refrescar -->
-    <li class="nav-item ms-auto d-flex align-items-center">
+    <!-- Filtro por Estado y Botón refrescar -->
+    <li class="nav-item ms-auto d-flex align-items-center gap-2">
+      <div class="ec-filter-container">
+        <span class="material-symbols-outlined filter-icon">filter_alt</span>
+        <select class="ec-filter-select" [(ngModel)]="selectedEstado" (ngModelChange)="onEstadoFilterChange($event)">
+          <option [ngValue]="null">Todos los estados</option>
+          <option *ngFor="let est of estadosList" [ngValue]="est.id">
+            {{ est.descripcion }}
+          </option>
+        </select>
+      </div>
+
       <button class="btn-icon" (click)="loadEventos()" title="Refrescar eventos">
         <span class="material-symbols-outlined" [class.spin]="loading">refresh</span>
       </button>
@@ -257,6 +267,10 @@
               Datos del Evento
             </div>
 
+            <div class="ec-detail-field">
+              <span class="ec-field-label">Id Evento</span>
+              <span class="ec-field-value">{{ selectedEvent.id }}</span>
+            </div>
             <div class="ec-detail-field">
               <span class="ec-field-label">Título</span>
               <span class="ec-field-value">{{ selectedEvent.titulo }}</span>

@@ -119,6 +119,49 @@
   margin-left: auto;
 }
 
+.gap-2 {
+  gap: 0.5rem;
+}
+
+/* ===== FILTRO POR ESTADO EN BARRA DE PESTAÑAS ===== */
+.ec-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-fondoSecundario);
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 8px;
+  padding: 4px 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ec-filter-container:hover,
+.ec-filter-container:focus-within {
+  border-color: var(--color-principal);
+}
+
+.ec-filter-container .filter-icon {
+  font-size: 18px;
+  color: var(--color-principal);
+  opacity: 0.85;
+}
+
+.ec-filter-select {
+  background: transparent;
+  border: none;
+  color: var(--color-texto);
+  font-size: 0.88rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.ec-filter-select option {
+  background: var(--color-fondoSecundario);
+  color: var(--color-texto);
+}
+
 /* ================================================================
    VISTA LISTA
    ================================================================ */
@@ -333,6 +376,11 @@
 .estado-completado {
   background: rgba(37, 99, 235, 0.15);
   color: #2563eb;
+}
+
+.estado-confirmado {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
 }
 
 /* ================================================================

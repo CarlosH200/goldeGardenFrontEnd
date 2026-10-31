@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { urlApi } from '../providers/api.providers';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { EventoResponse } from '../models/eventosResponseModel';
 import { EventosModel } from '../models/eventosModel';
 
@@ -26,8 +26,12 @@ export class EventosService {
     return this.http.get<{ success: boolean, data: EventosModel }>(`${this.apiUrl}/${id}`);
   }
 
-  obtenerEventos(): Observable<{ success: boolean, data: EventosModel[] }> {
-    return this.http.get<{ success: boolean, data: EventosModel[] }>(this.apiUrl);
+  obtenerEventos(estado?: number | null): Observable<{ success: boolean, data: EventosModel[] }> {
+    let params = new HttpParams();
+    if (estado !== undefined && estado !== null) {
+      params = params.set('estado', estado.toString());
+    }
+    return this.http.get<{ success: boolean, data: EventosModel[] }>(this.apiUrl, { params });
   }
 
   // Método específico para bloquear/desbloquear evento

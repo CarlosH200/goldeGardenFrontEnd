@@ -110,7 +110,7 @@
               </div>
               <!-- SELECTOR DE ESTADO -->
               <div class="select-wrapper" style="min-width: 170px">
-                <select class="form-select doc-state-select py-1" [(ngModel)]="pEstadoEvento" name="pEstadoEvento"
+                <select class="form-select doc-state-select py-1" [(ngModel)]="pEstadoEvento" name="pEstadoEvento" (ngModelChange)="onEstadoChange($event)"
                   [disabled]="!modoEdicion">
                   <option *ngFor="let estado of Estados" [value]="estado.id">
                     {{ estado.descripcion }} ({{ estado.id }})

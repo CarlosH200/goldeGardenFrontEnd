@@ -25,6 +25,7 @@ import { EventosService } from '../../services/eventosService';
 import { AuthService } from '../../services/authService';
 import { TransaccionesService } from '../../services/transacciones.service';
 import { ProductosService } from '../../services/productos.service';
+import { PagosService } from '../../services/pagosService';
 import { firstValueFrom, Subscription } from 'rxjs';
 import {
   Component,
@@ -103,6 +104,11 @@ export class DocumentoScreenComponent implements OnChanges {
   modoConsulta: boolean = true;
   // VARIABLES PARA EL MODO DE EDICION DE ESTADOS Y ESTADO POR DEFECTO AL CRER UN EVENTO
   pEstadoEvento: number = 1;
+  estadoAnterior: number = 1;
+  // CONSTANTES DE REGLAS DE NEGOCIO (ID 4: Confirmado, ID 8: Sin Pago / Cotización, ID 5: Cotización)
+  readonly ESTADO_CONFIRMADO: number = 4;
+  readonly FORMA_PAGO_SIN_PAGO_COTIZACION: number = 8;
+  readonly TIPO_MOVIMIENTO_COTIZACION: number = 5;
   modoEdicion: boolean = false;
   // VARIABLE PARA ALMACENAR EL ID DEL EVENTO CREADO
   idEventoCreado: number | null = null;
@@ -200,7 +206,8 @@ export class DocumentoScreenComponent implements OnChanges {
     //NUEVO SERVICE
     private clientesService: ClientesService,
     private empresaService: EmpresaService,
-    private productosService: ProductosService
+    private productosService: ProductosService,
+    private pagosService: PagosService
   ) { }
 
   isLocked: boolean = false;
@@ -284,26 +291,26 @@ export class DocumentoScreenComponent implements OnChanges {
     }
   }
 
-// FUNCION PARA CAMBIAR EL ESTADO DE CONSUMIDOR FINAL
+  // FUNCION PARA CAMBIAR EL ESTADO DE CONSUMIDOR FINAL
   esConsumidorFinal = false;
 
-cambiarConsumidorFinal(event: Event): void {
-  const marcado = (event.target as HTMLInputElement).checked;
+  cambiarConsumidorFinal(event: Event): void {
+    const marcado = (event.target as HTMLInputElement).checked;
 
-  this.esConsumidorFinal = marcado;
+    this.esConsumidorFinal = marcado;
 
-  if (marcado) {
-    this.clienteForm.nit = 'C/F';
-    this.clienteForm.nombre = 'CONSUMIDOR';
-    this.clienteForm.apellido = 'FINAL';
-    this.clienteForm.direccion = 'CIUDAD';
-  } else {
-    this.clienteForm.nit = '';
-    this.clienteForm.nombre = '';
-    this.clienteForm.apellido = '';
-    this.clienteForm.direccion = '';
+    if (marcado) {
+      this.clienteForm.nit = 'C/F';
+      this.clienteForm.nombre = 'CONSUMIDOR';
+      this.clienteForm.apellido = 'FINAL';
+      this.clienteForm.direccion = 'CIUDAD';
+    } else {
+      this.clienteForm.nit = '';
+      this.clienteForm.nombre = '';
+      this.clienteForm.apellido = '';
+      this.clienteForm.direccion = '';
+    }
   }
-}
 
   obtenerDescripcionUbicacion(idUbicacion: number | string): string {
     const ubicacion = this.ubicaciones.find((u) => u.id === Number(idUbicacion));
@@ -399,7 +406,7 @@ cambiarConsumidorFinal(event: Event): void {
     // Antes de imprimir, persistir cambios del documento y actualizar estado de bloqueo
     if (this.idEventoCreado) {
       try {
-  
+
         const evtRes = await firstValueFrom(this.eventosService.obtenerEvento(this.idEventoCreado));
         if (!evtRes?.success || !evtRes.data) {
           throw new Error('No se pudo obtener el evento actual');
@@ -434,7 +441,7 @@ cambiarConsumidorFinal(event: Event): void {
           console.warn('Servidor no confirmó actualización:', updateResponse);
         }
 
- 
+
 
       } catch (err: any) {
         console.error('❌ Error crítico al actualizar estado de impresión:', err);
@@ -756,7 +763,116 @@ cambiarConsumidorFinal(event: Event): void {
   }
 
   // INICIO FUNCION PARA GUARDAR EVENTO
-  guardarEvento(): void {
+  /**
+   * ==========================================================
+   * VALIDACIÓN REGLA DE NEGOCIO: CONFIRMACIÓN DE EVENTO (ESTADO 4)
+   * ==========================================================
+   * No se permite pasar a estado CONFIRMADO (ID: 4) mientras:
+   * 1. La forma de pago sea "SIN PAGO (COTIZACION)" (ID: 8)
+   * 2. El tipo de movimiento sea "COTIZACION" (ID: 5)
+   * 3. No existan pagos reales activos que hayan generado ingresos a la empresa.
+   */
+  async validarRequisitosConfirmacion(): Promise<boolean> {
+    if (!this.idEventoCreado) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'No se puede confirmar',
+          mensaje: 'Debe guardar el evento y registrar un pago real en la pestaña de Pago antes de poder confirmarlo.',
+          tipo: 'warning',
+          icon: 'warning',
+        },
+      });
+      return false;
+    }
+
+    try {
+      const res = await firstValueFrom(this.pagosService.obtenerPagos(this.idEventoCreado));
+      const pagosActivos = (res?.data || []).filter((p: any) => p.estado === 1);
+
+      if (pagosActivos.length === 0) {
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'No se puede confirmar',
+            mensaje: 'El evento no tiene ningún pago registrado. Para autorizarlo en Golden Garden debe registrar un pago real que genere ingresos a la empresa.',
+            tipo: 'warning',
+            icon: 'warning',
+          },
+        });
+        return false;
+      }
+
+      // Validar si algún pago activo tiene forma de pago 8 o tipo de movimiento 5
+      const pagoCotizacion = pagosActivos.find((p: any) => {
+        const idFormaPago = Number(p.id_forma_pago || 0);
+        const idTipoMov = Number(p.id_Tipo_Movimiento || 0);
+        return idFormaPago === this.FORMA_PAGO_SIN_PAGO_COTIZACION || idTipoMov === this.TIPO_MOVIMIENTO_COTIZACION;
+      });
+
+      if (pagoCotizacion) {
+        const idFormaPago = Number(pagoCotizacion.id_forma_pago || 0);
+        const idTipoMov = Number(pagoCotizacion.id_Tipo_Movimiento || 0);
+
+        let motivo = '';
+        if (idFormaPago === this.FORMA_PAGO_SIN_PAGO_COTIZACION && idTipoMov === this.TIPO_MOVIMIENTO_COTIZACION) {
+          motivo = 'la forma de pago es "SIN PAGO (COTIZACION)" y el tipo de movimiento es "COTIZACION".';
+        } else if (idFormaPago === this.FORMA_PAGO_SIN_PAGO_COTIZACION) {
+          motivo = 'la forma de pago registrada es "SIN PAGO (COTIZACION)".';
+        } else {
+          motivo = 'el tipo de movimiento registrado es "COTIZACION".';
+        }
+
+        this.dialog.open(AlertGenericComponent, {
+          width: '450px',
+          data: {
+            titulo: 'Autorización Bloqueada',
+            mensaje: `No se puede confirmar este evento porque ${motivo} Solo se pueden pasar a autorizados eventos que ya cuenten con una forma de pago que genere un ingreso real a Golden Garden.`,
+            tipo: 'warning',
+            icon: 'warning',
+          },
+        });
+        return false;
+      }
+
+      return true;
+    } catch (err: any) {
+      console.error('❌ Error al validar pagos del evento para confirmación:', err);
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Error de verificación',
+          mensaje: 'Ocurrió un error al verificar los pagos del evento. Por favor intente nuevamente.',
+          tipo: 'error',
+          icon: 'error',
+        },
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Listener para cuando el usuario cambia el estado en el selector de la interfaz.
+   * Si intenta seleccionar CONFIRMADO (ID: 4), valida de inmediato las reglas de negocio.
+   */
+  async onEstadoChange(nuevoEstado: any): Promise<void> {
+    const estadoNum = Number(nuevoEstado);
+    if (estadoNum === this.ESTADO_CONFIRMADO) {
+      const puedeConfirmar = await this.validarRequisitosConfirmacion();
+      if (!puedeConfirmar) {
+        // Revertir el valor en la UI al estado anterior
+        setTimeout(() => {
+          this.pEstadoEvento = this.estadoAnterior;
+        });
+        return;
+      }
+    }
+    // Si la validación pasa o no es estado 4, guardamos el nuevo estado anterior
+    this.estadoAnterior = estadoNum;
+  }
+
+  // INICIO FUNCION PARA GUARDAR EVENTO
+  async guardarEvento(): Promise<void> {
     if (!this.pTituloEvento || this.pTituloEvento.trim() === '') {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
@@ -781,6 +897,15 @@ cambiarConsumidorFinal(event: Event): void {
         },
       });
       return;
+    }
+
+    // VALIDACIÓN DE REGLA DE NEGOCIO PARA ESTADO CONFIRMADO (ID: 4)
+    if (Number(this.pEstadoEvento) === this.ESTADO_CONFIRMADO) {
+      const puedeConfirmar = await this.validarRequisitosConfirmacion();
+      if (!puedeConfirmar) {
+        this.pEstadoEvento = this.estadoAnterior;
+        return;
+      }
     }
 
     const body = {
@@ -906,7 +1031,7 @@ cambiarConsumidorFinal(event: Event): void {
   // ==========================================================
   // CARGAR EVENTO POR ID (CON CLIENTE)
   // ==========================================================
-cargarEventoPorId(id: number | null): void {
+  cargarEventoPorId(id: number | null): void {
     if (!id) return;
 
     this.isLoading = true; // 👈 activar pantalla de carga
@@ -941,6 +1066,7 @@ cargarEventoPorId(id: number | null): void {
           // ESTADO DOCUMENTO Y METADATOS
           // =========================
           this.pEstadoEvento = evento.estado;
+          this.estadoAnterior = evento.estado;
           this.pFechaCreacion = evento.fecha_Hora ? this.formatearFecha(evento.fecha_Hora) : '';
           this.pUsuarioCreacion = evento.username || '';
           this.pFechaModificacion = evento.m_Fecha_Hora ? this.formatearFecha(evento.m_Fecha_Hora) : '';
@@ -1184,6 +1310,7 @@ cargarEventoPorId(id: number | null): void {
 
     // estado por defecto ACTIVO
     this.pEstadoEvento = 1;
+    this.estadoAnterior = 1;
 
     // bloquear cambio de estado en nuevos
     this.modoEdicion = false;
@@ -1487,8 +1614,6 @@ cargarEventoPorId(id: number | null): void {
     // CONSUMO DE SERVICIO CREAR CLIENTE (api crear cliente)
     // ==========================================================
 
-console.log('NIT ingresado:', this.clienteForm.nit);
-console.log('NIT enviado al API:', body.nit);
 
 
     this.clientesService.insertCliente(body).subscribe({

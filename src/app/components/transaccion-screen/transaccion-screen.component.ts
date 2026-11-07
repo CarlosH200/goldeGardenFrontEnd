@@ -114,7 +114,6 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
 
   actualizarTotal(): void {
 
-    // console.log('EMITIENDO TOTAL:', this.totalGeneral);
 
     this.totalGeneralChange.emit(this.totalGeneral);
 
@@ -452,7 +451,6 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
         next: (res) => {
 
           if (res?.success) {
-            console.log('TRANSACCIONES RAW RES.DATA:', res.data);
 
             const rawItems = res.data;
 
@@ -471,10 +469,7 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
                   });
                 }
 
-                console.log('%c======================================================', 'color: yellow; font-size: 16px; font-weight: bold;');
-                console.log('%c🔍 DIAGNÓSTICO DE PRODUCTOS Y VIÑETAS', 'color: #00ff00; font-size: 18px; font-weight: bold;');
-                console.log('📦 Total productos en catálogo:', prodRes?.data?.length);
-                console.log('📦 Total transacciones en evento:', rawItems?.length);
+
 
                 this.transacciones = rawItems
                   .map((t: any) => {
@@ -504,15 +499,9 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
                       t.observacion_1 ||
                       '';
 
-                    console.log('   Objeto completo en catálogo prodMatch:', prodMatch);
                     if (idProd === 10) {
-                      console.log('%c🔍 DISCOTECA MOVIL KEYS:', 'color: orange; font-weight: bold;', Object.keys(prodMatch || {}));
-                      console.log('%c🔍 DISCOTECA MOVIL JSON:', 'color: orange;', JSON.stringify(prodMatch));
                     }
 
-                    console.log(`%c👉 Producto: [${t.descripcion}] | ID_Producto: ${idProd}`, 'color: cyan; font-weight: bold;');
-                    console.log('   Encontrado en Catálogo?:', prodMatch ? 'SÍ' : 'NO');
-                    console.log('   Observación 1 obtenida:', obsProd ? obsProd : '(VACÍA / NULL)');
 
                     return {
                       id: t.id || t.id_producto || null,
@@ -527,7 +516,6 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
                   })
                   .sort((a: any, b: any) => (a.id ?? 0) - (b.id ?? 0));
 
-                console.log('%c======================================================', 'color: yellow; font-size: 16px; font-weight: bold;');
 
                 this.actualizarTotal();
                 this.checkPaymentsAndLock();
@@ -571,89 +559,89 @@ export class TransaccionScreenComponent implements OnInit, OnChanges, OnDestroy 
 
 
 
-// ==========================================================
-// ELIMINAR PRODUCTO
-// ==========================================================
-eliminarProducto(index: number) {
-  const transaccion = this.transacciones[index];
-  if (!transaccion) return;
+  // ==========================================================
+  // ELIMINAR PRODUCTO
+  // ==========================================================
+  eliminarProducto(index: number) {
+    const transaccion = this.transacciones[index];
+    if (!transaccion) return;
 
-  // 🚫 Validación: documento bloqueado
-  if (this.isLocked) {
-    this.dialog.open(AlertGenericComponent, {
-      width: '450px',
-      data: {
-        titulo: 'Documento bloqueado',
-        mensaje: 'Debes desbloquear el documento para poder eliminar una transacción.',
-        tipo: 'warning',
-        icon: 'lock',
-      },
-    });
-    return;
-  }
-
-  // 👇 Abrimos el diálogo con botones Cancelar/Aceptar
-  const dialogRef = this.dialog.open(AlertGenericComponent, {
-    width: '450px',
-    data: {
-      titulo: 'Confirmar eliminación',
-      mensaje: '¿Estás seguro de eliminar esta transacción?',
-      tipo: 'warning',
-      icon: 'warning',
-      mostrarBotones: true
-    },
-  });
-
-  dialogRef.afterClosed().subscribe((resultado) => {
-    if (resultado !== 'confirmar' && resultado !== true) {
+    // 🚫 Validación: documento bloqueado
+    if (this.isLocked) {
+      this.dialog.open(AlertGenericComponent, {
+        width: '450px',
+        data: {
+          titulo: 'Documento bloqueado',
+          mensaje: 'Debes desbloquear el documento para poder eliminar una transacción.',
+          tipo: 'warning',
+          icon: 'lock',
+        },
+      });
       return;
     }
 
-    if (transaccion.id) {
-      this.transaccionesService.eliminarTransaccion(
-        transaccion.id,
-        this.authService.getUsername()
-      ).subscribe({
-        next: (res) => {
-          if (res?.success) {
-            this.transacciones.splice(index, 1);
-            setTimeout(() => {
-              this.actualizarTotal();
-              this.cdr.detectChanges();
-            });
+    // 👇 Abrimos el diálogo con botones Cancelar/Aceptar
+    const dialogRef = this.dialog.open(AlertGenericComponent, {
+      width: '450px',
+      data: {
+        titulo: 'Confirmar eliminación',
+        mensaje: '¿Estás seguro de eliminar esta transacción?',
+        tipo: 'warning',
+        icon: 'warning',
+        mostrarBotones: true
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado !== 'confirmar' && resultado !== true) {
+        return;
+      }
+
+      if (transaccion.id) {
+        this.transaccionesService.eliminarTransaccion(
+          transaccion.id,
+          this.authService.getUsername()
+        ).subscribe({
+          next: (res) => {
+            if (res?.success) {
+              this.transacciones.splice(index, 1);
+              setTimeout(() => {
+                this.actualizarTotal();
+                this.cdr.detectChanges();
+              });
+              this.dialog.open(AlertGenericComponent, {
+                width: '450px',
+                data: {
+                  titulo: 'Transacción eliminada',
+                  mensaje: 'La transacción fue eliminada correctamente.',
+                  tipo: 'success',
+                  icon: 'check_circle',
+                },
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Error eliminando transacción:', err);
             this.dialog.open(AlertGenericComponent, {
               width: '450px',
               data: {
-                titulo: 'Transacción eliminada',
-                mensaje: 'La transacción fue eliminada correctamente.',
-                tipo: 'success',
-                icon: 'check_circle',
+                titulo: 'Error',
+                mensaje: err?.error?.mensaje || 'Error al eliminar la transacción',
+                tipo: 'error',
+                icon: 'error',
               },
             });
-          }
-        },
-        error: (err) => {
-          console.error('Error eliminando transacción:', err);
-          this.dialog.open(AlertGenericComponent, {
-            width: '450px',
-            data: {
-              titulo: 'Error',
-              mensaje: err?.error?.mensaje || 'Error al eliminar la transacción',
-              tipo: 'error',
-              icon: 'error',
-            },
-          });
-        },
-      });
-    } else {
-      this.transacciones.splice(index, 1);
-      setTimeout(() => {
-        this.actualizarTotal();
-        this.cdr.detectChanges();
-      });
-    }
-  });
-}
+          },
+        });
+      } else {
+        this.transacciones.splice(index, 1);
+        setTimeout(() => {
+          this.actualizarTotal();
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
 
 
 
@@ -749,7 +737,7 @@ eliminarProducto(index: number) {
     if (!texto || !texto.trim()) return [];
     // Si viene del formato anterior "Cantidad: X", ignorarlo
     if (/^cantidad:\s*\d+/i.test(texto.trim())) return [];
-    
+
     // Si contiene '*', dividir por '*'
     if (texto.includes('*')) {
       return texto

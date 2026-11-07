@@ -117,7 +117,6 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
         this.lockSub = this.documentLockService
           .isLocked$(this.idEvento)
           .subscribe((v) => {
-            console.log('[FormaPago] lock state for', this.idEvento, v);
             this.isLocked = v;
           });
       } else {
@@ -126,7 +125,6 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     if (changes['cliente']) {
-      // console.log('CLIENTE RECIBIDO EN FORMA PAGO:', this.cliente);
     }
   }
 
@@ -140,7 +138,6 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.lockSub = this.documentLockService
         .isLocked$(this.idEvento)
         .subscribe((v) => {
-          console.log('[FormaPago] lock state for', this.idEvento, v);
           this.isLocked = v;
         });
     }
@@ -266,7 +263,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
- cargarFormasPago(): void {
+  cargarFormasPago(): void {
     this.formaPagoService.getFormasPago().subscribe({
       next: (response) => {
         this.formasPago = response;
@@ -305,7 +302,6 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   agregarPago(): void {
-    console.log('Estado del lock al intentar agregar:', this.isLocked);
 
     if (this.isLocked) {
       this.dialog.open(AlertGenericComponent, {
@@ -409,11 +405,9 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       id_Cuenta_Bancaria: Number(this.cuentaSeleccionada),
     };
 
-    console.log('BODY PAGO:', body);
 
     this.pagosService.insertarPago(body).subscribe({
       next: (response) => {
-        console.log('Pago insertado', response);
 
         // Agregado optimista local
         const pagoLocal: PagoModel = {

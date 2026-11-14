@@ -1024,7 +1024,7 @@ export class DocumentoScreenComponent implements OnChanges {
       return;
     }
 
-    this.isLoading = true; // 👈 activar pantalla de carga
+    this.isLoading = true; // activar pantalla de carga
     this.cargarEventoPorId(this.idEventoCreado);
   }
 
@@ -1034,7 +1034,7 @@ export class DocumentoScreenComponent implements OnChanges {
   cargarEventoPorId(id: number | null): void {
     if (!id) return;
 
-    this.isLoading = true; // 👈 activar pantalla de carga
+    this.isLoading = true; // activar pantalla de carga
 
     this.eventosService.obtenerEvento(id).subscribe({
       next: (res: any) => {
@@ -1135,7 +1135,7 @@ export class DocumentoScreenComponent implements OnChanges {
           }, 1000);
 
         } else {
-          // 🛑 Diálogo cuando el servidor responde pero el evento no existe
+          // Diálogo cuando el servidor responde pero el evento no existe
           this.dialog.open(AlertGenericComponent, {
             width: '450px',
             data: {

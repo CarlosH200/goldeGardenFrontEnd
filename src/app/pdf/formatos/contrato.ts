@@ -65,7 +65,7 @@ export function generarContratoTemplate(data: any): TDocumentDefinitions {
             width: 'auto',
             stack: [
               ...(data.logo ? [{ image: data.logo, width: 100, margin: [0, 0, 0, 10] as [number, number, number, number] }] : []),
-              { text: data.empresa?.nombre || 'GOLDEN GARDEN', style: 'headerEmpresa' },
+              { text: data.empresa?.nombre || '   GOLDEN GARDEN', style: 'headerEmpresa' },
               { text: 'JARDÍN DE EVENTOS', style: 'subHeaderEmpresa' },
               { text: data.empresa?.direccion || '4ta. Avenida y 4ta. Calle, Barrio Asunción, Tecpán Guatemala, Chimaltenango', style: 'datosEmpresa' },
               { text: `Teléfono: ${data.empresa?.telefono || '32861562'}`, style: 'datosEmpresa' },

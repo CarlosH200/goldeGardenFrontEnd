@@ -94,10 +94,10 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.eventoData = null;
     this.transacciones = [];
     this.pagos = [];
-    this.montoPago = 0;
+    this.montoPago = this.saldoPendiente;
     this.referencia = '';
     this.autorizacion = '';
-    this.tipoMovimientoSeleccionado = '';
+    this.tipoMovimientoSeleccionado = this.tiposMovimiento[0]?.id?.toString() ?? '';
     this.formaPagoSeleccionada = this.formasPago[0]?.id?.toString() ?? '';
     this.bancoSeleccionado = this.bancos[0]?.id?.toString() ?? '';
     this.cuentaSeleccionada = this.cuentasEmpresa[0]?.id?.toString() ?? '';
@@ -303,7 +303,7 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   agregarPago(): void {
 
-    if (this.isLocked) {
+    if (this.isLocked){
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
@@ -315,7 +315,8 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       });
       return;
     }
-
+    
+   
     if (!this.idEvento) {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
@@ -359,10 +360,10 @@ export class FormaPagoScreenComponent implements OnInit, OnChanges, OnDestroy {
       this.dialog.open(AlertGenericComponent, {
         width: '450px',
         data: {
-          titulo: 'Sin saldo pendiente',
+          titulo: 'Evento sin saldo pendiente',
           mensaje: 'No hay saldo pendiente por pagar en este evento.',
           tipo: 'info',
-          icon: 'info',
+          icon: 'account_balance',
         },
       });
       return;
